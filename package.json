@@ -1,0 +1,20 @@
+{
+  "name": "sunclock",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Sun Clock — die Uhr, die zeigt, wie weit die soziale Zeit von der Sonnenzeit entfernt ist. Phase-1-MVP (Web-Target).",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10",
+    "vitest": "^2.1.4"
+  }
+}

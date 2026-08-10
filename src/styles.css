@@ -1,0 +1,367 @@
+/* Sun Clock — Wabi-Tech (Spec §11): Reduktion, viel Leerraum, feine Linien,
+   Kreisformen dominant. Farben kommen als CSS-Variablen aus der Theme-Engine. */
+
+:root {
+  --bg: #f7f5f0;
+  --surface: #ffffff;
+  --accent: #c94f3d;
+  --secondary: #2b3a42;
+  --text: #1a1a1a;
+  --text-dim: #6b6b6b;
+  --wall-brightness: 1;
+  --wall-drift-x: 0px;
+  --wall-drift-y: 0px;
+
+  --font-head: 'Space Grotesk', system-ui, sans-serif;
+  --font-ui: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  transition:
+    background 1.2s ease,
+    color 1.2s ease;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  min-height: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.frame {
+  width: 100%;
+  max-width: 480px;
+  min-height: 100vh;
+  padding: 20px 20px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  filter: brightness(var(--wall-brightness));
+  transition: filter 2s ease;
+}
+
+/* Topbar */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand__mark {
+  font-size: 22px;
+  color: var(--accent);
+}
+
+.brand__name {
+  font-family: var(--font-head);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.brand__tag {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.topbar__actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Buttons */
+.btn {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.btn--ghost {
+  background: transparent;
+  border-color: color-mix(in srgb, var(--text-dim) 45%, transparent);
+  color: var(--text);
+}
+
+.btn--ghost:hover {
+  border-color: var(--text);
+}
+
+.btn--primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Stage */
+.stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.dial-wrap {
+  width: min(78vw, 340px);
+  aspect-ratio: 1;
+  transform: translate(var(--wall-drift-x), var(--wall-drift-y));
+  transition: transform 4s ease;
+}
+
+.dial {
+  overflow: visible;
+}
+
+/* Readout */
+.readout {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.readout__label {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-right: 8px;
+}
+
+.readout__time {
+  font-family: var(--font-mono);
+  font-size: 40px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.readout__solar {
+  margin-top: 2px;
+}
+
+.readout__solar-time {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  color: var(--accent);
+}
+
+.offset {
+  margin: 10px 0 0;
+  font-size: 15px;
+  font-weight: 500;
+  max-width: 34ch;
+  margin-inline: auto;
+}
+
+.offset__explain {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--text-dim);
+  max-width: 40ch;
+  margin-inline: auto;
+}
+
+/* Sky strip */
+.sky {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  border-top: 1px solid color-mix(in srgb, var(--text-dim) 30%, transparent);
+  padding-top: 16px;
+}
+
+.sky__cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: center;
+}
+
+.sky__k {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.sky__v {
+  font-family: var(--font-mono);
+  font-size: 17px;
+}
+
+.sky__sub {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* Location bar */
+.locbar {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.loc {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.loc__pin {
+  filter: grayscale(0.2);
+}
+
+.loc-search {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.loc-search input {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--text-dim) 45%, transparent);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-ui);
+}
+
+.loc__msg {
+  font-size: 12px;
+  color: var(--accent);
+  margin: 0;
+  text-align: center;
+}
+
+/* Onboarding */
+.onboard {
+  position: fixed;
+  inset: 0;
+  background: color-mix(in srgb, var(--bg) 92%, #000);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 50;
+}
+
+.onboard__card {
+  background: var(--surface);
+  border-radius: 24px;
+  padding: 36px 28px 24px;
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+}
+
+.onboard__glyph {
+  font-size: 44px;
+  margin-bottom: 12px;
+}
+
+.onboard__title {
+  font-family: var(--font-head);
+  font-size: 22px;
+  margin: 0 0 10px;
+}
+
+.onboard__body {
+  color: var(--text-dim);
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0 0 22px;
+}
+
+.onboard__dots {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  margin-bottom: 20px;
+}
+
+.onboard__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--text-dim) 40%, transparent);
+}
+
+.onboard__dot.is-active {
+  background: var(--accent);
+}
+
+.onboard__actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Wall mode (§25) */
+#app.is-wall .topbar,
+#app.is-wall .sky,
+#app.is-wall .locbar {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+#app.is-wall.wall-peek .topbar,
+#app.is-wall.wall-peek .sky,
+#app.is-wall.wall-peek .locbar {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#app.is-wall .frame {
+  justify-content: center;
+}
+
+/* Reduce motion (§13) */
+@media (prefers-reduced-motion: reduce) {
+  body,
+  .frame,
+  .dial-wrap {
+    transition: none;
+  }
+}
