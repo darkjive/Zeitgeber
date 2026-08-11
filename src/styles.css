@@ -1035,6 +1035,57 @@ body {
   color: var(--text-dim);
 }
 
+/* Meteorschauer-Panel (§21) */
+.onboard__card.meteor {
+  text-align: left;
+  max-width: 420px;
+}
+
+.meteor__list {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+}
+
+.meteor__row {
+  padding: 10px 8px;
+  border-radius: 8px;
+  border-bottom: 1px solid color-mix(in srgb, var(--text-dim) 16%, transparent);
+}
+
+.meteor__row.is-active {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border-bottom-color: transparent;
+}
+
+.meteor__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.meteor__name {
+  font-size: 15px;
+  color: var(--text);
+}
+
+.meteor__badge {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #fff;
+  background: var(--accent);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+
+.meteor__meta {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 3px;
+}
+
 /* Wall mode (§25) */
 #app.is-wall .topbar,
 #app.is-wall .sky,

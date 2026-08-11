@@ -44,6 +44,7 @@ import { openGarden, openArchitecture } from './features/sun-hours-panels';
 import { openComfort } from './features/comfort';
 import { openWildlife } from './features/wildlife';
 import { openDrone } from './features/drone';
+import { openMeteorShowers } from './features/meteor-showers';
 import { openModuleMenu, type ModuleEntry } from './features/module-menu';
 import {
   azimuthDirKey,
@@ -419,6 +420,7 @@ function wireEvents(): void {
       { labelKey: 'arch.button', glyph: '🏠', open: () => openArchitecture(location, now, t) },
       { labelKey: 'garden.button', glyph: '🌱', open: () => openGarden(location, now, t) },
       { labelKey: 'wildlife.button', glyph: '🦊', open: () => openWildlife(location, now, t) },
+      { labelKey: 'meteor.button', glyph: '☄️', open: () => openMeteorShowers(location, now, t) },
       { labelKey: 'drone.button', glyph: '🚁', open: () => openDrone(location, now, t) },
       { labelKey: 'prayer.button', glyph: '🕌', open: () => openPrayerTimes(location, now, t) },
       { labelKey: 'wheel.button', glyph: '☀', open: () => openWheelOfYear(now, t) },

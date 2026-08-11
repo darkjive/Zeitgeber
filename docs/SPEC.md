@@ -1120,13 +1120,14 @@ umsetzt; ein nativer Aufsatz (React Native + Expo) teilt sich diese Ebene.
 | Wetter (28), Outdoor (29), Teilen/Export (33), Wandmodus-Grundfunktion (25) | umgesetzt |
 | `solar-yield` (31.1), `garden` (31.2), `architecture` (31.3), `drone` (31.4), `wildlife` (31.5), `comfort` (31.8) | umgesetzt |
 | `prayer-times` (32.1), `wheel-of-year` (32.2) | umgesetzt |
+| Meteorschauer (21), acht Hauptströme mit Radiant-Höhe | umgesetzt |
 | Onboarding (14), i18n DE/EN (15), Barrierefreiheit-Grundgerüst (13), Fehlerzustände (10) | umgesetzt |
 | Info-/Spenden-Bereich (36, 38.3) | umgesetzt |
 | Modul-Menü (11.5) | umgesetzt |
 
 ### 40.2 Noch offen
 
-- **Provider:** Satelliten/ISS (20), Flugzeuge (20), Deep Sky (19), Kometen (21), Meteorschauer (21)
+- **Provider:** Satelliten/ISS (20), Flugzeuge (20), Deep Sky (19), Kometen (21)
 - **Ansichten:** Kamera-Liveview (23, nur nativ, 38.2)
 - **Fähigkeiten:** dynamischer Wecker (27, bewusst nicht auf Web, 27.2), Klangebene (16), Kinder-Layer (30), antike Stunden
 - **Widgets** (25) und **Smarthome-Begleitdienst** `sunclock-bridge` (34)

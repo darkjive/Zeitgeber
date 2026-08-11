@@ -67,6 +67,7 @@ in allen Ansichten.
 | Hitze & Lüften | wann lüften, wann Rolläden schließen – Sonnengeometrie, optional mit Außentemperatur |
 | Wildtiere | Dämmerungsaktivität und Mondlicht (ohne Solunar-Theorie) |
 | Drohne | Lichtfenster für heute mit Countdown und Rechtshinweis |
+| Meteorschauer | die acht Hauptströme, aktiv/kommend, Radiant-Höhe und Mondstörung |
 | Gebetszeiten | etablierte Konventionen (auswählbar, mit Quelle), reine Zeitangabe |
 | Jahreskreis | Sonnenwenden, Tagundnachtgleichen und Zwischenfeste als exakter astronomischer Zeitpunkt |
 | Wetter | Beobachtungseignung über Open-Meteo, mit Offline-Rückfall |
@@ -125,6 +126,7 @@ src/
     wheel-of-year.ts     Sonnenwenden/Tagundnachtgleichen als exakte Zeitpunkte
     sun-hours.ts         direkte Sonnenstunden, Fassade & Verschattung
     comfort.ts           Hitzeschutz: Rolläden & Lüften (Geometrie + Temperatur)
+    meteor-showers.ts    die acht Hauptströme, Radiant-Höhe, Aktivität
     object-bus.ts        aggregiert aktive Provider, Fehlerisolierung pro Modul
     location.ts          GPS, manuelle Eingabe, lokale Persistenz
   providers/           Achse A – sun, moon, planets, stars
