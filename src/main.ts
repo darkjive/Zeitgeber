@@ -26,8 +26,10 @@ import { sunTimes } from './core/astro-engine';
 import { sunProvider } from './providers/sun';
 import { moonProvider } from './providers/moon';
 import { planetsProvider } from './providers/planets';
+import { starsProvider } from './providers/stars';
 import { renderDial } from './views/dial';
 import { renderObjectList } from './views/object-list';
+import { renderSkyMap } from './views/sky-map';
 import { showOnboarding, hasOnboarded } from './features/onboarding';
 import { WallMode } from './features/wallmode';
 import { fetchWeather, observationRating, type WeatherNow } from './features/weather';
@@ -50,10 +52,12 @@ const bus = new ObjectBus();
 bus.register(sunProvider);
 bus.register(moonProvider);
 bus.register(planetsProvider); // optional, standardmäßig deaktiviert (§7.4)
+bus.register(starsProvider); // optional, standardmäßig deaktiviert (§7.4)
 
 const app = document.getElementById('app') as HTMLElement;
 let wall: WallMode;
-let currentView: 'dial' | 'list' = 'dial';
+type ViewId = 'dial' | 'list' | 'map';
+let currentView: ViewId = 'dial';
 let weather: WeatherNow | null = null;
 
 // --- Formatierung -----------------------------------------------------------
@@ -94,9 +98,13 @@ app.innerHTML = `
     <div class="controls">
       <div class="seg" role="tablist">
         <button class="seg__btn is-active" id="view-dial" data-i18n="view.dial"></button>
+        <button class="seg__btn" id="view-map" data-i18n="view.map"></button>
         <button class="seg__btn" id="view-list" data-i18n="view.list"></button>
       </div>
-      <button class="chip" id="planets-toggle" aria-pressed="false" data-i18n="layer.planets"></button>
+      <div class="layers">
+        <button class="chip" id="planets-toggle" aria-pressed="false" data-i18n="layer.planets"></button>
+        <button class="chip" id="stars-toggle" aria-pressed="false" data-i18n="layer.stars"></button>
+      </div>
     </div>
 
     <main class="stage">
@@ -179,10 +187,14 @@ function render(now: Date): void {
   applyPalette(palette);
   wall?.setNightness(nightness);
 
-  // Ansicht (Achse B): Zifferblatt oder Objektliste
+  // Ansicht (Achse B): Zifferblatt, Himmelskarte oder Objektliste
   const wrap = $('#view-wrap');
   if (currentView === 'dial') {
     const { svg } = renderDial({ time: now, location, tzOffsetMinutes: tz, objects, t });
+    wrap.replaceChildren(svg);
+    $('#readout').hidden = false;
+  } else if (currentView === 'map') {
+    const { svg } = renderSkyMap(objects, t);
     wrap.replaceChildren(svg);
     $('#readout').hidden = false;
   } else {
@@ -274,10 +286,20 @@ function setLocation(loc: GeoLocation): void {
   void refreshWeather(); // §28: Wetter am neuen Ort neu holen
 }
 
-function setView(view: 'dial' | 'list'): void {
+function setView(view: ViewId): void {
   currentView = view;
   $('#view-dial').classList.toggle('is-active', view === 'dial');
+  $('#view-map').classList.toggle('is-active', view === 'map');
   $('#view-list').classList.toggle('is-active', view === 'list');
+  render(new Date());
+}
+
+function toggleLayer(id: 'planets' | 'stars', btnSel: string): void {
+  const on = !bus.isEnabled(id);
+  bus.setEnabled(id, on);
+  const btn = $(btnSel);
+  btn.classList.toggle('is-on', on);
+  btn.setAttribute('aria-pressed', String(on));
   render(new Date());
 }
 
@@ -285,16 +307,11 @@ function wireEvents(): void {
   $('#lang-toggle').addEventListener('click', () => setLang(lang === 'de' ? 'en' : 'de'));
 
   $('#view-dial').addEventListener('click', () => setView('dial'));
+  $('#view-map').addEventListener('click', () => setView('map'));
   $('#view-list').addEventListener('click', () => setView('list'));
 
-  $('#planets-toggle').addEventListener('click', () => {
-    const on = !bus.isEnabled('planets');
-    bus.setEnabled('planets', on);
-    const btn = $('#planets-toggle');
-    btn.classList.toggle('is-on', on);
-    btn.setAttribute('aria-pressed', String(on));
-    render(new Date());
-  });
+  $('#planets-toggle').addEventListener('click', () => toggleLayer('planets', '#planets-toggle'));
+  $('#stars-toggle').addEventListener('click', () => toggleLayer('stars', '#stars-toggle'));
 
   $('#wall-toggle').addEventListener('click', async () => {
     if (wall.isActive) wall.exit();

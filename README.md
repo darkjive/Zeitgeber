@@ -40,6 +40,8 @@ dem Ziel von 500 KB Initial-Load (§35).
 | §12 Theme-Engine | kontinuierliche Tag/Nacht-Interpolation nach Sonnenhöhe, echter Nachtsicht-Modus |
 | §17 Provider Sonne & Mond | Core-Provider, nicht deaktivierbar |
 | §18 Provider Planeten | Merkur…Neptun, Helligkeit/Elongation, optional (Layer-Toggle) |
+| §19 Provider Sterne | helle benannte Fixsterne (J2000), optional |
+| §24 Ansicht Himmelskarte | 2D-Allsky, auf Web die Hauptansicht (§38.2) |
 | §24 Ansicht Objektliste | „Heute Nacht sichtbar", sortiert nach Höhe |
 | §28 Wetter | Open-Meteo, Beobachtungseignung, Offline-Fallback |
 | §14 Onboarding | vier überspringbare Bildschirme |
@@ -61,8 +63,9 @@ src/
     location.ts        GPS, manuelle Eingabe, lokale Persistenz
     types.ts           CelestialObject / ObjectProvider / SkyView (§7.2/7.3)
     planets.ts         geozentrische Planetenpositionen (Keplerelemente)
-  providers/           Achse A — sun, moon, planets
-  views/               Achse B — dial, object-list
+    stars.ts           heller Fixstern-Katalog (J2000) + Transformation
+  providers/           Achse A — sun, moon, planets, stars
+  views/               Achse B — dial, sky-map, object-list
   features/            Achse C — onboarding, wallmode, weather
   i18n/                DE/EN
   main.ts              App-Shell, verdrahtet die drei Achsen

@@ -21,10 +21,15 @@ const de: Dict = {
   'object.saturn': 'Saturn',
   'object.uranus': 'Uranus',
   'object.neptune': 'Neptun',
+  'object.star': 'Stern',
 
   'layer.planets': 'Planeten',
+  'layer.stars': 'Sterne',
   'view.dial': 'Zifferblatt',
   'view.list': 'Liste',
+  'view.map': 'Karte',
+
+  'map.a11y': 'Himmelskarte: {count} Objekte über dem Horizont, darunter {objects}. Hellster Stern: {star}.',
 
   'list.empty': 'Gerade ist nichts über dem Horizont.',
   'list.optics': 'nur mit Optik',
@@ -121,10 +126,15 @@ const en: Dict = {
   'object.saturn': 'Saturn',
   'object.uranus': 'Uranus',
   'object.neptune': 'Neptune',
+  'object.star': 'Star',
 
   'layer.planets': 'Planets',
+  'layer.stars': 'Stars',
   'view.dial': 'Dial',
   'view.list': 'List',
+  'view.map': 'Map',
+
+  'map.a11y': 'Sky map: {count} objects above the horizon, including {objects}. Brightest star: {star}.',
 
   'list.empty': 'Nothing above the horizon right now.',
   'list.optics': 'optics only',

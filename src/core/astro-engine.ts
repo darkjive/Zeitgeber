@@ -205,6 +205,23 @@ function gmst(date: Date): number {
   return mod360(280.46061837 + 360.98564736629 * d);
 }
 
+/**
+ * Äquatoriale (RA/Dec, J2000, Grad) → horizontale Koordinaten für Ort und Zeit.
+ * Geteilte Basis für Fixstern- und Deep-Sky-Provider (Spec §4:
+ * Koordinatentransformation über Greenwich Sidereal Time).
+ */
+export function equatorialToHorizontal(raDeg: number, decDeg: number, date: Date, loc: GeoLocation): HorizontalCoords {
+  const lst = mod360(gmst(date) + loc.longitude);
+  const ha = mod360(lst - raDeg) * RAD;
+  const latR = loc.latitude * RAD;
+  const decR = decDeg * RAD;
+  const elev = Math.asin(clamp(Math.sin(latR) * Math.sin(decR) + Math.cos(latR) * Math.cos(decR) * Math.cos(ha))) * DEG;
+  const az = mod360(
+    Math.atan2(Math.sin(ha), Math.cos(ha) * Math.sin(latR) - Math.tan(decR) * Math.cos(latR)) * DEG + 180,
+  );
+  return { elevation: elev + refraction(elev), azimuth: az };
+}
+
 export function moonInfo(date: Date, loc: GeoLocation): MoonInfo {
   const d = julianDay(date) - 2_451_543.5;
 

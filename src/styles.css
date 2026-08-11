@@ -149,6 +149,16 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+  flex-wrap: wrap;
+}
+
+.layers {
+  display: flex;
+  gap: 6px;
+}
+
+.skymap {
+  overflow: visible;
 }
 
 .seg {

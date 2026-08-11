@@ -40,7 +40,7 @@ export function renderObjectList(objects: CelestialObject[], t: Translator): HTM
 
     const name = document.createElement('span');
     name.className = 'objlist__name';
-    name.textContent = t(o.nameKey);
+    name.textContent = (o.metadata?.name as string) ?? t(o.nameKey);
     if (o.metadata?.needsOptics) {
       const optics = document.createElement('span');
       optics.className = 'objlist__tag';
