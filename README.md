@@ -51,8 +51,9 @@ nirgends gibt. Sun Clock zeigt ihn auf einem einzigen Zifferblatt.
 **Am Himmel**
 
 Sonne und Mond (immer aktiv), Planeten (Merkur–Neptun mit Helligkeit und
-Elongation) und helle benannte Fixsterne. Jeder Provider erscheint automatisch
-in allen Ansichten.
+Elongation), helle benannte Fixsterne und Deep-Sky-Highlights (kuratierter
+Messier-Katalog: Galaxien, Nebel, Sternhaufen). Jeder Provider erscheint
+automatisch in allen Ansichten.
 
 **Fähigkeiten**
 
@@ -119,6 +120,7 @@ src/
     theme-engine.ts      Zonen nach Sonnenhöhe, kontinuierliche Paletten
     planets.ts           geozentrische Planetenpositionen
     stars.ts             heller Fixstern-Katalog + Transformation
+    deep-sky.ts          kuratierter Messier-/NGC-Katalog
     solar-geometry.ts    Einstrahlungsgeometrie für PV
     prayer-times.ts      Gebetszeiten aus Sonnenhöhe
     chronobiology.ts     sozialer Jetlag & Chronotyp (MCTQ)
@@ -129,7 +131,7 @@ src/
     meteor-showers.ts    die acht Hauptströme, Radiant-Höhe, Aktivität
     object-bus.ts        aggregiert aktive Provider, Fehlerisolierung pro Modul
     location.ts          GPS, manuelle Eingabe, lokale Persistenz
-  providers/           Achse A – sun, moon, planets, stars
+  providers/           Achse A – sun, moon, planets, stars, deep-sky
   views/               Achse B – dial, sky-map, object-list
   features/            Achse C – onboarding, wallmode, weather, share, solar-yield,
                                  prayer-times, chronobiology, outdoor, wheel-of-year,

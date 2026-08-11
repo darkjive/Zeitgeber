@@ -70,6 +70,9 @@ export function renderSkyMap(objects: CelestialObject[], t: Translator): { svg: 
     if (o.kind === 'star') {
       const rad = Math.max(0.8, 2.6 - (o.magnitude ?? 2) * 0.7);
       svg.appendChild(el('circle', { cx: x, cy: y, r: rad, fill: palette.text, opacity: 0.85 }));
+    } else if (o.kind === 'dso') {
+      // Deep-Sky: kleiner offener Marker, ohne Beschriftung (Details in der Liste).
+      svg.appendChild(el('circle', { cx: x, cy: y, r: 3, fill: 'none', stroke: palette.secondary, 'stroke-width': 1.2, opacity: 0.8 }));
     } else if (o.kind === 'sun') {
       svg.appendChild(el('circle', { cx: x, cy: y, r: 9, fill: palette.accent }));
       addLabel(svg, x, y, objName(o, t), palette.text);

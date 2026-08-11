@@ -22,9 +22,11 @@ const de: Dict = {
   'object.uranus': 'Uranus',
   'object.neptune': 'Neptun',
   'object.star': 'Stern',
+  'object.dso': 'Deep-Sky-Objekt',
 
   'layer.planets': 'Planeten',
   'layer.stars': 'Sterne',
+  'layer.deepsky': 'Deep Sky',
   'view.dial': 'Zifferblatt',
   'view.list': 'Liste',
   'view.map': 'Karte',
@@ -302,9 +304,11 @@ const en: Dict = {
   'object.uranus': 'Uranus',
   'object.neptune': 'Neptune',
   'object.star': 'Star',
+  'object.dso': 'Deep-sky object',
 
   'layer.planets': 'Planets',
   'layer.stars': 'Stars',
+  'layer.deepsky': 'Deep sky',
   'view.dial': 'Dial',
   'view.list': 'List',
   'view.map': 'Map',

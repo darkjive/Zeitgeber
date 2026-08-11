@@ -12,6 +12,7 @@ const KIND_GLYPH: Record<string, string> = {
   moon: '🌙',
   planet: '🪐',
   star: '★',
+  dso: '✦',
 };
 
 export function renderObjectList(objects: CelestialObject[], t: Translator): HTMLElement {

@@ -27,6 +27,7 @@ import { sunProvider } from './providers/sun';
 import { moonProvider } from './providers/moon';
 import { planetsProvider } from './providers/planets';
 import { starsProvider } from './providers/stars';
+import { deepSkyProvider } from './providers/deep-sky';
 import { renderDial } from './views/dial';
 import { renderObjectList } from './views/object-list';
 import { renderSkyMap } from './views/sky-map';
@@ -66,6 +67,7 @@ bus.register(sunProvider);
 bus.register(moonProvider);
 bus.register(planetsProvider); // optional, standardmäßig deaktiviert (§7.4)
 bus.register(starsProvider); // optional, standardmäßig deaktiviert (§7.4)
+bus.register(deepSkyProvider); // optional, standardmäßig deaktiviert (§7.4)
 
 const app = document.getElementById('app') as HTMLElement;
 let wall: WallMode;
@@ -123,6 +125,7 @@ app.innerHTML = `
       <div class="layers">
         <button class="chip" id="planets-toggle" aria-pressed="false" data-i18n="layer.planets"></button>
         <button class="chip" id="stars-toggle" aria-pressed="false" data-i18n="layer.stars"></button>
+        <button class="chip" id="deepsky-toggle" aria-pressed="false" data-i18n="layer.deepsky"></button>
         <button class="chip" id="modules-open" data-i18n="modules.button"></button>
       </div>
     </div>
@@ -365,7 +368,7 @@ function setView(view: ViewId): void {
   rerender();
 }
 
-function toggleLayer(id: 'planets' | 'stars', btnSel: string): void {
+function toggleLayer(id: 'planets' | 'stars' | 'deep-sky', btnSel: string): void {
   const on = !bus.isEnabled(id);
   bus.setEnabled(id, on);
   const btn = $(btnSel);
@@ -383,6 +386,7 @@ function wireEvents(): void {
 
   $('#planets-toggle').addEventListener('click', () => toggleLayer('planets', '#planets-toggle'));
   $('#stars-toggle').addEventListener('click', () => toggleLayer('stars', '#stars-toggle'));
+  $('#deepsky-toggle').addEventListener('click', () => toggleLayer('deep-sky', '#deepsky-toggle'));
 
   // Zeitreise (§24)
   const stepBy = (ms: number) => {
