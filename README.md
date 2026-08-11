@@ -59,6 +59,8 @@ in allen Ansichten.
 | Sonnenzeit-Versatz | gesetzlicher vs. echter Mittag, live |
 | Outdoor & Survival | Restlicht-Countdown, blaue/goldene Stunde, Mondlicht-Prognose, Himmelsrichtung ohne Kompass |
 | Solarertrag | Modul-Ausrichtung/Neigung, Ertragsfenster, Sommer/Winter – reine Geometrie, keine kWh |
+| Fassade & Tageslicht | direkte Besonnung einer Fassade über den Tag – macht „Wohnung mit Nachmittagssonne" prüfbar |
+| Garten & Verschattung | Sonnenstunden am Standort, Verschattung durch Gebäude/Baum (Höhe & Abstand) |
 | Gebetszeiten | etablierte Konventionen (auswählbar, mit Quelle), reine Zeitangabe |
 | Jahreskreis | Sonnenwenden, Tagundnachtgleichen und Zwischenfeste als exakter astronomischer Zeitpunkt |
 | Wetter | Beobachtungseignung über Open-Meteo, mit Offline-Rückfall |
@@ -115,6 +117,7 @@ src/
     chronobiology.ts     sozialer Jetlag & Chronotyp (MCTQ)
     outdoor.ts           Restlicht, blaue/goldene Stunde, Mondlicht, Richtung
     wheel-of-year.ts     Sonnenwenden/Tagundnachtgleichen als exakte Zeitpunkte
+    sun-hours.ts         direkte Sonnenstunden, Fassade & Verschattung
     object-bus.ts        aggregiert aktive Provider, Fehlerisolierung pro Modul
     location.ts          GPS, manuelle Eingabe, lokale Persistenz
   providers/           Achse A – sun, moon, planets, stars

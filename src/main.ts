@@ -40,6 +40,8 @@ import { openChronobiology, currentChrono } from './features/chronobiology';
 import { openOutdoor } from './features/outdoor';
 import { openAbout } from './features/about';
 import { openWheelOfYear } from './features/wheel-of-year';
+import { openGarden, openArchitecture } from './features/sun-hours-panels';
+import { openModuleMenu, type ModuleEntry } from './features/module-menu';
 import {
   azimuthDirKey,
   createTranslator,
@@ -117,11 +119,7 @@ app.innerHTML = `
       <div class="layers">
         <button class="chip" id="planets-toggle" aria-pressed="false" data-i18n="layer.planets"></button>
         <button class="chip" id="stars-toggle" aria-pressed="false" data-i18n="layer.stars"></button>
-        <button class="chip" id="solar-open" data-i18n="solar.button"></button>
-        <button class="chip" id="prayer-open" data-i18n="prayer.button"></button>
-        <button class="chip" id="chrono-open" data-i18n="chrono.button"></button>
-        <button class="chip" id="outdoor-open" data-i18n="outdoor.button"></button>
-        <button class="chip" id="wheel-open" data-i18n="wheel.button"></button>
+        <button class="chip" id="modules-open" data-i18n="modules.button"></button>
       </div>
     </div>
 
@@ -407,23 +405,20 @@ function wireEvents(): void {
   // Teilen/Export (§33)
   $('#t-share').addEventListener('click', () => void exportCurrentView());
 
-  // Solar-Modul (§31.1) — Panel bei Bedarf, für aktuellen Ort und Zeitpunkt
-  $('#solar-open').addEventListener('click', () => openSolarYield(location, currentTime(), t));
-
-  // Gebetszeiten (§32.1) — Panel bei Bedarf
-  $('#prayer-open').addEventListener('click', () => openPrayerTimes(location, currentTime(), t));
-
-  // Chronobiologie (§26) — sozialer Jetlag, rein lokal; aktualisiert den Ring
-  $('#chrono-open').addEventListener('click', () => {
-    const off = solarOffset(currentTime(), location).minutes;
-    openChronobiology(off, t, () => rerender());
+  // Modul-Menü — bündelt die optionalen Fähigkeits-Panels (§7.4, §11)
+  $('#modules-open').addEventListener('click', () => {
+    const now = currentTime();
+    const entries: ModuleEntry[] = [
+      { labelKey: 'chrono.button', glyph: '🌙', open: () => openChronobiology(solarOffset(now, location).minutes, t, () => rerender()) },
+      { labelKey: 'outdoor.button', glyph: '🧭', open: () => openOutdoor(location, now, t) },
+      { labelKey: 'solar.button', glyph: '⚡', open: () => openSolarYield(location, now, t) },
+      { labelKey: 'arch.button', glyph: '🏠', open: () => openArchitecture(location, now, t) },
+      { labelKey: 'garden.button', glyph: '🌱', open: () => openGarden(location, now, t) },
+      { labelKey: 'prayer.button', glyph: '🕌', open: () => openPrayerTimes(location, now, t) },
+      { labelKey: 'wheel.button', glyph: '☀', open: () => openWheelOfYear(now, t) },
+    ];
+    openModuleMenu(entries, t);
   });
-
-  // Outdoor & Survival (§29) — Panel bei Bedarf, offline
-  $('#outdoor-open').addEventListener('click', () => openOutdoor(location, currentTime(), t));
-
-  // Jahreskreis (§32.2) — Panel bei Bedarf
-  $('#wheel-open').addEventListener('click', () => openWheelOfYear(currentTime(), t));
 
   // Info & Unterstützen (§36, §38.3)
   $('#about-open').addEventListener('click', () => openAbout(t));

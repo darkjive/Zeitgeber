@@ -888,6 +888,98 @@ body {
   color: var(--text-dim);
 }
 
+/* Modul-Menü */
+.modmenu__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 8px 0 16px;
+}
+
+.modmenu__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 8px;
+  border: 1px solid color-mix(in srgb, var(--text-dim) 30%, transparent);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.modmenu__item:hover {
+  border-color: var(--accent);
+}
+
+.modmenu__glyph {
+  font-size: 24px;
+}
+
+/* Sonnenstunden-Panels (§31.2, §31.3) */
+.onboard__card.sunhours {
+  text-align: left;
+  max-width: 420px;
+}
+
+.sunhours__pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.sunhours__pair input[type='number'] {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--text-dim) 40%, transparent);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-mono);
+  width: 100%;
+}
+
+.sunhours__stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 16px 0 10px;
+}
+
+.sunhours__stats--2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.sunhours__stats div {
+  text-align: center;
+}
+
+.sunhours__stats dt {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 0 0 4px;
+}
+
+.sunhours__stats dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--text);
+}
+
+.sunhours__season {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin: 0 0 10px;
+}
+
 /* Wall mode (§25) */
 #app.is-wall .topbar,
 #app.is-wall .sky,
