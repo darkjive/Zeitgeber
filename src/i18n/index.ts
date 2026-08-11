@@ -29,6 +29,15 @@ const de: Dict = {
   'view.list': 'Liste',
   'view.map': 'Karte',
 
+  'time.now': 'Jetzt',
+  'time.travel': 'Zeitreise',
+  'time.dayBack': '−1 T',
+  'time.hourBack': '−1 h',
+  'time.hourFwd': '+1 h',
+  'time.dayFwd': '+1 T',
+  'share.button': 'Teilen',
+  'share.brand': 'Sun Clock · 12 Uhr ist fast nie Mittag',
+
   'map.a11y': 'Himmelskarte: {count} Objekte über dem Horizont, darunter {objects}. Hellster Stern: {star}.',
 
   'list.empty': 'Gerade ist nichts über dem Horizont.',
@@ -133,6 +142,15 @@ const en: Dict = {
   'view.dial': 'Dial',
   'view.list': 'List',
   'view.map': 'Map',
+
+  'time.now': 'Now',
+  'time.travel': 'Time travel',
+  'time.dayBack': '−1 d',
+  'time.hourBack': '−1 h',
+  'time.hourFwd': '+1 h',
+  'time.dayFwd': '+1 d',
+  'share.button': 'Share',
+  'share.brand': 'Sun Clock · 12 o’clock is almost never noon',
 
   'map.a11y': 'Sky map: {count} objects above the horizon, including {objects}. Brightest star: {star}.',
 

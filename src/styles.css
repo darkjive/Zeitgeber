@@ -201,6 +201,42 @@ body {
   background: color-mix(in srgb, var(--secondary) 18%, transparent);
 }
 
+.chip--sm {
+  padding: 5px 9px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+}
+
+/* Zeitreise-Leiste (§24) + Teilen (§33) */
+.timebar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.stepper {
+  display: flex;
+  gap: 4px;
+}
+
+.t-input {
+  border: 1px solid color-mix(in srgb, var(--text-dim) 45%, transparent);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color-scheme: light dark;
+}
+
+/* Dezenter Hinweis, dass man sich nicht in der Gegenwart befindet */
+#app.is-travelling .readout__time {
+  color: var(--secondary);
+}
+
 /* Objektliste (§24) */
 .objlist {
   list-style: none;

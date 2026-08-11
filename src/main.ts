@@ -33,6 +33,7 @@ import { renderSkyMap } from './views/sky-map';
 import { showOnboarding, hasOnboarded } from './features/onboarding';
 import { WallMode } from './features/wallmode';
 import { fetchWeather, observationRating, type WeatherNow } from './features/weather';
+import { renderViewToBlob, shareOrDownload } from './features/share';
 import {
   azimuthDirKey,
   createTranslator,
@@ -59,6 +60,11 @@ let wall: WallMode;
 type ViewId = 'dial' | 'list' | 'map';
 let currentView: ViewId = 'dial';
 let weather: WeatherNow | null = null;
+
+// Zeitreise (§24): null = Live (jetzt), sonst eingefrorener Zeitpunkt.
+let frozenTime: Date | null = null;
+const currentTime = (): Date => frozenTime ?? new Date();
+const rerender = (): void => render(currentTime());
 
 // --- Formatierung -----------------------------------------------------------
 
@@ -123,6 +129,18 @@ app.innerHTML = `
         <p class="offset__explain" id="offset-explain"></p>
       </section>
     </main>
+
+    <div class="timebar">
+      <div class="stepper">
+        <button class="chip chip--sm" id="t-day-back" data-i18n="time.dayBack"></button>
+        <button class="chip chip--sm" id="t-hr-back" data-i18n="time.hourBack"></button>
+        <button class="chip chip--sm" id="t-hr-fwd" data-i18n="time.hourFwd"></button>
+        <button class="chip chip--sm" id="t-day-fwd" data-i18n="time.dayFwd"></button>
+      </div>
+      <input class="t-input" id="t-input" type="datetime-local" aria-label="Zeitpunkt" />
+      <button class="chip" id="t-now" data-i18n="time.now"></button>
+      <button class="chip" id="t-share" data-i18n="share.button"></button>
+    </div>
 
     <div class="weather" id="weather" hidden>
       <span class="weather__k" data-i18n="weather.title"></span>
@@ -235,6 +253,21 @@ function render(now: Date): void {
   $('#loc-label').textContent = location.label ?? nearestCityLabel(location);
 
   renderWeather(moon);
+  updateTimebar(now);
+}
+
+const pad2 = (n: number): string => String(n).padStart(2, '0');
+function toLocalInputValue(d: Date): string {
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+}
+
+function updateTimebar(now: Date): void {
+  const input = $('#t-input') as HTMLInputElement;
+  if (document.activeElement !== input) input.value = toLocalInputValue(now);
+  const live = frozenTime === null;
+  const nowBtn = $('#t-now');
+  nowBtn.classList.toggle('is-on', !live); // hervorgehoben, solange man in der Zeitreise ist
+  app.classList.toggle('is-travelling', !live);
 }
 
 function renderWeather(moon?: { horizontal: { elevation: number }; metadata?: Record<string, unknown> }): void {
@@ -256,7 +289,29 @@ function renderWeather(moon?: { horizontal: { elevation: number }; metadata?: Re
 
 async function refreshWeather(): Promise<void> {
   weather = await fetchWeather(location);
-  renderWeather(bus.collect({ time: new Date(), location }).find((o) => o.kind === 'moon'));
+  renderWeather(bus.collect({ time: currentTime(), location }).find((o) => o.kind === 'moon'));
+}
+
+async function exportCurrentView(): Promise<void> {
+  const svg = $('#view-wrap').querySelector('svg');
+  if (!svg) return; // Listenansicht hat kein Bild
+  const now = currentTime();
+  const css = getComputedStyle(document.documentElement);
+  const fmt = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+  const place = location.label ?? nearestCityLabel(location);
+  try {
+    const blob = await renderViewToBlob(svg as SVGElement, {
+      title: t('app.title'),
+      caption: `${fmt.format(now)} · ${place}`,
+      brand: t('share.brand'),
+      bg: css.getPropertyValue('--bg').trim() || '#0B0D12',
+      text: css.getPropertyValue('--text').trim() || '#E8E8E8',
+      textDim: css.getPropertyValue('--text-dim').trim() || '#8A8F9C',
+    });
+    await shareOrDownload(blob, `sunclock-${toLocalInputValue(now).replace(/[:T-]/g, '')}.png`, t('app.title'));
+  } catch (err) {
+    console.warn('Export fehlgeschlagen:', err);
+  }
 }
 
 function applyPalette(p: ReturnType<typeof paletteForElevation>['palette']): void {
@@ -276,13 +331,13 @@ function setLang(next: Lang): void {
   t = createTranslator(lang);
   saveLang(lang);
   applyStaticI18n();
-  render(new Date());
+  rerender();
 }
 
 function setLocation(loc: GeoLocation): void {
   location = { ...loc, label: loc.label ?? nearestCityLabel(loc) };
   saveLocation(location);
-  render(new Date());
+  rerender();
   void refreshWeather(); // §28: Wetter am neuen Ort neu holen
 }
 
@@ -291,7 +346,7 @@ function setView(view: ViewId): void {
   $('#view-dial').classList.toggle('is-active', view === 'dial');
   $('#view-map').classList.toggle('is-active', view === 'map');
   $('#view-list').classList.toggle('is-active', view === 'list');
-  render(new Date());
+  rerender();
 }
 
 function toggleLayer(id: 'planets' | 'stars', btnSel: string): void {
@@ -300,7 +355,7 @@ function toggleLayer(id: 'planets' | 'stars', btnSel: string): void {
   const btn = $(btnSel);
   btn.classList.toggle('is-on', on);
   btn.setAttribute('aria-pressed', String(on));
-  render(new Date());
+  rerender();
 }
 
 function wireEvents(): void {
@@ -312,6 +367,31 @@ function wireEvents(): void {
 
   $('#planets-toggle').addEventListener('click', () => toggleLayer('planets', '#planets-toggle'));
   $('#stars-toggle').addEventListener('click', () => toggleLayer('stars', '#stars-toggle'));
+
+  // Zeitreise (§24)
+  const stepBy = (ms: number) => {
+    frozenTime = new Date(currentTime().getTime() + ms);
+    rerender();
+  };
+  $('#t-day-back').addEventListener('click', () => stepBy(-86_400_000));
+  $('#t-hr-back').addEventListener('click', () => stepBy(-3_600_000));
+  $('#t-hr-fwd').addEventListener('click', () => stepBy(3_600_000));
+  $('#t-day-fwd').addEventListener('click', () => stepBy(86_400_000));
+  $('#t-now').addEventListener('click', () => {
+    frozenTime = null; // zurück in die Gegenwart
+    rerender();
+  });
+  ($('#t-input') as HTMLInputElement).addEventListener('change', (e) => {
+    const val = (e.target as HTMLInputElement).value;
+    const d = new Date(val);
+    if (!Number.isNaN(d.getTime())) {
+      frozenTime = d;
+      rerender();
+    }
+  });
+
+  // Teilen/Export (§33)
+  $('#t-share').addEventListener('click', () => void exportCurrentView());
 
   $('#wall-toggle').addEventListener('click', async () => {
     if (wall.isActive) wall.exit();
@@ -367,7 +447,7 @@ async function boot(): Promise<void> {
   wall = new WallMode(app, () => applyStaticI18n());
   wireEvents();
   applyStaticI18n();
-  render(new Date());
+  rerender();
   void refreshWeather();
 
   if (!hasOnboarded()) {
@@ -375,7 +455,7 @@ async function boot(): Promise<void> {
   }
 
   // Sekundentakt für den Zeiger; Ephemeriden nur bei Bedarf teuer (§8).
-  window.setInterval(() => render(new Date()), 1000);
+  window.setInterval(() => rerender(), 1000);
   // Wetter deutlich seltener aktualisieren (§8, §28).
   window.setInterval(() => void refreshWeather(), 15 * 60_000);
 }

@@ -43,6 +43,8 @@ dem Ziel von 500 KB Initial-Load (§35).
 | §19 Provider Sterne | helle benannte Fixsterne (J2000), optional |
 | §24 Ansicht Himmelskarte | 2D-Allsky, auf Web die Hauptansicht (§38.2) |
 | §24 Ansicht Objektliste | „Heute Nacht sichtbar", sortiert nach Höhe |
+| §24 Zeitreise | jeder Zeitpunkt frei wählbar, Grundlage für „Himmel bei deiner Geburt" |
+| §33 Teilen & Export | Ansicht als PNG mit Fusszeile, Web Share API + Download |
 | §28 Wetter | Open-Meteo, Beobachtungseignung, Offline-Fallback |
 | §14 Onboarding | vier überspringbare Bildschirme |
 | §15 Lokalisierung | DE/EN, keine fest verdrahteten Strings |
@@ -66,7 +68,7 @@ src/
     stars.ts           heller Fixstern-Katalog (J2000) + Transformation
   providers/           Achse A — sun, moon, planets, stars
   views/               Achse B — dial, sky-map, object-list
-  features/            Achse C — onboarding, wallmode, weather
+  features/            Achse C — onboarding, wallmode, weather, share
   i18n/                DE/EN
   main.ts              App-Shell, verdrahtet die drei Achsen
 ```
