@@ -69,6 +69,7 @@ automatisch in allen Ansichten.
 | Wildtiere | Dämmerungsaktivität und Mondlicht (ohne Solunar-Theorie) |
 | Drohne | Lichtfenster für heute mit Countdown und Rechtshinweis |
 | Meteorschauer | die acht Hauptströme, aktiv/kommend, Radiant-Höhe und Mondstörung |
+| Für Kinder | fragengeführte, vereinfachte Ansicht mit Beobachtungsaufgabe – ohne Gamification, ohne Datenerhebung |
 | Gebetszeiten | etablierte Konventionen (auswählbar, mit Quelle), reine Zeitangabe |
 | Jahreskreis | Sonnenwenden, Tagundnachtgleichen und Zwischenfeste als exakter astronomischer Zeitpunkt |
 | Wetter | Beobachtungseignung über Open-Meteo, mit Offline-Rückfall |
@@ -129,6 +130,7 @@ src/
     sun-hours.ts         direkte Sonnenstunden, Fassade & Verschattung
     comfort.ts           Hitzeschutz: Rolläden & Lüften (Geometrie + Temperatur)
     meteor-showers.ts    die acht Hauptströme, Radiant-Höhe, Aktivität
+    kids.ts              Beobachtungsaufgabe für den Kinder-Layer
     object-bus.ts        aggregiert aktive Provider, Fehlerisolierung pro Modul
     location.ts          GPS, manuelle Eingabe, lokale Persistenz
   providers/           Achse A – sun, moon, planets, stars, deep-sky

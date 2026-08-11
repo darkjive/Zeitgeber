@@ -46,6 +46,7 @@ import { openComfort } from './features/comfort';
 import { openWildlife } from './features/wildlife';
 import { openDrone } from './features/drone';
 import { openMeteorShowers } from './features/meteor-showers';
+import { openKids } from './features/kids';
 import { openModuleMenu, type ModuleEntry } from './features/module-menu';
 import {
   azimuthDirKey,
@@ -428,6 +429,7 @@ function wireEvents(): void {
       { labelKey: 'drone.button', glyph: '🚁', open: () => openDrone(location, now, t) },
       { labelKey: 'prayer.button', glyph: '🕌', open: () => openPrayerTimes(location, now, t) },
       { labelKey: 'wheel.button', glyph: '☀', open: () => openWheelOfYear(now, t) },
+      { labelKey: 'kids.button', glyph: '🧒', open: () => openKids(location, now, t) },
     ];
     openModuleMenu(entries, t);
   });
