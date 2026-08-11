@@ -13,6 +13,8 @@ const KIND_GLYPH: Record<string, string> = {
   planet: '🪐',
   star: '★',
   dso: '✦',
+  satellite: '🛰',
+  aircraft: '✈',
 };
 
 export function renderObjectList(objects: CelestialObject[], t: Translator): HTMLElement {

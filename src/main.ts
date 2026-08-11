@@ -28,6 +28,10 @@ import { moonProvider } from './providers/moon';
 import { planetsProvider } from './providers/planets';
 import { starsProvider } from './providers/stars';
 import { deepSkyProvider } from './providers/deep-sky';
+import { satellitesProvider } from './providers/satellites';
+import { aircraftProvider } from './providers/aircraft';
+import { openSatellites, refreshTles } from './features/satellites';
+import { fetchAircraft } from './features/aircraft';
 import { renderDial } from './views/dial';
 import { renderObjectList } from './views/object-list';
 import { renderSkyMap } from './views/sky-map';
@@ -69,6 +73,8 @@ bus.register(moonProvider);
 bus.register(planetsProvider); // optional, standardmäßig deaktiviert (§7.4)
 bus.register(starsProvider); // optional, standardmäßig deaktiviert (§7.4)
 bus.register(deepSkyProvider); // optional, standardmäßig deaktiviert (§7.4)
+bus.register(satellitesProvider); // optional, standardmäßig deaktiviert (§7.4)
+bus.register(aircraftProvider); // optional, standardmäßig deaktiviert (§7.4)
 
 const app = document.getElementById('app') as HTMLElement;
 let wall: WallMode;
@@ -127,6 +133,8 @@ app.innerHTML = `
         <button class="chip" id="planets-toggle" aria-pressed="false" data-i18n="layer.planets"></button>
         <button class="chip" id="stars-toggle" aria-pressed="false" data-i18n="layer.stars"></button>
         <button class="chip" id="deepsky-toggle" aria-pressed="false" data-i18n="layer.deepsky"></button>
+        <button class="chip" id="sats-toggle" aria-pressed="false" data-i18n="layer.satellites"></button>
+        <button class="chip" id="aircraft-toggle" aria-pressed="false" data-i18n="layer.aircraft"></button>
         <button class="chip" id="modules-open" data-i18n="modules.button"></button>
       </div>
     </div>
@@ -369,7 +377,7 @@ function setView(view: ViewId): void {
   rerender();
 }
 
-function toggleLayer(id: 'planets' | 'stars' | 'deep-sky', btnSel: string): void {
+function toggleLayer(id: 'planets' | 'stars' | 'deep-sky' | 'satellites' | 'aircraft', btnSel: string): void {
   const on = !bus.isEnabled(id);
   bus.setEnabled(id, on);
   const btn = $(btnSel);
@@ -388,6 +396,14 @@ function wireEvents(): void {
   $('#planets-toggle').addEventListener('click', () => toggleLayer('planets', '#planets-toggle'));
   $('#stars-toggle').addEventListener('click', () => toggleLayer('stars', '#stars-toggle'));
   $('#deepsky-toggle').addEventListener('click', () => toggleLayer('deep-sky', '#deepsky-toggle'));
+  $('#sats-toggle').addEventListener('click', () => {
+    toggleLayer('satellites', '#sats-toggle');
+    if (bus.isEnabled('satellites')) void refreshTles().then(() => rerender()); // frische TLEs (§20)
+  });
+  $('#aircraft-toggle').addEventListener('click', () => {
+    toggleLayer('aircraft', '#aircraft-toggle');
+    if (bus.isEnabled('aircraft')) void fetchAircraft(location).then(() => rerender());
+  });
 
   // Zeitreise (§24)
   const stepBy = (ms: number) => {
@@ -430,6 +446,7 @@ function wireEvents(): void {
       { labelKey: 'prayer.button', glyph: '🕌', open: () => openPrayerTimes(location, now, t) },
       { labelKey: 'wheel.button', glyph: '☀', open: () => openWheelOfYear(now, t) },
       { labelKey: 'kids.button', glyph: '🧒', open: () => openKids(location, now, t) },
+      { labelKey: 'sat.button', glyph: '🛰️', open: () => openSatellites(location, now, t) },
     ];
     openModuleMenu(entries, t);
   });
@@ -502,6 +519,10 @@ async function boot(): Promise<void> {
   window.setInterval(() => rerender(), 1000);
   // Wetter deutlich seltener aktualisieren (§8, §28).
   window.setInterval(() => void refreshWeather(), 15 * 60_000);
+  // Flugzeuge nur bei aktiver Ansicht nachladen (§20, Rate-Limits beachten).
+  window.setInterval(() => {
+    if (bus.isEnabled('aircraft')) void fetchAircraft(location);
+  }, 12_000);
 }
 
 void boot();

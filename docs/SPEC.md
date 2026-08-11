@@ -1115,6 +1115,8 @@ umsetzt; ein nativer Aufsatz (React Native + Expo) teilt sich diese Ebene.
 | Sonnenzeit-Versatz (2, 26.1 A) | vollständig |
 | Theme-Engine, kontinuierliche Zonen (12) | vollständig |
 | Provider Sonne, Mond (17); Planeten (18); helle Fixsterne (19); Deep Sky (19, Messier-Highlights) | umgesetzt |
+| Provider Satelliten/ISS (20, SGP4 via satellite.js, Überflugvorhersage) | umgesetzt; braucht Live-TLEs, SGP4 unit-getestet |
+| Provider Flugzeuge (20, ADS-B/OpenSky, Topozentrik) | umgesetzt; braucht Live-ADS-B, Geometrie unit-getestet |
 | Ansichten: Zifferblatt (22), Himmelskarte (24/38.2), Objektliste (24), Zeitreise (24) | umgesetzt |
 | Chronobiologie inkl. sozialem Jetlag & kombiniertem Gesamtversatz (26) | vollständig, dritter Ring |
 | Wetter (28), Outdoor (29), Teilen/Export (33), Wandmodus-Grundfunktion (25) | umgesetzt |
@@ -1129,7 +1131,7 @@ umsetzt; ein nativer Aufsatz (React Native + Expo) teilt sich diese Ebene.
 
 ### 40.2 Noch offen
 
-- **Provider:** Satelliten/ISS (20), Flugzeuge (20), Kometen (21)
+- **Provider:** Kometen (21, ereignisgetrieben — nur bei aktueller Erscheinung sinnvoll, Bahnelemente nachladbar)
 - **Ansichten:** Kamera-Liveview (23, nur nativ, 38.2)
 - **Fähigkeiten:** dynamischer Wecker (27, bewusst nicht auf Web, 27.2), Klangebene (16), antike Stunden
 - **Widgets** (25) und **Smarthome-Begleitdienst** `sunclock-bridge` (34)

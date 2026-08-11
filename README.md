@@ -51,9 +51,14 @@ nirgends gibt. Sun Clock zeigt ihn auf einem einzigen Zifferblatt.
 **Am Himmel**
 
 Sonne und Mond (immer aktiv), Planeten (Merkur–Neptun mit Helligkeit und
-Elongation), helle benannte Fixsterne und Deep-Sky-Highlights (kuratierter
-Messier-Katalog: Galaxien, Nebel, Sternhaufen). Jeder Provider erscheint
+Elongation), helle benannte Fixsterne, Deep-Sky-Highlights (kuratierter
+Messier-Katalog), **Satelliten/ISS** (SGP4 aus TLE-Daten, mit Überflug-
+vorhersage) und **Flugzeuge** (ADS-B über OpenSky). Jeder Provider erscheint
 automatisch in allen Ansichten.
+
+Satelliten und Flugzeuge brauchen frische Netzdaten (CelesTrak-TLEs bzw.
+OpenSky); veraltete Bahndaten werden erkannt und gemeldet (§10). Die
+Berechnung selbst läuft lokal auf dem Gerät.
 
 **Fähigkeiten**
 
@@ -122,6 +127,8 @@ src/
     planets.ts           geozentrische Planetenpositionen
     stars.ts             heller Fixstern-Katalog + Transformation
     deep-sky.ts          kuratierter Messier-/NGC-Katalog
+    satellites.ts        SGP4-Propagation (satellite.js), Überflugvorhersage
+    aircraft.ts          topozentrische Winkel aus ADS-B-Position
     solar-geometry.ts    Einstrahlungsgeometrie für PV
     prayer-times.ts      Gebetszeiten aus Sonnenhöhe
     chronobiology.ts     sozialer Jetlag & Chronotyp (MCTQ)
@@ -133,7 +140,8 @@ src/
     kids.ts              Beobachtungsaufgabe für den Kinder-Layer
     object-bus.ts        aggregiert aktive Provider, Fehlerisolierung pro Modul
     location.ts          GPS, manuelle Eingabe, lokale Persistenz
-  providers/           Achse A – sun, moon, planets, stars, deep-sky
+  providers/           Achse A – sun, moon, planets, stars, deep-sky,
+                                 satellites, aircraft
   views/               Achse B – dial, sky-map, object-list
   features/            Achse C – onboarding, wallmode, weather, share, solar-yield,
                                  prayer-times, chronobiology, outdoor, wheel-of-year,
