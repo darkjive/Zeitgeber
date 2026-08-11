@@ -52,6 +52,11 @@ body {
   display: flex;
   flex-direction: column;
   gap: 18px;
+}
+
+/* Automatische Abdunklung NUR im Wandmodus (§25) — im normalen Betrieb bleibt
+   die Oberfläche voll hell. */
+#app.is-wall .frame {
   filter: brightness(var(--wall-brightness));
   transition: filter 2s ease;
 }
