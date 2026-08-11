@@ -109,6 +109,12 @@ const de: Dict = {
   'outdoor.note': 'Alle Werte funktionieren offline und ohne Kompass. Die Himmelsrichtung ergibt sich aus dem Sonnenstand.',
   'outdoor.close': 'Schließen',
 
+  'about.button': 'Info',
+  'about.opensource': 'Open Source und werbefrei. Finanziert ausschließlich über freiwillige Spenden – kein Paywall, keine In-App-Käufe.',
+  'about.support': 'Unterstützen',
+  'about.repo': 'Quellcode auf GitHub',
+  'about.close': 'Schließen',
+
   'map.a11y': 'Himmelskarte: {count} Objekte über dem Horizont, darunter {objects}. Hellster Stern: {star}.',
 
   'list.empty': 'Gerade ist nichts über dem Horizont.',
@@ -293,6 +299,12 @@ const en: Dict = {
   'outdoor.sunDown': 'Sun below the horizon',
   'outdoor.note': 'All values work offline and without a compass. Direction is derived from the sun’s position.',
   'outdoor.close': 'Close',
+
+  'about.button': 'Info',
+  'about.opensource': 'Open source and ad-free. Funded solely by voluntary donations – no paywall, no in-app purchases.',
+  'about.support': 'Support',
+  'about.repo': 'Source on GitHub',
+  'about.close': 'Close',
 
   'map.a11y': 'Sky map: {count} objects above the horizon, including {objects}. Brightest star: {star}.',
 

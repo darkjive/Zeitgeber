@@ -38,6 +38,7 @@ import { openSolarYield } from './features/solar-yield';
 import { openPrayerTimes } from './features/prayer-times';
 import { openChronobiology, currentChrono } from './features/chronobiology';
 import { openOutdoor } from './features/outdoor';
+import { openAbout } from './features/about';
 import {
   azimuthDirKey,
   createTranslator,
@@ -102,6 +103,7 @@ app.innerHTML = `
       <div class="topbar__actions">
         <button class="btn btn--ghost" id="lang-toggle" aria-label="Language"></button>
         <button class="btn btn--ghost" id="wall-toggle"></button>
+        <button class="btn btn--ghost" id="about-open" data-i18n="about.button"></button>
       </div>
     </header>
 
@@ -417,6 +419,9 @@ function wireEvents(): void {
 
   // Outdoor & Survival (§29) — Panel bei Bedarf, offline
   $('#outdoor-open').addEventListener('click', () => openOutdoor(location, currentTime(), t));
+
+  // Info & Unterstützen (§36, §38.3)
+  $('#about-open').addEventListener('click', () => openAbout(t));
 
   $('#wall-toggle').addEventListener('click', async () => {
     if (wall.isActive) wall.exit();

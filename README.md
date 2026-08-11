@@ -1,100 +1,182 @@
-# Sun Clock — Phase-1-MVP (Web-Target)
+<div align="center">
 
-> Die einzige Uhr, die zeigt, wie weit die soziale Zeit von der Sonnenzeit
-> entfernt ist. — _12 Uhr ist fast nie Mittag._
+# Sun Clock
 
-Eigenständiger Neubau nach der technischen Spezifikation v1.1. Diese Umsetzung
-ist der **Phase-1-MVP-Kern** (Spec §37) als lauffähiges Web-Target: ein
-astronomisch korrektes Zifferblatt mit Sonnenzeit-Versatz — dem
-Alleinstellungsmerkmal aus §2, das „bereits der halbe USP" ist.
+**Die einzige Uhr, die zeigt, wie weit die soziale Zeit von der Sonnenzeit entfernt ist.**
 
-Der Zielstack der vollen App ist React Native + Expo (§6). Dieses Paket setzt
-die Achse-übergreifende **Architektur bewusst UI-frei und portabel** um, damit
-die Berechnungsebene (`src/core/astro-engine.ts`) unverändert in die native App
-und in den späteren Begleitdienst (`sunclock-bridge`, §34) übernommen werden
-kann.
+_12 Uhr ist fast nie Mittag._
+
+Open Source (MIT) · TypeScript strict · Web (PWA) + iOS/Android · offline · ohne Backend · DE/EN
+
+</div>
+
+---
+
+Sun Clock ist eine astronomisch korrekte Uhr, die nicht die Zeitzone anzeigt,
+sondern den **tatsächlichen Sonnenstand an deinem Ort** — und den Abstand
+dazwischen. Fast jede Uhr kennt nur deine Zeitzone, nicht deinen Ort. Sun Clock
+kennt beides und zeigt als einzige **beide Seiten der Gleichung**: die soziale
+Zeit und die echte Lichtumgebung.
+
+Kein Konto, kein Server, keine Tracker. Alle Daten bleiben auf dem Gerät.
+
+## Das Alleinstellungsmerkmal
+
+Sun Clock verbindet zwei Größen, die sonst niemand zusammenführt:
+
+- **Sonnenzeit-Versatz** — der Abstand zwischen gesetzlichem Mittag und
+  echtem Sonnenhöchststand. Reine Physik, keine Eingabe nötig.
+- **Sozialer Jetlag** — der Abstand zwischen deinem sozialen und deinem
+  biologischen Rhythmus, nach dem Munich Chronotype Questionnaire (vier
+  Zeitangaben genügen).
+
+Wer einen späten Chronotyp hat *und* am Westrand einer Zeitzone lebt, erlebt
+beide Effekte **additiv** — den **kombinierten Gesamtversatz**, den es sonst
+nirgends gibt. Sun Clock zeigt ihn auf einem einzigen Zifferblatt.
+
+## Funktionsumfang
+
+**Ansichten**
+
+| Ansicht | Beschreibung |
+|---|---|
+| Zifferblatt | 24-Stunden-Sonnenuhr mit kontinuierlichen Dämmerungszonen, Sonnenhöchststand-Marker, Kompassring und – bei aktivem Rhythmus – drei überlagerten Ringen (Sonne, gesetzliche Zeit, Körper-Rhythmus) |
+| Himmelskarte | 2D-Allsky-Karte, Zenit in der Mitte, alle Objekte an ihrer realen Position |
+| Objektliste | „Heute Nacht sichtbar", sortiert nach Höhe, mit Helligkeit und Richtung |
+| Zeitreise | jeder Zeitpunkt frei wählbar – Vergangenheit wie Zukunft, „Der Himmel bei deiner Geburt" |
+
+**Am Himmel**
+
+Sonne und Mond (immer aktiv), Planeten (Merkur–Neptun mit Helligkeit und
+Elongation) und helle benannte Fixsterne. Jeder Provider erscheint automatisch
+in allen Ansichten.
+
+**Fähigkeiten**
+
+| Modul | Beschreibung |
+|---|---|
+| Chronobiologie | sozialer Jetlag, Chronotyp und kombinierter Gesamtversatz – rein lokal, rein beschreibend |
+| Sonnenzeit-Versatz | gesetzlicher vs. echter Mittag, live |
+| Outdoor & Survival | Restlicht-Countdown, blaue/goldene Stunde, Mondlicht-Prognose, Himmelsrichtung ohne Kompass |
+| Solarertrag | Modul-Ausrichtung/Neigung, Ertragsfenster, Sommer/Winter – reine Geometrie, keine kWh |
+| Gebetszeiten | etablierte Konventionen (auswählbar, mit Quelle), reine Zeitangabe |
+| Wetter | Beobachtungseignung über Open-Meteo, mit Offline-Rückfall |
+| Teilen & Export | aktuelle Ansicht als hochauflösendes PNG mit Fußzeile |
+| Wandmodus | lebende Wanduhr mit Abdunklung und Einbrennschutz |
+
+Alle optionalen Module sind **standardmäßig deaktiviert** – wer nichts
+konfiguriert, sieht ein ruhiges Zifferblatt. Die Breite wird erst sichtbar, wenn
+jemand danach sucht.
+
+## Plattformen
+
+- **Web** (`react-native-web`-frei, eigenständiges Web-Target): läuft im
+  Browser, als PWA installierbar, offline-fähig.
+- **Nativ** (`native/`, React Native + Expo): iOS und Android teilen sich die
+  **identische, UI-freie Berechnungsebene** mit dem Web-Target – keine Kopie der
+  Astronomie-Logik.
 
 ## Schnellstart
 
 ```bash
-cd sunclock
+# Web
 npm install
 npm run dev        # Entwicklungsserver
 npm run build      # Typecheck + Produktions-Build nach dist/
-npm run preview    # gebauten Build lokal ansehen
-npm test           # Validierung der Astro-Engine gegen Referenzwerte
+npm run preview    # gebauten Build ansehen
+npm test           # Validierung der Berechnungen gegen Referenzwerte
+
+# Nativ (iOS/Android)
+cd native
+npm install
+npx expo start
 ```
 
-Node 22+. Der Produktions-Build wiegt < 30 KB JS (gzip ~10 KB) — deutlich unter
-dem Ziel von 500 KB Initial-Load (§35).
+Node 22+.
 
-## Was der MVP kann
+## Architektur
 
-| Spec | Umsetzung |
-|---|---|
-| §7 Drei-Achsen-Architektur | `core` · `providers` (Achse A) · `views` (Achse B) · `features` (Achse C), zusammengeführt über den `object-bus` |
-| §6.3 UI-freie Astro-Engine | `core/astro-engine.ts` — reine Funktionen, NOAA-Sonnenalgorithmus + Schlyter-Mond, keine DOM-Abhängigkeit |
-| §4 Wissenschaftliche Grundlage | Sonnenposition < 0,1°, Zeitgleichung, Refraktion; Validierung in `astro-engine.test.ts` |
-| §2 / §26.1 A Sonnenzeit-Versatz | `core/time-engine.ts` — gesetzlicher vs. echter Mittag, ohne Nutzerdaten |
-| §26.3 Chronobiologie | sozialer Jetlag (MCTQ), Chronotyp, **kombinierter Gesamtversatz**, dritter Ring, rein lokal |
-| §22 Zifferblatt | `views/dial.ts` — 24-h-Zeitring mit Dämmerungszonen, Sonnenhöchststand-Marker, Kompassring mit Sonne/Mond |
-| §12 Theme-Engine | kontinuierliche Tag/Nacht-Interpolation nach Sonnenhöhe, echter Nachtsicht-Modus |
-| §17 Provider Sonne & Mond | Core-Provider, nicht deaktivierbar |
-| §18 Provider Planeten | Merkur…Neptun, Helligkeit/Elongation, optional (Layer-Toggle) |
-| §19 Provider Sterne | helle benannte Fixsterne (J2000), optional |
-| §24 Ansicht Himmelskarte | 2D-Allsky, auf Web die Hauptansicht (§38.2) |
-| §24 Ansicht Objektliste | „Heute Nacht sichtbar", sortiert nach Höhe |
-| §24 Zeitreise | jeder Zeitpunkt frei wählbar, Grundlage für „Himmel bei deiner Geburt" |
-| §33 Teilen & Export | Ansicht als PNG mit Fusszeile, Web Share API + Download |
-| §31.1 solar-yield | Modul-Ausrichtung/Neigung, Ertragsfenster, Sommer/Winter — reine Geometrie |
-| §32.1 prayer-times | etablierte Konventionen (auswählbar, mit Quelle), reine Zeitangabe |
-| §29 Outdoor & Survival | Restlicht-Countdown, blaue/goldene Stunde, Mondlicht, Richtung ohne Kompass |
-| §28 Wetter | Open-Meteo, Beobachtungseignung, Offline-Fallback |
-| §14 Onboarding | vier überspringbare Bildschirme |
-| §15 Lokalisierung | DE/EN, keine fest verdrahteten Strings |
-| §13 Barrierefreiheit | semantische Zifferblatt-Beschreibung, Fokus, Reduce-Motion |
-| §10 Fehlerzustände | Rückfall auf manuelle Ortseingabe, Kernuhr bleibt funktionsfähig |
-| §25 Wandmodus | Bildschirm-Wachhalten, Abdunklung nach Sonnenstand, Einbrennschutz-Drift |
-| §38.1 rein lokal | keine Backend-Komponente; Standort/Spracheinstellung nur lokal |
-
-## Projektstruktur
+Ein schlanker Core plus Module auf **drei getrennten Achsen** – die Trennung
+zwischen *was am Himmel ist* und *wie es dargestellt wird* hält alles entkoppelt:
+Ein neuer Provider erscheint automatisch in allen Ansichten, eine neue Ansicht
+zeigt automatisch alle Objekte.
 
 ```
 src/
-  core/
-    astro-engine.ts    Ephemeriden (Sonne, Mond, Ereignisse) — reine Funktionen
-    time-engine.ts     Sonnenzeit-Versatz, Zeitgleichung, Zeitzonen
-    theme-engine.ts    Zonen nach Sonnenhöhe, kontinuierliche Paletten
-    object-bus.ts      aggregiert aktive Provider, Fehlerisolierung pro Modul
-    location.ts        GPS, manuelle Eingabe, lokale Persistenz
-    types.ts           CelestialObject / ObjectProvider / SkyView (§7.2/7.3)
-    planets.ts         geozentrische Planetenpositionen (Keplerelemente)
-    stars.ts           heller Fixstern-Katalog (J2000) + Transformation
-    solar-geometry.ts  Einstrahlungsgeometrie für PV (Einfallswinkel)
-    prayer-times.ts    Gebetszeiten aus Sonnenhöhe (etablierte Konventionen)
-    chronobiology.ts   sozialer Jetlag & Chronotyp (MCTQ)
-    outdoor.ts         Restlicht, blaue/goldene Stunde, Mondlicht, Richtung
-  providers/           Achse A — sun, moon, planets, stars
-  views/               Achse B — dial (mit drittem Ring), sky-map, object-list
-  features/            Achse C — onboarding, wallmode, weather, share,
+  core/                Ephemeriden & Ableitungen – reine, UI-freie Funktionen
+    astro-engine.ts      Sonne, Mond, Ereignisse, Koordinatentransformation
+    time-engine.ts       Sonnenzeit-Versatz, Zeitgleichung, Zeitzonen
+    theme-engine.ts      Zonen nach Sonnenhöhe, kontinuierliche Paletten
+    planets.ts           geozentrische Planetenpositionen
+    stars.ts             heller Fixstern-Katalog + Transformation
+    solar-geometry.ts    Einstrahlungsgeometrie für PV
+    prayer-times.ts      Gebetszeiten aus Sonnenhöhe
+    chronobiology.ts     sozialer Jetlag & Chronotyp (MCTQ)
+    outdoor.ts           Restlicht, blaue/goldene Stunde, Mondlicht, Richtung
+    object-bus.ts        aggregiert aktive Provider, Fehlerisolierung pro Modul
+    location.ts          GPS, manuelle Eingabe, lokale Persistenz
+  providers/           Achse A – sun, moon, planets, stars
+  views/               Achse B – dial, sky-map, object-list
+  features/            Achse C – onboarding, wallmode, weather, share,
                                  solar-yield, prayer-times, chronobiology, outdoor
   i18n/                DE/EN
   main.ts              App-Shell, verdrahtet die drei Achsen
+
+native/                React-Native/Expo-Aufsatz auf derselben core-Engine
 ```
 
-## Bewusst noch nicht enthalten (spätere Phasen)
+Die Berechnungsebene ist bewusst **frei von UI-Abhängigkeiten**, damit sie
+unverändert in die native App und in einen späteren Smarthome-Begleitdienst
+(`sunclock-bridge`) übernommen werden kann.
 
-Gemäß Roadmap (§37) gehören in weitere Phasen: Sterne/Satelliten/Flugzeuge,
-Kamera-Liveview und Himmelskarte, dynamischer Wecker (auf Web bewusst nicht,
-§27.2), Chronobiologie mit Nutzereingabe (sozialer Jetlag), Teilen/Export,
-Klangebene sowie die anwendungsgebundenen Module (§31/§32). Die Architektur ist
-so angelegt, dass ein neuer Provider automatisch in allen Ansichten erscheint
-und eine neue Ansicht automatisch alle Objekte zeigt (§7.4) — diese
-Erweiterungen kommen ohne Kernumbau hinzu.
+## Wissenschaftliche Grundlage
 
-Der native Aufsatz (React Native + Expo, §6) liegt unter `native/` und teilt
-sich die UI-freie Berechnungsebene mit dem Web-Target.
+| Domäne | Methode |
+|---|---|
+| Sonnenposition, Auf-/Untergang, Dämmerung | NOAA-Algorithmus (VSOP87-Ableitung), Refraktion |
+| Mondposition, Phase | Schlyter-Näherung inkl. Hauptperturbationen |
+| Planeten | Keplersche Bahnelemente, geozentrisch |
+| Fixsterne | J2000-Katalog, Transformation über Greenwich Sidereal Time |
+| Chronotyp, sozialer Jetlag | Munich Chronotype Questionnaire (Roenneberg/Wittmann) |
+| Zeitzonen | IANA über `Intl` |
+
+**Keine** astrologischen, esoterischen oder Solunar-Inhalte. Wissenschaftliche
+Korrektheit ist die Grundlage des Vertrauens in dieses Projekt.
+
+Validiert über Unit-Tests gegen Referenzwerte und starke physikalische
+Invarianten (u. a. Polaris-Höhe ≈ geografische Breite, maximale Elongation der
+inneren Planeten, korrekte Reihenfolge der Gebetszeiten). `npm test`.
+
+## Datenschutz
+
+- Kein Backend, keine Konten, keine Synchronisation, keine Tracking-Bibliotheken.
+- Standort und alle Eingaben werden **nur lokal** verarbeitet.
+- Chronobiologie-Daten: Export als JSON und Löschung mit einem Tippen.
+
+## Regulatorisches
+
+Sun Clock liefert **Informationen über Licht-, Zeit- und Himmelsverhältnisse** –
+niemals Diagnose, Therapie oder Rechtsauskunft. Module mit Gesundheits-,
+Rechts- oder Weltanschauungsbezug bleiben beschreibend und sind standardmäßig
+deaktiviert.
+
+## Unterstützen
+
+Sun Clock ist Open Source und wird ausschließlich über **freiwillige Spenden**
+finanziert – kein Paywall, keine In-App-Käufe, keine Werbung.
+
+- **GitHub Sponsors** — https://github.com/sponsors/darkjive
+- **PayPal** — im Info-Bereich der App verlinkt
+
+Die Spenden-Hinweise stehen dezent im Info-Bereich, nie in der Hauptoberfläche.
+
+## Mitwirken
+
+Beiträge sind willkommen – besonders Genauigkeits-Prüfungen der Berechnungen und
+Übersetzungen. Siehe [CONTRIBUTING.md](./CONTRIBUTING.md) und den
+[Verhaltenskodex](./CODE_OF_CONDUCT.md). Neue oder geänderte Berechnungen
+brauchen einen Test gegen einen Referenzwert.
 
 ## Lizenz
 
-MIT (§36).
+[MIT](./LICENSE).
