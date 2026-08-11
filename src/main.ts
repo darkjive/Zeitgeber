@@ -41,6 +41,9 @@ import { openOutdoor } from './features/outdoor';
 import { openAbout } from './features/about';
 import { openWheelOfYear } from './features/wheel-of-year';
 import { openGarden, openArchitecture } from './features/sun-hours-panels';
+import { openComfort } from './features/comfort';
+import { openWildlife } from './features/wildlife';
+import { openDrone } from './features/drone';
 import { openModuleMenu, type ModuleEntry } from './features/module-menu';
 import {
   azimuthDirKey,
@@ -410,10 +413,13 @@ function wireEvents(): void {
     const now = currentTime();
     const entries: ModuleEntry[] = [
       { labelKey: 'chrono.button', glyph: '🌙', open: () => openChronobiology(solarOffset(now, location).minutes, t, () => rerender()) },
+      { labelKey: 'comfort.button', glyph: '🌡️', open: () => openComfort(location, now, t) },
       { labelKey: 'outdoor.button', glyph: '🧭', open: () => openOutdoor(location, now, t) },
       { labelKey: 'solar.button', glyph: '⚡', open: () => openSolarYield(location, now, t) },
       { labelKey: 'arch.button', glyph: '🏠', open: () => openArchitecture(location, now, t) },
       { labelKey: 'garden.button', glyph: '🌱', open: () => openGarden(location, now, t) },
+      { labelKey: 'wildlife.button', glyph: '🦊', open: () => openWildlife(location, now, t) },
+      { labelKey: 'drone.button', glyph: '🚁', open: () => openDrone(location, now, t) },
       { labelKey: 'prayer.button', glyph: '🕌', open: () => openPrayerTimes(location, now, t) },
       { labelKey: 'wheel.button', glyph: '☀', open: () => openWheelOfYear(now, t) },
     ];

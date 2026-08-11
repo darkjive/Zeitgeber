@@ -8,6 +8,7 @@
  */
 
 import type { GeoLocation } from '../core/astro-engine';
+import type { HourTemp } from '../core/comfort';
 
 export interface WeatherNow {
   cloudCover: number; // %
@@ -69,6 +70,41 @@ export async function fetchWeather(loc: GeoLocation): Promise<WeatherNow | null>
     return w;
   } catch {
     return readCache(loc); // letzter Stand, evtl. null
+  }
+}
+
+export interface TemperatureForecast {
+  hours: HourTemp[];
+  maxToday: number | null;
+}
+
+/**
+ * Stündliche Temperaturen des Tages für das Hitze-Modul (comfort.ts). Wie oben
+ * datenschutzfreundlich über Open-Meteo; bei Netzfehler null (Modul fällt auf
+ * reine Geometrie zurück).
+ */
+export async function fetchTemperatures(loc: GeoLocation): Promise<TemperatureForecast | null> {
+  const url =
+    `${OPEN_METEO}?latitude=${loc.latitude.toFixed(4)}&longitude=${loc.longitude.toFixed(4)}` +
+    `&hourly=temperature_2m&daily=temperature_2m_max&forecast_days=1&timezone=auto`;
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 8000);
+    const res = await fetch(url, { signal: ctrl.signal });
+    clearTimeout(timer);
+    if (!res.ok) throw new Error(`http ${res.status}`);
+    const data = (await res.json()) as {
+      hourly?: { time: string[]; temperature_2m: number[] };
+      daily?: { temperature_2m_max: number[] };
+    };
+    if (!data.hourly) throw new Error('no hourly');
+    const hours: HourTemp[] = data.hourly.time.map((iso, i) => ({
+      time: new Date(iso),
+      temp: data.hourly!.temperature_2m[i],
+    }));
+    return { hours, maxToday: data.daily?.temperature_2m_max?.[0] ?? null };
+  } catch {
+    return null;
   }
 }
 

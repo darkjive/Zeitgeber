@@ -61,6 +61,9 @@ in allen Ansichten.
 | Solarertrag | Modul-Ausrichtung/Neigung, Ertragsfenster, Sommer/Winter – reine Geometrie, keine kWh |
 | Fassade & Tageslicht | direkte Besonnung einer Fassade über den Tag – macht „Wohnung mit Nachmittagssonne" prüfbar |
 | Garten & Verschattung | Sonnenstunden am Standort, Verschattung durch Gebäude/Baum (Höhe & Abstand) |
+| Hitze & Lüften | wann lüften, wann Rolläden schließen – Sonnengeometrie, optional mit Außentemperatur |
+| Wildtiere | Dämmerungsaktivität und Mondlicht (ohne Solunar-Theorie) |
+| Drohne | Lichtfenster für heute mit Countdown und Rechtshinweis |
 | Gebetszeiten | etablierte Konventionen (auswählbar, mit Quelle), reine Zeitangabe |
 | Jahreskreis | Sonnenwenden, Tagundnachtgleichen und Zwischenfeste als exakter astronomischer Zeitpunkt |
 | Wetter | Beobachtungseignung über Open-Meteo, mit Offline-Rückfall |
@@ -118,12 +121,14 @@ src/
     outdoor.ts           Restlicht, blaue/goldene Stunde, Mondlicht, Richtung
     wheel-of-year.ts     Sonnenwenden/Tagundnachtgleichen als exakte Zeitpunkte
     sun-hours.ts         direkte Sonnenstunden, Fassade & Verschattung
+    comfort.ts           Hitzeschutz: Rolläden & Lüften (Geometrie + Temperatur)
     object-bus.ts        aggregiert aktive Provider, Fehlerisolierung pro Modul
     location.ts          GPS, manuelle Eingabe, lokale Persistenz
   providers/           Achse A – sun, moon, planets, stars
   views/               Achse B – dial, sky-map, object-list
   features/            Achse C – onboarding, wallmode, weather, share, solar-yield,
-                                 prayer-times, chronobiology, outdoor, wheel-of-year, about
+                                 prayer-times, chronobiology, outdoor, wheel-of-year,
+                                 sun-hours-panels, comfort, wildlife, drone, module-menu, about
   i18n/                DE/EN
   main.ts              App-Shell, verdrahtet die drei Achsen
 

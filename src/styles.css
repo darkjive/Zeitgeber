@@ -980,6 +980,61 @@ body {
   margin: 0 0 10px;
 }
 
+/* Hitze-/Wildtier-/Drohnen-Panels */
+.onboard__card.comfort {
+  text-align: left;
+  max-width: 420px;
+}
+
+.comfort__section {
+  margin-bottom: 16px;
+}
+
+.comfort__k {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+
+.comfort__v {
+  font-size: 15px;
+  color: var(--text);
+  margin: 0;
+}
+
+.comfort__temp {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin: 6px 0 0;
+}
+
+.comfort__rows {
+  margin: 0;
+}
+
+.comfort__rows div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 9px 4px;
+  border-bottom: 1px solid color-mix(in srgb, var(--text-dim) 16%, transparent);
+}
+
+.comfort__rows dt {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.comfort__rows dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
 /* Wall mode (§25) */
 #app.is-wall .topbar,
 #app.is-wall .sky,
