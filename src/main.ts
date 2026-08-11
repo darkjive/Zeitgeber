@@ -34,6 +34,7 @@ import { showOnboarding, hasOnboarded } from './features/onboarding';
 import { WallMode } from './features/wallmode';
 import { fetchWeather, observationRating, type WeatherNow } from './features/weather';
 import { renderViewToBlob, shareOrDownload } from './features/share';
+import { openSolarYield } from './features/solar-yield';
 import {
   azimuthDirKey,
   createTranslator,
@@ -110,6 +111,7 @@ app.innerHTML = `
       <div class="layers">
         <button class="chip" id="planets-toggle" aria-pressed="false" data-i18n="layer.planets"></button>
         <button class="chip" id="stars-toggle" aria-pressed="false" data-i18n="layer.stars"></button>
+        <button class="chip" id="solar-open" data-i18n="solar.button"></button>
       </div>
     </div>
 
@@ -392,6 +394,9 @@ function wireEvents(): void {
 
   // Teilen/Export (§33)
   $('#t-share').addEventListener('click', () => void exportCurrentView());
+
+  // Solar-Modul (§31.1) — Panel bei Bedarf, für aktuellen Ort und Zeitpunkt
+  $('#solar-open').addEventListener('click', () => openSolarYield(location, currentTime(), t));
 
   $('#wall-toggle').addEventListener('click', async () => {
     if (wall.isActive) wall.exit();

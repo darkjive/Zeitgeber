@@ -38,6 +38,16 @@ const de: Dict = {
   'share.button': 'Teilen',
   'share.brand': 'Sun Clock · 12 Uhr ist fast nie Mittag',
 
+  'solar.button': 'Solar',
+  'solar.title': 'Solarertrag (Geometrie)',
+  'solar.azimuth': 'Ausrichtung',
+  'solar.tilt': 'Neigung',
+  'solar.window': 'Ertragsfenster',
+  'solar.peak': 'Bestes Zeitfenster',
+  'solar.summerWinter': 'Sommer/Winter',
+  'solar.note': 'Reine Geometrie- und Einstrahlungsberechnung, keine Ertragsangabe in kWh (hängt von Modul, Wechselrichter, Verschmutzung und Wetter ab).',
+  'solar.close': 'Schließen',
+
   'map.a11y': 'Himmelskarte: {count} Objekte über dem Horizont, darunter {objects}. Hellster Stern: {star}.',
 
   'list.empty': 'Gerade ist nichts über dem Horizont.',
@@ -151,6 +161,16 @@ const en: Dict = {
   'time.dayFwd': '+1 d',
   'share.button': 'Share',
   'share.brand': 'Sun Clock · 12 o’clock is almost never noon',
+
+  'solar.button': 'Solar',
+  'solar.title': 'Solar yield (geometry)',
+  'solar.azimuth': 'Orientation',
+  'solar.tilt': 'Tilt',
+  'solar.window': 'Yield window',
+  'solar.peak': 'Best window',
+  'solar.summerWinter': 'Summer/winter',
+  'solar.note': 'Pure geometry and incidence calculation — no yield in kWh (depends on module, inverter, soiling and weather).',
+  'solar.close': 'Close',
 
   'map.a11y': 'Sky map: {count} objects above the horizon, including {objects}. Brightest star: {star}.',
 

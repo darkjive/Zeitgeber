@@ -522,6 +522,78 @@ body {
   gap: 12px;
 }
 
+/* Solar-Ertrag-Panel (§31.1) */
+.onboard__card.solar {
+  text-align: left;
+  max-width: 420px;
+}
+
+.solar__controls {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 8px 0 16px;
+}
+
+.solar__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--text-dim);
+}
+
+.solar__field b {
+  color: var(--text);
+  font-family: var(--font-mono);
+}
+
+.solar__field input[type='range'] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.solar__curve {
+  width: 100%;
+  height: auto;
+  border: 1px solid color-mix(in srgb, var(--text-dim) 25%, transparent);
+  border-radius: 12px;
+  background: var(--bg);
+}
+
+.solar__stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 16px 0 12px;
+}
+
+.solar__stats div {
+  text-align: center;
+}
+
+.solar__stats dt {
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 0 0 4px;
+}
+
+.solar__stats dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--text);
+}
+
+.solar__note {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-dim);
+  margin: 0 0 16px;
+}
+
 /* Wall mode (§25) */
 #app.is-wall .topbar,
 #app.is-wall .sky,
