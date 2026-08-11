@@ -69,6 +69,7 @@ const de: Dict = {
   'solar.peak': 'Bestes Zeitfenster',
   'solar.summerWinter': 'Sommer/Winter',
   'solar.note': 'Reine Geometrie- und Einstrahlungsberechnung, keine Ertragsangabe in kWh (hängt von Modul, Wechselrichter, Verschmutzung und Wetter ab).',
+  'solar.curveAlt': 'Tageskurve des Einstrahlungs-Geometriefaktors, mit hervorgehobenem Ertragsfenster.',
   'solar.close': 'Schließen',
 
   'prayer.button': 'Gebetszeiten',
@@ -396,6 +397,7 @@ const en: Dict = {
   'solar.peak': 'Best window',
   'solar.summerWinter': 'Summer/winter',
   'solar.note': 'Pure geometry and incidence calculation — no yield in kWh (depends on module, inverter, soiling and weather).',
+  'solar.curveAlt': 'Daily curve of the irradiance geometry factor, with the yield window highlighted.',
   'solar.close': 'Close',
 
   'prayer.button': 'Prayer times',

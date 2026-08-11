@@ -65,11 +65,11 @@ export function openChronobiology(solarOffsetMin: number, t: Translator, onChang
     <div class="chrono__grid">
       <div></div><div class="chrono__h">${t('chrono.onset')}</div><div class="chrono__h">${t('chrono.wake')}</div>
       <div class="chrono__rowlabel">${t('chrono.workdays')}</div>
-      <input type="time" id="c-wo" value="${log.workOnset}" />
-      <input type="time" id="c-ww" value="${log.workWake}" />
+      <input type="time" id="c-wo" value="${log.workOnset}" aria-label="${t('chrono.workdays')} – ${t('chrono.onset')}" />
+      <input type="time" id="c-ww" value="${log.workWake}" aria-label="${t('chrono.workdays')} – ${t('chrono.wake')}" />
       <div class="chrono__rowlabel">${t('chrono.freedays')}</div>
-      <input type="time" id="c-fo" value="${log.freeOnset}" />
-      <input type="time" id="c-fw" value="${log.freeWake}" />
+      <input type="time" id="c-fo" value="${log.freeOnset}" aria-label="${t('chrono.freedays')} – ${t('chrono.onset')}" />
+      <input type="time" id="c-fw" value="${log.freeWake}" aria-label="${t('chrono.freedays')} – ${t('chrono.wake')}" />
     </div>
 
     <dl class="chrono__stats">

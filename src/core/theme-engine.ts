@@ -38,6 +38,8 @@ export interface Palette {
   secondary: string;
   text: string;
   textDim: string;
+  /** Textfarbe auf Akzent-Flächen (Buttons) — kontraststark in beiden Themes. */
+  onAccent: string;
   /** Ringfarbe der Zone auf dem Zifferblatt. */
   ringDay: string;
   ringGolden: string;
@@ -51,10 +53,12 @@ export interface Palette {
 const DAY: Palette = {
   bg: '#F7F5F0',
   surface: '#FFFFFF',
-  accent: '#C94F3D',
+  // Etwas dunkleres Vermillion: Akzent-Text auf hellem Grund erreicht WCAG AA.
+  accent: '#B23A2A',
   secondary: '#2B3A42',
   text: '#1A1A1A',
-  textDim: '#6B6B6B',
+  textDim: '#5E5E5E',
+  onAccent: '#FFFFFF',
   ringDay: '#FBD07A',
   ringGolden: '#F0A05A',
   ringCivil: '#C97A8C',
@@ -70,7 +74,8 @@ const NIGHT: Palette = {
   accent: '#6FE0C9',
   secondary: '#8D6FE7',
   text: '#E8E8E8',
-  textDim: '#8A8F9C',
+  textDim: '#9AA0AD',
+  onAccent: '#08221D',
   ringDay: '#3A4A2E',
   ringGolden: '#5A4A2E',
   ringCivil: '#4A3550',

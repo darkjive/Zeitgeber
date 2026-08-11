@@ -7,7 +7,8 @@
   --accent: #c94f3d;
   --secondary: #2b3a42;
   --text: #1a1a1a;
-  --text-dim: #6b6b6b;
+  --text-dim: #5e5e5e;
+  --on-accent: #ffffff;
   --wall-brightness: 1;
   --wall-drift-x: 0px;
   --wall-drift-y: 0px;
@@ -115,7 +116,7 @@ body {
 
 .btn--primary {
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   border: none;
 }
 
@@ -181,7 +182,7 @@ body {
 
 .seg__btn.is-active {
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
 }
 
 .chip {
@@ -1073,7 +1074,7 @@ body {
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #fff;
+  color: var(--on-accent);
   background: var(--accent);
   border-radius: 999px;
   padding: 1px 8px;

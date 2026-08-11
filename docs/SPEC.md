@@ -1144,5 +1144,10 @@ verifiziert), rein lokale Datenhaltung, kein Backend/Tracking, Bundle-Größe
 deutlich unter 500 KB. Referenzvalidierung der Berechnungen über
 Unit-Tests (u. a. Sonnenposition, Elongationsschranken der inneren Planeten,
 Polaris-Höhe ≈ geografische Breite, Reihenfolge der Gebetszeiten,
-Jahreskreis-Ekliptiklängen). Vollständige WCAG-2.2-AA-Prüfung und
-JPL-Horizons-Abgleich stehen noch aus.
+Jahreskreis-Ekliptiklängen, SGP4-Bahnhöhe der ISS).
+
+Barrierefreiheit: automatischer axe-core-Durchlauf (WCAG 2.0/2.1/2.2 A+AA)
+über Haupt- und Panel-Ansichten in Tag- und Nachtdarstellung — **0 Verstöße**
+(Kontraste, ARIA-Rollen der Tabs, Formularbeschriftungen, SVG-Alternativtexte,
+Seitensprache). Eine manuelle Prüfung mit Screenreader und reiner
+Tastaturbedienung sowie der JPL-Horizons-Abgleich stehen noch aus.

@@ -36,7 +36,7 @@ export function openSolarYield(location: GeoLocation, date: Date, t: Translator)
         <input id="sy-tilt" type="range" min="0" max="90" step="5" value="${tilt}" />
       </label>
     </div>
-    <svg id="sy-curve" class="solar__curve" viewBox="0 0 300 90" role="img"></svg>
+    <svg id="sy-curve" class="solar__curve" viewBox="0 0 300 90" role="img" aria-label="${t('solar.curveAlt')}"></svg>
     <dl class="solar__stats">
       <div><dt>${t('solar.window')}</dt><dd id="sy-window">–</dd></div>
       <div><dt>${t('solar.peak')}</dt><dd id="sy-peak">–</dd></div>

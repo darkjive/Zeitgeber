@@ -124,10 +124,10 @@ app.innerHTML = `
     </header>
 
     <div class="controls">
-      <div class="seg" role="tablist">
-        <button class="seg__btn is-active" id="view-dial" data-i18n="view.dial"></button>
-        <button class="seg__btn" id="view-map" data-i18n="view.map"></button>
-        <button class="seg__btn" id="view-list" data-i18n="view.list"></button>
+      <div class="seg" role="tablist" aria-label="Ansicht">
+        <button class="seg__btn is-active" id="view-dial" role="tab" aria-selected="true" aria-controls="view-wrap" data-i18n="view.dial"></button>
+        <button class="seg__btn" id="view-map" role="tab" aria-selected="false" aria-controls="view-wrap" data-i18n="view.map"></button>
+        <button class="seg__btn" id="view-list" role="tab" aria-selected="false" aria-controls="view-wrap" data-i18n="view.list"></button>
       </div>
       <div class="layers">
         <button class="chip" id="planets-toggle" aria-pressed="false" data-i18n="layer.planets"></button>
@@ -210,12 +210,15 @@ app.innerHTML = `
 const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => app.querySelector(sel) as T;
 
 function applyStaticI18n(): void {
+  document.documentElement.lang = lang; // WCAG 3.1.1
   app.querySelectorAll<HTMLElement>('[data-i18n]').forEach((node) => {
     node.textContent = t(node.dataset.i18n as string);
   });
   $('#lang-toggle').textContent = lang === 'de' ? 'EN' : 'DE';
   $('#wall-toggle').textContent = t(wall?.isActive ? 'wall.exit' : 'wall.enter');
-  ($('#loc-input') as HTMLInputElement).placeholder = t('loc.placeholder');
+  const locInput = $('#loc-input') as HTMLInputElement;
+  locInput.placeholder = t('loc.placeholder');
+  locInput.setAttribute('aria-label', t('loc.manual'));
 }
 
 // --- Haupt-Render -----------------------------------------------------------
@@ -350,6 +353,7 @@ function applyPalette(p: ReturnType<typeof paletteForElevation>['palette']): voi
   r.setProperty('--secondary', p.secondary);
   r.setProperty('--text', p.text);
   r.setProperty('--text-dim', p.textDim);
+  r.setProperty('--on-accent', p.onAccent);
 }
 
 // --- Interaktion ------------------------------------------------------------
@@ -358,6 +362,7 @@ function setLang(next: Lang): void {
   lang = next;
   t = createTranslator(lang);
   saveLang(lang);
+  document.documentElement.lang = lang; // WCAG 3.1.1
   applyStaticI18n();
   rerender();
 }
@@ -371,9 +376,11 @@ function setLocation(loc: GeoLocation): void {
 
 function setView(view: ViewId): void {
   currentView = view;
-  $('#view-dial').classList.toggle('is-active', view === 'dial');
-  $('#view-map').classList.toggle('is-active', view === 'map');
-  $('#view-list').classList.toggle('is-active', view === 'list');
+  for (const [id, v] of [['#view-dial', 'dial'], ['#view-map', 'map'], ['#view-list', 'list']] as const) {
+    const on = view === v;
+    $(id).classList.toggle('is-active', on);
+    $(id).setAttribute('aria-selected', String(on));
+  }
   rerender();
 }
 
