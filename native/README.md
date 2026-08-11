@@ -21,11 +21,20 @@ Dateien aus dem Repo-Wurzelordner mitgebündelt werden.
 
 ## Was nativ neu ist
 
-- `App.tsx` — Shell für iOS/Android
+- `App.tsx` — Shell für iOS/Android mit Ansichts-Umschalter (Zifferblatt /
+  Karte / Liste) und Layer-Toggles (Planeten / Sterne / Deep Sky)
 - `src/Dial.tsx` — Zifferblatt über `react-native-svg` (Geometrie identisch
   zum Web-Zifferblatt)
-- `src/useSky.ts` — Hook, der die geteilte Engine im Sekundentakt auswertet
+- `src/SkyMap.tsx` — 2D-Himmelskarte über `react-native-svg` (§24)
+- `src/ObjectList.tsx` — „Heute Nacht sichtbar", sortiert nach Höhe (§24)
+- `src/useSky.ts` — Hook, wertet die geteilte Engine im Sekundentakt aus;
+  Provider Sonne/Mond/Planeten/Sterne/Deep Sky
 - `src/useLocation.ts` — GPS über `expo-location`, Fallback-Ort (§10)
+
+Noch offen für die native Parität: Fähigkeits-Panels (Chronobiologie,
+Outdoor, Solar …) als `Modal`, Onboarding, Ortssuche, Wandmodus, Widgets
+(§25), dynamischer Wecker (§27) und die Umstellung des Zifferblatt-Renderings
+auf Skia (§6.2).
 
 ## Starten
 

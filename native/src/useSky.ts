@@ -14,6 +14,14 @@ import type { CelestialObject } from '../../src/core/types';
 import { sunProvider } from '../../src/providers/sun';
 import { moonProvider } from '../../src/providers/moon';
 import { planetsProvider } from '../../src/providers/planets';
+import { starsProvider } from '../../src/providers/stars';
+import { deepSkyProvider } from '../../src/providers/deep-sky';
+
+export interface Layers {
+  planets: boolean;
+  stars: boolean;
+  deepSky: boolean;
+}
 
 export interface SkyState {
   now: Date;
@@ -27,16 +35,20 @@ export interface SkyState {
   tzOffsetMinutes: number;
 }
 
-export function useSky(location: GeoLocation, planetsOn: boolean): SkyState {
+export function useSky(location: GeoLocation, layers: Layers): SkyState {
   const bus = useMemo(() => {
     const b = new ObjectBus();
     b.register(sunProvider);
     b.register(moonProvider);
     b.register(planetsProvider);
+    b.register(starsProvider);
+    b.register(deepSkyProvider);
     return b;
   }, []);
 
-  bus.setEnabled('planets', planetsOn);
+  bus.setEnabled('planets', layers.planets);
+  bus.setEnabled('stars', layers.stars);
+  bus.setEnabled('deep-sky', layers.deepSky);
 
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
@@ -60,5 +72,5 @@ export function useSky(location: GeoLocation, planetsOn: boolean): SkyState {
       nightness,
       tzOffsetMinutes: utcOffsetMinutes(now),
     };
-  }, [bus, now, location, planetsOn]);
+  }, [bus, now, location, layers.planets, layers.stars, layers.deepSky]);
 }
