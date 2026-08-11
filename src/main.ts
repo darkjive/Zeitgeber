@@ -505,3 +505,12 @@ async function boot(): Promise<void> {
 }
 
 void boot();
+
+// PWA: Service Worker registrieren (Offline-Fähigkeit, §9/§35).
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => {
+      /* PWA optional — die App läuft auch ohne Service Worker. */
+    });
+  });
+}

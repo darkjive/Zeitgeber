@@ -1125,6 +1125,7 @@ umsetzt; ein nativer Aufsatz (React Native + Expo) teilt sich diese Ebene.
 | Onboarding (14), i18n DE/EN (15), Barrierefreiheit-Grundgerüst (13), Fehlerzustände (10) | umgesetzt |
 | Info-/Spenden-Bereich (36, 38.3) | umgesetzt |
 | Modul-Menü (11.5) | umgesetzt |
+| PWA: Manifest, Service Worker, installierbar, offline (9, 35) | umgesetzt, offline verifiziert |
 
 ### 40.2 Noch offen
 
@@ -1136,8 +1137,9 @@ umsetzt; ein nativer Aufsatz (React Native + Expo) teilt sich diese Ebene.
 
 ### 40.3 Nicht-funktional (35)
 
-Erfüllt: Offline-Kernuhr, rein lokale Datenhaltung, kein Backend/Tracking,
-Bundle-Größe deutlich unter 500 KB. Referenzvalidierung der Berechnungen über
+Erfüllt: Offline-Kernuhr (als installierbare PWA mit Service Worker, offline
+verifiziert), rein lokale Datenhaltung, kein Backend/Tracking, Bundle-Größe
+deutlich unter 500 KB. Referenzvalidierung der Berechnungen über
 Unit-Tests (u. a. Sonnenposition, Elongationsschranken der inneren Planeten,
 Polaris-Höhe ≈ geografische Breite, Reihenfolge der Gebetszeiten,
 Jahreskreis-Ekliptiklängen). Vollständige WCAG-2.2-AA-Prüfung und
