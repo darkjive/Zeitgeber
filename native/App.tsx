@@ -10,6 +10,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Dial } from './src/Dial';
 import { SkyMap } from './src/SkyMap';
 import { ObjectList } from './src/ObjectList';
+import { ModuleSheet } from './src/ModuleSheet';
 import { useSky, type Layers } from './src/useSky';
 import { useLocation } from './src/useLocation';
 import { createTranslator, azimuthDirKey, type Lang } from '../src/i18n';
@@ -27,6 +28,7 @@ function fmtTime(d: Date, withSeconds = false): string {
 export default function App(): React.JSX.Element {
   const [lang, setLang] = useState<Lang>('de');
   const [view, setView] = useState<ViewId>('dial');
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [layers, setLayers] = useState<Layers>({ planets: false, stars: false, deepSky: false });
   const { location } = useLocation();
   const t = useMemo(() => createTranslator(lang), [lang]);
@@ -75,6 +77,7 @@ export default function App(): React.JSX.Element {
           <Chip label={t('layer.planets')} active={layers.planets} onPress={() => toggle('planets')} palette={palette} />
           <Chip label={t('layer.stars')} active={layers.stars} onPress={() => toggle('stars')} palette={palette} />
           <Chip label={t('layer.deepsky')} active={layers.deepSky} onPress={() => toggle('deepSky')} palette={palette} />
+          <Chip label={t('modules.button')} onPress={() => setSheetOpen(true)} palette={palette} />
         </View>
 
         <View style={styles.stage}>
@@ -102,6 +105,8 @@ export default function App(): React.JSX.Element {
           </View>
         )}
       </ScrollView>
+
+      <ModuleSheet visible={sheetOpen} onClose={() => setSheetOpen(false)} location={location} now={sky.now} t={t} palette={palette} />
     </SafeAreaView>
   );
 }

@@ -27,12 +27,14 @@ Dateien aus dem Repo-Wurzelordner mitgebündelt werden.
   zum Web-Zifferblatt)
 - `src/SkyMap.tsx` — 2D-Himmelskarte über `react-native-svg` (§24)
 - `src/ObjectList.tsx` — „Heute Nacht sichtbar", sortiert nach Höhe (§24)
+- `src/ModuleSheet.tsx` — Modul-Menü + Fähigkeits-Panels als `Modal`
+  (Outdoor, Meteore, Jahreskreis, Gebetszeiten mit Methodenwahl)
 - `src/useSky.ts` — Hook, wertet die geteilte Engine im Sekundentakt aus;
   Provider Sonne/Mond/Planeten/Sterne/Deep Sky
 - `src/useLocation.ts` — GPS über `expo-location`, Fallback-Ort (§10)
 
-Noch offen für die native Parität: Fähigkeits-Panels (Chronobiologie,
-Outdoor, Solar …) als `Modal`, Onboarding, Ortssuche, Wandmodus, Widgets
+Noch offen für die native Parität: Panels mit Eingaben (Chronobiologie,
+Solar, Garten/Fassade, Hitze), Onboarding, Ortssuche, Wandmodus, Widgets
 (§25), dynamischer Wecker (§27) und die Umstellung des Zifferblatt-Renderings
 auf Skia (§6.2).
 
