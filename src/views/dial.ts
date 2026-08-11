@@ -31,6 +31,8 @@ export interface DialState {
   tzOffsetMinutes: number;
   objects: CelestialObject[];
   t: Translator;
+  /** Persönlicher Rhythmus (§26.4) — innerer Ring, wenn Chronobiologie aktiv. */
+  chrono?: { idealOnsetMin: number; idealWakeMin: number; msfScMin: number } | null;
 }
 
 const el = (tag: string, attrs: Record<string, string | number>): SVGElement => {
@@ -210,6 +212,23 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
       g.appendChild(el('circle', { cx: ox - (1 - illum) * 8, cy: oy, r: 8, fill: palette.surface, opacity: 0.55 }));
       svg.appendChild(g);
     }
+  }
+
+  // --- Innerer Ring: persönlicher Rhythmus (§26.4) ------------------------
+  if (state.chrono) {
+    const R_SLEEP = 92;
+    const onsetH = state.chrono.idealOnsetMin / 60;
+    let wakeH = state.chrono.idealWakeMin / 60;
+    if (wakeH <= onsetH) wakeH += 24; // Schlaffenster über Mitternacht
+    svg.appendChild(
+      el('path', {
+        d: annularSector(R_SLEEP + 5, R_SLEEP - 5, hourToAngle(onsetH), hourToAngle(wakeH)),
+        fill: palette.secondary,
+        opacity: 0.5,
+      }),
+    );
+    const [mx, my] = polar(R_SLEEP, hourToAngle(state.chrono.msfScMin / 60));
+    svg.appendChild(el('circle', { cx: mx, cy: my, r: 4, fill: palette.secondary }));
   }
 
   // --- Zeiger auf die aktuelle gesetzliche Zeit ---------------------------

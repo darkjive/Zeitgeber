@@ -36,6 +36,7 @@ import { fetchWeather, observationRating, type WeatherNow } from './features/wea
 import { renderViewToBlob, shareOrDownload } from './features/share';
 import { openSolarYield } from './features/solar-yield';
 import { openPrayerTimes } from './features/prayer-times';
+import { openChronobiology, currentChrono } from './features/chronobiology';
 import {
   azimuthDirKey,
   createTranslator,
@@ -114,6 +115,7 @@ app.innerHTML = `
         <button class="chip" id="stars-toggle" aria-pressed="false" data-i18n="layer.stars"></button>
         <button class="chip" id="solar-open" data-i18n="solar.button"></button>
         <button class="chip" id="prayer-open" data-i18n="prayer.button"></button>
+        <button class="chip" id="chrono-open" data-i18n="chrono.button"></button>
       </div>
     </div>
 
@@ -212,7 +214,9 @@ function render(now: Date): void {
   // Ansicht (Achse B): Zifferblatt, Himmelskarte oder Objektliste
   const wrap = $('#view-wrap');
   if (currentView === 'dial') {
-    const { svg } = renderDial({ time: now, location, tzOffsetMinutes: tz, objects, t });
+    const chr = currentChrono();
+    const chrono = chr ? { idealOnsetMin: chr.idealOnsetMin, idealWakeMin: chr.idealWakeMin, msfScMin: chr.msfScMin } : null;
+    const { svg } = renderDial({ time: now, location, tzOffsetMinutes: tz, objects, t, chrono });
     wrap.replaceChildren(svg);
     $('#readout').hidden = false;
   } else if (currentView === 'map') {
@@ -402,6 +406,12 @@ function wireEvents(): void {
 
   // Gebetszeiten (§32.1) — Panel bei Bedarf
   $('#prayer-open').addEventListener('click', () => openPrayerTimes(location, currentTime(), t));
+
+  // Chronobiologie (§26) — sozialer Jetlag, rein lokal; aktualisiert den Ring
+  $('#chrono-open').addEventListener('click', () => {
+    const off = solarOffset(currentTime(), location).minutes;
+    openChronobiology(off, t, () => rerender());
+  });
 
   $('#wall-toggle').addEventListener('click', async () => {
     if (wall.isActive) wall.exit();

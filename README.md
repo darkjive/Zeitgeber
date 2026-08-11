@@ -36,6 +36,7 @@ dem Ziel von 500 KB Initial-Load (§35).
 | §6.3 UI-freie Astro-Engine | `core/astro-engine.ts` — reine Funktionen, NOAA-Sonnenalgorithmus + Schlyter-Mond, keine DOM-Abhängigkeit |
 | §4 Wissenschaftliche Grundlage | Sonnenposition < 0,1°, Zeitgleichung, Refraktion; Validierung in `astro-engine.test.ts` |
 | §2 / §26.1 A Sonnenzeit-Versatz | `core/time-engine.ts` — gesetzlicher vs. echter Mittag, ohne Nutzerdaten |
+| §26.3 Chronobiologie | sozialer Jetlag (MCTQ), Chronotyp, **kombinierter Gesamtversatz**, dritter Ring, rein lokal |
 | §22 Zifferblatt | `views/dial.ts` — 24-h-Zeitring mit Dämmerungszonen, Sonnenhöchststand-Marker, Kompassring mit Sonne/Mond |
 | §12 Theme-Engine | kontinuierliche Tag/Nacht-Interpolation nach Sonnenhöhe, echter Nachtsicht-Modus |
 | §17 Provider Sonne & Mond | Core-Provider, nicht deaktivierbar |
@@ -70,10 +71,11 @@ src/
     stars.ts           heller Fixstern-Katalog (J2000) + Transformation
     solar-geometry.ts  Einstrahlungsgeometrie für PV (Einfallswinkel)
     prayer-times.ts    Gebetszeiten aus Sonnenhöhe (etablierte Konventionen)
+    chronobiology.ts   sozialer Jetlag & Chronotyp (MCTQ)
   providers/           Achse A — sun, moon, planets, stars
-  views/               Achse B — dial, sky-map, object-list
+  views/               Achse B — dial (mit drittem Ring), sky-map, object-list
   features/            Achse C — onboarding, wallmode, weather, share,
-                                 solar-yield, prayer-times
+                                 solar-yield, prayer-times, chronobiology
   i18n/                DE/EN
   main.ts              App-Shell, verdrahtet die drei Achsen
 ```

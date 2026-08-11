@@ -650,6 +650,91 @@ body {
   margin: 0 0 10px;
 }
 
+/* Chronobiologie-Panel (§26) */
+.onboard__card.chrono {
+  text-align: left;
+  max-width: 420px;
+}
+
+.chrono__intro {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin: 0 0 16px;
+}
+
+.chrono__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px 10px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.chrono__h {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+.chrono__rowlabel {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.chrono__grid input[type='time'] {
+  padding: 7px 8px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--text-dim) 40%, transparent);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color-scheme: light dark;
+  width: 100%;
+}
+
+.chrono__stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.chrono__stats div {
+  text-align: center;
+}
+
+.chrono__stats dt {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 0 0 4px;
+}
+
+.chrono__stats dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--text);
+}
+
+.chrono__explain {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin: 0 0 10px;
+}
+
+.chrono__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 /* Wall mode (§25) */
 #app.is-wall .topbar,
 #app.is-wall .sky,
