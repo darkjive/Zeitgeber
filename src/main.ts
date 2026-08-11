@@ -35,6 +35,7 @@ import { fetchAircraft } from './features/aircraft';
 import { renderDial } from './views/dial';
 import { renderObjectList } from './views/object-list';
 import { renderSkyMap } from './views/sky-map';
+import { buildOverlay, type DialOverlay, type OverlayId } from './core/dial-overlay';
 import { showOnboarding, hasOnboarded } from './features/onboarding';
 import { WallMode } from './features/wallmode';
 import { fetchWeather, observationRating, type WeatherNow } from './features/weather';
@@ -88,6 +89,28 @@ let frozenTime: Date | null = null;
 const currentTime = (): Date => frozenTime ?? new Date();
 const rerender = (): void => render(currentTime());
 
+// Ans Zifferblatt geheftetes Modul-Overlay (§22, §29). Persistiert, Default aus.
+const OVERLAY_KEY = 'sunclock.dialOverlay';
+const loadOverlay = (): OverlayId | null => {
+  try {
+    return localStorage.getItem(OVERLAY_KEY) === 'outdoor' ? 'outdoor' : null;
+  } catch {
+    return null;
+  }
+};
+let dialOverlay: OverlayId | null = loadOverlay();
+
+function setDialOverlay(id: OverlayId | null): void {
+  dialOverlay = id;
+  try {
+    if (id) localStorage.setItem(OVERLAY_KEY, id);
+    else localStorage.removeItem(OVERLAY_KEY);
+  } catch {
+    /* ignore */
+  }
+  rerender();
+}
+
 // --- Formatierung -----------------------------------------------------------
 
 const fmtTime = (d: Date, withSeconds = false): string =>
@@ -134,7 +157,7 @@ interface ModuleDef {
 const MODULES: ModuleDef[] = [
   { key: 'chrono', labelKey: 'chrono.button', icon: 'moon', color: '#8D6FE7', open: (now) => openChronobiology(solarOffset(now, location).minutes, t, () => rerender()) },
   { key: 'comfort', labelKey: 'comfort.button', icon: 'thermometer-sun', color: '#E8794A', open: (now) => openComfort(location, now, t) },
-  { key: 'outdoor', labelKey: 'outdoor.button', icon: 'compass', color: '#4F9E8C', open: (now) => openOutdoor(location, now, t) },
+  { key: 'outdoor', labelKey: 'outdoor.button', icon: 'compass', color: '#4F9E8C', open: (now) => openOutdoor(location, now, t, { pinned: dialOverlay === 'outdoor', onPin: (on) => setDialOverlay(on ? 'outdoor' : null) }) },
   { key: 'solar', labelKey: 'solar.button', icon: 'zap', color: '#E0A93C', open: (now) => openSolarYield(location, now, t) },
   { key: 'arch', labelKey: 'arch.button', icon: 'building-2', color: '#7C93B0', open: (now) => openArchitecture(location, now, t) },
   { key: 'garden', labelKey: 'garden.button', icon: 'sprout', color: '#5FA968', open: (now) => openGarden(location, now, t) },
@@ -172,6 +195,8 @@ app.innerHTML = `
 
     <main class="stage">
       <div class="view-wrap" id="view-wrap"></div>
+
+      <div class="overlay-key" id="overlay-key" hidden></div>
 
       <section class="readout" id="readout" aria-live="polite">
         <div class="readout__legal">
@@ -365,15 +390,19 @@ function render(now: Date): void {
   if (currentView === 'dial') {
     const chr = currentChrono();
     const chrono = chr ? { idealOnsetMin: chr.idealOnsetMin, idealWakeMin: chr.idealWakeMin, msfScMin: chr.msfScMin } : null;
-    const { svg } = renderDial({ time: now, location, tzOffsetMinutes: tz, objects, t, chrono });
+    const overlay = buildOverlay(dialOverlay, now, location);
+    const { svg } = renderDial({ time: now, location, tzOffsetMinutes: tz, objects, t, chrono, overlay });
     wrap.replaceChildren(svg);
+    renderOverlayKey(overlay);
     $('#readout').hidden = false;
   } else if (currentView === 'map') {
     const { svg } = renderSkyMap(objects, t);
     wrap.replaceChildren(svg);
+    renderOverlayKey(null);
     $('#readout').hidden = false;
   } else {
     wrap.replaceChildren(renderObjectList(objects, t));
+    renderOverlayKey(null);
     $('#readout').hidden = true;
   }
 
@@ -442,6 +471,39 @@ function renderWeather(moon?: { horizontal: { elevation: number }; metadata?: Re
   badge.dataset.rating = rating;
   const stamp = t('weather.stamp', { time: fmtTime(new Date(weather.fetchedAt)) });
   $('#weather-sub').textContent = `${t('weather.clouds')} ${Math.round(weather.cloudCover)} % · ${stamp}`;
+}
+
+function renderOverlayKey(overlay: DialOverlay | null): void {
+  const box = $('#overlay-key');
+  if (!overlay) {
+    box.hidden = true;
+    box.replaceChildren();
+    return;
+  }
+  // Legende: Bögen und Marker nach Label zusammenfassen (gleiche Farbe/Bedeutung).
+  const seen = new Set<string>();
+  const items: { color: string; label: string; hollow: boolean }[] = [];
+  for (const a of overlay.arcs) {
+    if (!a.from || !a.to || seen.has(a.labelKey)) continue;
+    seen.add(a.labelKey);
+    items.push({ color: a.color, label: t(a.labelKey), hollow: false });
+  }
+  for (const m of overlay.markers) {
+    if (!m.at || seen.has(m.labelKey)) continue;
+    seen.add(m.labelKey);
+    items.push({ color: m.color, label: t(m.labelKey), hollow: !!m.hollow });
+  }
+  box.replaceChildren();
+  for (const it of items) {
+    const chip = document.createElement('span');
+    chip.className = 'overlay-key__item';
+    const sw = document.createElement('span');
+    sw.className = it.hollow ? 'overlay-key__dot overlay-key__dot--hollow' : 'overlay-key__dot';
+    sw.style.setProperty('--k', it.color);
+    chip.append(sw, document.createTextNode(it.label));
+    box.appendChild(chip);
+  }
+  box.hidden = items.length === 0;
 }
 
 async function refreshWeather(): Promise<void> {

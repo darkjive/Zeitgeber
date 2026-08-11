@@ -186,6 +186,60 @@ body {
   overflow: visible;
 }
 
+/* Legende für ein angeheftetes Modul-Overlay (§22) */
+.overlay-key {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 16px;
+}
+
+.overlay-key[hidden] {
+  display: none;
+}
+
+.overlay-key__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.overlay-key__dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--k);
+  flex: none;
+}
+
+.overlay-key__dot--hollow {
+  background: transparent;
+  border: 2px solid var(--k);
+}
+
+/* „Aufs Zifferblatt heften" — Umschalter in einem Modul-Panel */
+.pin-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  margin: 4px 0 4px;
+  border: 1px solid color-mix(in srgb, var(--text-dim) 30%, transparent);
+  border-radius: 12px;
+  font-size: 14px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.pin-toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
 /* Controls: Ansicht-Umschalter + Layer-Toggle (§7.4) */
 .controls {
   display: flex;

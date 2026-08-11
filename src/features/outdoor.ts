@@ -13,7 +13,12 @@ const fmt = (d: Date | null): string =>
 
 const win = (w: LightWindow): string => (w.start && w.end ? `${fmt(w.start)} – ${fmt(w.end)}` : '—');
 
-export function openOutdoor(location: GeoLocation, date: Date, t: Translator): void {
+export interface OutdoorPin {
+  pinned: boolean;
+  onPin: (on: boolean) => void;
+}
+
+export function openOutdoor(location: GeoLocation, date: Date, t: Translator, pin?: OutdoorPin): void {
   const overlay = document.createElement('div');
   overlay.className = 'onboard';
   overlay.setAttribute('role', 'dialog');
@@ -56,6 +61,8 @@ export function openOutdoor(location: GeoLocation, date: Date, t: Translator): v
       <div><dt>${t('outdoor.direction')}</dt><dd>${dir.above ? `${t('outdoor.sunIn')} ${t(azimuthDirKey(dir.azimuth))} (${Math.round(dir.azimuth)}°)` : t('outdoor.sunDown')}</dd></div>
     </dl>
 
+    ${pin ? `<label class="pin-toggle"><input type="checkbox" id="od-pin" ${pin.pinned ? 'checked' : ''} /><span>${t('overlay.pin')}</span></label>` : ''}
+
     <p class="solar__note">${t('outdoor.note')}</p>
     <div class="onboard__actions">
       <span></span>
@@ -64,6 +71,12 @@ export function openOutdoor(location: GeoLocation, date: Date, t: Translator): v
   `;
   overlay.appendChild(card);
   document.body.appendChild(overlay);
+
+  if (pin) {
+    (card.querySelector('#od-pin') as HTMLInputElement).addEventListener('change', (e) => {
+      pin.onPin((e.target as HTMLInputElement).checked);
+    });
+  }
 
   (card.querySelector('#od-close') as HTMLElement).addEventListener('click', () => overlay.remove());
   overlay.addEventListener('click', (e) => {

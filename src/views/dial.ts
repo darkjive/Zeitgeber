@@ -14,6 +14,7 @@
 
 import type { GeoLocation } from '../core/astro-engine';
 import { sunTimes } from '../core/astro-engine';
+import type { DialOverlay } from '../core/dial-overlay';
 import { paletteForElevation, zoneForElevation } from '../core/theme-engine';
 import type { CelestialObject } from '../core/types';
 import { azimuthDirKey, type Translator } from '../i18n';
@@ -23,6 +24,7 @@ const SIZE = 400;
 const C = SIZE / 2;
 const R_TIME_OUT = 190;
 const R_TIME_IN = 150;
+const R_OVERLAY = 136;
 const R_COMPASS = 120;
 
 export interface DialState {
@@ -33,6 +35,8 @@ export interface DialState {
   t: Translator;
   /** Persönlicher Rhythmus (§26.4) — innerer Ring, wenn Chronobiologie aktiv. */
   chrono?: { idealOnsetMin: number; idealWakeMin: number; msfScMin: number } | null;
+  /** Angeheftetes Modul-Overlay (Bögen/Marker), wenn eines gewählt ist. */
+  overlay?: DialOverlay | null;
 }
 
 const el = (tag: string, attrs: Record<string, string | number>): SVGElement => {
@@ -64,6 +68,14 @@ const localHour = (date: Date | null, tzOff: number): number | null => {
   if (!date) return null;
   return (((date.getTime() + tzOff * 60_000) / 3_600_000) % 24 + 24) % 24;
 };
+
+/** Gestrichener Bogen (nur Außenkante) zwischen zwei Winkeln. */
+function arcStroke(r: number, a0: number, a1: number): string {
+  const large = a1 - a0 > 180 ? 1 : 0;
+  const [x0, y0] = polar(r, a0);
+  const [x1, y1] = polar(r, a1);
+  return `M ${x0} ${y0} A ${r} ${r} 0 ${large} 1 ${x1} ${y1}`;
+}
 
 /** Legale Tagesstunde → Winkel: 12:00 oben, im Uhrzeigersinn über 24 h. */
 const hourToAngle = (h: number): number => ((h - 12) / 24) * 360;
@@ -160,6 +172,38 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
     }
   }
   svg.appendChild(ticks);
+
+  // --- Modul-Overlay: Bögen (Zeitfenster) + Marker (Zeitpunkte) -----------
+  if (state.overlay) {
+    const ov = el('g', { class: 'dial__overlay' });
+    for (const arc of state.overlay.arcs) {
+      const fromH = localHour(arc.from, tz);
+      let toH = localHour(arc.to, tz);
+      if (fromH == null || toH == null) continue;
+      if (toH <= fromH) toH += 24; // Fenster über Mitternacht
+      ov.appendChild(
+        el('path', {
+          d: arcStroke(R_OVERLAY, hourToAngle(fromH), hourToAngle(toH)),
+          fill: 'none',
+          stroke: arc.color,
+          'stroke-width': 5,
+          'stroke-linecap': 'round',
+          opacity: 0.9,
+        }),
+      );
+    }
+    for (const mk of state.overlay.markers) {
+      const h = localHour(mk.at, tz);
+      if (h == null) continue;
+      const [mx, my] = polar(R_OVERLAY, hourToAngle(h));
+      if (mk.hollow) {
+        ov.appendChild(el('circle', { cx: mx, cy: my, r: 4.5, fill: palette.bg, stroke: mk.color, 'stroke-width': 2 }));
+      } else {
+        ov.appendChild(el('circle', { cx: mx, cy: my, r: 4.5, fill: mk.color }));
+      }
+    }
+    svg.appendChild(ov);
+  }
 
   // --- Sonnenhöchststand-Marker (der Versatz, sichtbar) -------------------
   const solarNoonHour = localHour(times.solarNoon, tz);

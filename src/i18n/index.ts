@@ -132,6 +132,11 @@ const de: Dict = {
   'outdoor.sunDown': 'Sonne unter dem Horizont',
   'outdoor.note': 'Alle Werte funktionieren offline und ohne Kompass. Die Himmelsrichtung ergibt sich aus dem Sonnenstand.',
   'outdoor.close': 'Schließen',
+  'outdoor.goldenHour': 'Goldene Stunde',
+  'outdoor.blueHour': 'Blaue Stunde',
+  'outdoor.lightEnds': 'Restlicht endet',
+
+  'overlay.pin': 'Aufs Zifferblatt heften',
 
   'about.button': 'Info',
   'about.opensource': 'Open Source und werbefrei. Finanziert ausschließlich über freiwillige Spenden – kein Paywall, keine In-App-Käufe.',
@@ -467,6 +472,11 @@ const en: Dict = {
   'outdoor.sunDown': 'Sun below the horizon',
   'outdoor.note': 'All values work offline and without a compass. Direction is derived from the sun’s position.',
   'outdoor.close': 'Close',
+  'outdoor.goldenHour': 'Golden hour',
+  'outdoor.blueHour': 'Blue hour',
+  'outdoor.lightEnds': 'Usable light ends',
+
+  'overlay.pin': 'Show on the dial',
 
   'about.button': 'Info',
   'about.opensource': 'Open source and ad-free. Funded solely by voluntary donations – no paywall, no in-app purchases.',
