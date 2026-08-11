@@ -158,6 +158,13 @@ const de: Dict = {
   'modules.subtitle': 'Optionale Funktionen – standardmäßig aus, hier bei Bedarf.',
   'modules.close': 'Schließen',
 
+  'menu.open': 'Menü',
+  'menu.close': 'Menü schließen',
+  'menu.title': 'Menü',
+  'menu.layers': 'Am Himmel',
+  'menu.modules': 'Module',
+  'menu.settings': 'Einstellungen',
+
   'sunhours.close': 'Schließen',
   'sunhours.season': 'Sommer: {summer} · Winter: {winter}',
   'arch.button': 'Fassade',
@@ -485,6 +492,13 @@ const en: Dict = {
   'modules.title': 'Modules',
   'modules.subtitle': 'Optional features – off by default, here when you need them.',
   'modules.close': 'Close',
+
+  'menu.open': 'Menu',
+  'menu.close': 'Close menu',
+  'menu.title': 'Menu',
+  'menu.layers': 'In the sky',
+  'menu.modules': 'Modules',
+  'menu.settings': 'Settings',
 
   'sunhours.close': 'Close',
   'sunhours.season': 'Summer: {summer} · Winter: {winter}',

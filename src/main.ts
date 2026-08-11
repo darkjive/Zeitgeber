@@ -51,7 +51,7 @@ import { openWildlife } from './features/wildlife';
 import { openDrone } from './features/drone';
 import { openMeteorShowers } from './features/meteor-showers';
 import { openKids } from './features/kids';
-import { openModuleMenu, type ModuleEntry } from './features/module-menu';
+import { icon, type IconName } from './icons';
 import {
   azimuthDirKey,
   createTranslator,
@@ -79,6 +79,7 @@ bus.register(aircraftProvider); // optional, standardmäßig deaktiviert (§7.4)
 const app = document.getElementById('app') as HTMLElement;
 let wall: WallMode;
 type ViewId = 'dial' | 'list' | 'map';
+type LayerId = 'planets' | 'stars' | 'deep-sky' | 'satellites' | 'aircraft';
 let currentView: ViewId = 'dial';
 let weather: WeatherNow | null = null;
 
@@ -104,6 +105,48 @@ function fmtDuration(totalMin: number): string {
   return `${h} ${t('unit.hour')} ${min} ${t('unit.min')}`;
 }
 
+// --- Menü-Inhalte (Ebenen + Module) -----------------------------------------
+// Lucide-Icons statt Emojis, je Modul in einer eigenen, ruhigen Farbe (§11).
+
+interface LayerDef {
+  id: LayerId;
+  labelKey: string;
+  icon: IconName;
+  color: string;
+}
+
+const LAYERS: LayerDef[] = [
+  { id: 'planets', labelKey: 'layer.planets', icon: 'globe', color: '#C97A4A' },
+  { id: 'stars', labelKey: 'layer.stars', icon: 'star', color: '#E0C24E' },
+  { id: 'deep-sky', labelKey: 'layer.deepsky', icon: 'telescope', color: '#8D6FE7' },
+  { id: 'satellites', labelKey: 'layer.satellites', icon: 'satellite', color: '#4FB6A0' },
+  { id: 'aircraft', labelKey: 'layer.aircraft', icon: 'plane', color: '#5AA0D6' },
+];
+
+interface ModuleDef {
+  key: string;
+  labelKey: string;
+  icon: IconName;
+  color: string;
+  open: (now: Date) => void;
+}
+
+const MODULES: ModuleDef[] = [
+  { key: 'chrono', labelKey: 'chrono.button', icon: 'moon', color: '#8D6FE7', open: (now) => openChronobiology(solarOffset(now, location).minutes, t, () => rerender()) },
+  { key: 'comfort', labelKey: 'comfort.button', icon: 'thermometer-sun', color: '#E8794A', open: (now) => openComfort(location, now, t) },
+  { key: 'outdoor', labelKey: 'outdoor.button', icon: 'compass', color: '#4F9E8C', open: (now) => openOutdoor(location, now, t) },
+  { key: 'solar', labelKey: 'solar.button', icon: 'zap', color: '#E0A93C', open: (now) => openSolarYield(location, now, t) },
+  { key: 'arch', labelKey: 'arch.button', icon: 'building-2', color: '#7C93B0', open: (now) => openArchitecture(location, now, t) },
+  { key: 'garden', labelKey: 'garden.button', icon: 'sprout', color: '#5FA968', open: (now) => openGarden(location, now, t) },
+  { key: 'wildlife', labelKey: 'wildlife.button', icon: 'bird', color: '#C98A5E', open: (now) => openWildlife(location, now, t) },
+  { key: 'meteor', labelKey: 'meteor.button', icon: 'sparkles', color: '#C9A94B', open: (now) => openMeteorShowers(location, now, t) },
+  { key: 'drone', labelKey: 'drone.button', icon: 'radar', color: '#5AA0D6', open: (now) => openDrone(location, now, t) },
+  { key: 'prayer', labelKey: 'prayer.button', icon: 'moon-star', color: '#8FA6D8', open: (now) => openPrayerTimes(location, now, t) },
+  { key: 'wheel', labelKey: 'wheel.button', icon: 'orbit', color: '#C77FA8', open: (now) => openWheelOfYear(now, t) },
+  { key: 'kids', labelKey: 'kids.button', icon: 'baby', color: '#E56B9B', open: (now) => openKids(location, now, t) },
+  { key: 'sat', labelKey: 'sat.button', icon: 'satellite', color: '#9AA0AD', open: (now) => openSatellites(location, now, t) },
+];
+
 // --- App-Gerüst -------------------------------------------------------------
 
 app.innerHTML = `
@@ -116,11 +159,7 @@ app.innerHTML = `
           <div class="brand__tag" data-i18n="app.tagline"></div>
         </div>
       </div>
-      <div class="topbar__actions">
-        <button class="btn btn--ghost" id="lang-toggle" aria-label="Language"></button>
-        <button class="btn btn--ghost" id="wall-toggle"></button>
-        <button class="btn btn--ghost" id="about-open" data-i18n="about.button"></button>
-      </div>
+      <button class="iconbtn" id="burger" aria-label="Menü" aria-haspopup="dialog" aria-expanded="false">${icon('menu')}</button>
     </header>
 
     <div class="controls">
@@ -128,14 +167,6 @@ app.innerHTML = `
         <button class="seg__btn is-active" id="view-dial" role="tab" aria-selected="true" aria-controls="view-wrap" data-i18n="view.dial"></button>
         <button class="seg__btn" id="view-map" role="tab" aria-selected="false" aria-controls="view-wrap" data-i18n="view.map"></button>
         <button class="seg__btn" id="view-list" role="tab" aria-selected="false" aria-controls="view-wrap" data-i18n="view.list"></button>
-      </div>
-      <div class="layers">
-        <button class="chip" id="planets-toggle" aria-pressed="false" data-i18n="layer.planets"></button>
-        <button class="chip" id="stars-toggle" aria-pressed="false" data-i18n="layer.stars"></button>
-        <button class="chip" id="deepsky-toggle" aria-pressed="false" data-i18n="layer.deepsky"></button>
-        <button class="chip" id="sats-toggle" aria-pressed="false" data-i18n="layer.satellites"></button>
-        <button class="chip" id="aircraft-toggle" aria-pressed="false" data-i18n="layer.aircraft"></button>
-        <button class="chip" id="modules-open" data-i18n="modules.button"></button>
       </div>
     </div>
 
@@ -205,6 +236,30 @@ app.innerHTML = `
       <p class="loc__msg" id="loc-msg" hidden></p>
     </footer>
   </div>
+
+  <div class="drawer" id="drawer" hidden>
+    <div class="drawer__scrim" id="drawer-scrim"></div>
+    <aside class="drawer__panel" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+      <div class="drawer__head">
+        <span class="drawer__title" id="drawer-title" data-i18n="menu.title"></span>
+        <button class="iconbtn" id="drawer-close" aria-label="Menü schließen">${icon('x')}</button>
+      </div>
+      <div class="drawer__body" id="drawer-body">
+        <section class="drawer__section">
+          <h3 class="drawer__h" data-i18n="menu.layers"></h3>
+          <div class="mlist" id="drawer-layers"></div>
+        </section>
+        <section class="drawer__section">
+          <h3 class="drawer__h" data-i18n="menu.modules"></h3>
+          <div class="mlist" id="drawer-modules"></div>
+        </section>
+        <section class="drawer__section">
+          <h3 class="drawer__h" data-i18n="menu.settings"></h3>
+          <div class="mlist" id="drawer-settings"></div>
+        </section>
+      </div>
+    </aside>
+  </div>
 `;
 
 const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => app.querySelector(sel) as T;
@@ -214,11 +269,82 @@ function applyStaticI18n(): void {
   app.querySelectorAll<HTMLElement>('[data-i18n]').forEach((node) => {
     node.textContent = t(node.dataset.i18n as string);
   });
-  $('#lang-toggle').textContent = lang === 'de' ? 'EN' : 'DE';
-  $('#wall-toggle').textContent = t(wall?.isActive ? 'wall.exit' : 'wall.enter');
+  $('#burger').setAttribute('aria-label', t('menu.open'));
+  $('#drawer-close').setAttribute('aria-label', t('menu.close'));
   const locInput = $('#loc-input') as HTMLInputElement;
   locInput.placeholder = t('loc.placeholder');
   locInput.setAttribute('aria-label', t('loc.manual'));
+  buildDrawer();
+}
+
+// --- Menü-Drawer (§11) ------------------------------------------------------
+
+const iconSpan = (name: IconName, color: string): string =>
+  `<span class="mrow__ic" style="color:${color}">${icon(name)}</span>`;
+
+function buildDrawer(): void {
+  // Ebenen — Kippschalter je Himmels-Provider.
+  $('#drawer-layers').innerHTML = LAYERS.map(
+    (l) => `
+    <button class="mrow" data-layer="${l.id}" role="switch" aria-checked="${bus.isEnabled(l.id)}">
+      ${iconSpan(l.icon, l.color)}
+      <span class="mrow__label">${t(l.labelKey)}</span>
+      <span class="mrow__switch" aria-hidden="true"></span>
+    </button>`,
+  ).join('');
+
+  // Module — öffnen jeweils ein Panel.
+  $('#drawer-modules').innerHTML = MODULES.map(
+    (m) => `
+    <button class="mrow" data-mod="${m.key}">
+      ${iconSpan(m.icon, m.color)}
+      <span class="mrow__label">${t(m.labelKey)}</span>
+      <span class="mrow__chev">${icon('chevron-right')}</span>
+    </button>`,
+  ).join('');
+
+  // Einstellungen — Sprache, Wandmodus, Info.
+  const langName = lang === 'de' ? 'Deutsch' : 'English';
+  $('#drawer-settings').innerHTML = `
+    <button class="mrow" data-set="lang">
+      ${iconSpan('languages', '#6C8ED6')}
+      <span class="mrow__label">${t('settings.language')}</span>
+      <span class="mrow__val">${langName}</span>
+    </button>
+    <button class="mrow" data-set="wall" aria-pressed="${wall?.isActive ? 'true' : 'false'}">
+      ${iconSpan('monitor', '#8D7BC0')}
+      <span class="mrow__label">${t(wall?.isActive ? 'wall.exit' : 'wall.enter')}</span>
+      <span class="mrow__chev">${icon('chevron-right')}</span>
+    </button>
+    <button class="mrow" data-set="about">
+      ${iconSpan('info', '#4F9E8C')}
+      <span class="mrow__label">${t('about.button')}</span>
+      <span class="mrow__chev">${icon('chevron-right')}</span>
+    </button>`;
+}
+
+let lastFocus: HTMLElement | null = null;
+
+function openDrawer(): void {
+  lastFocus = document.activeElement as HTMLElement;
+  const drawer = $('#drawer');
+  drawer.hidden = false;
+  // Reflow, dann is-open für die Slide-in-Animation.
+  void drawer.offsetWidth;
+  drawer.classList.add('is-open');
+  $('#burger').setAttribute('aria-expanded', 'true');
+  ($('#drawer-close') as HTMLButtonElement).focus();
+}
+
+function closeDrawer(): void {
+  const drawer = $('#drawer');
+  if (drawer.hidden) return;
+  drawer.classList.remove('is-open');
+  $('#burger').setAttribute('aria-expanded', 'false');
+  window.setTimeout(() => {
+    drawer.hidden = true;
+  }, 280);
+  lastFocus?.focus();
 }
 
 // --- Haupt-Render -----------------------------------------------------------
@@ -384,32 +510,55 @@ function setView(view: ViewId): void {
   rerender();
 }
 
-function toggleLayer(id: 'planets' | 'stars' | 'deep-sky' | 'satellites' | 'aircraft', btnSel: string): void {
+function toggleLayer(id: LayerId, row: HTMLElement): void {
   const on = !bus.isEnabled(id);
   bus.setEnabled(id, on);
-  const btn = $(btnSel);
-  btn.classList.toggle('is-on', on);
-  btn.setAttribute('aria-pressed', String(on));
+  row.setAttribute('aria-checked', String(on));
+  // Frische Netzdaten nur beim Einschalten (§20).
+  if (on && id === 'satellites') void refreshTles().then(() => rerender());
+  if (on && id === 'aircraft') void fetchAircraft(location).then(() => rerender());
   rerender();
 }
 
-function wireEvents(): void {
-  $('#lang-toggle').addEventListener('click', () => setLang(lang === 'de' ? 'en' : 'de'));
+async function toggleWall(): Promise<void> {
+  if (wall.isActive) wall.exit();
+  else await wall.enter();
+  applyStaticI18n();
+}
 
+function wireEvents(): void {
   $('#view-dial').addEventListener('click', () => setView('dial'));
   $('#view-map').addEventListener('click', () => setView('map'));
   $('#view-list').addEventListener('click', () => setView('list'));
 
-  $('#planets-toggle').addEventListener('click', () => toggleLayer('planets', '#planets-toggle'));
-  $('#stars-toggle').addEventListener('click', () => toggleLayer('stars', '#stars-toggle'));
-  $('#deepsky-toggle').addEventListener('click', () => toggleLayer('deep-sky', '#deepsky-toggle'));
-  $('#sats-toggle').addEventListener('click', () => {
-    toggleLayer('satellites', '#sats-toggle');
-    if (bus.isEnabled('satellites')) void refreshTles().then(() => rerender()); // frische TLEs (§20)
+  // Burger-Menü + Drawer (§11)
+  $('#burger').addEventListener('click', openDrawer);
+  $('#drawer-close').addEventListener('click', closeDrawer);
+  $('#drawer-scrim').addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !$('#drawer').hidden) closeDrawer();
   });
-  $('#aircraft-toggle').addEventListener('click', () => {
-    toggleLayer('aircraft', '#aircraft-toggle');
-    if (bus.isEnabled('aircraft')) void fetchAircraft(location).then(() => rerender());
+
+  // Ein Delegat für alle Drawer-Zeilen; der Drawer-Inhalt wird bei Sprach-/
+  // Wandmodus-Wechsel neu aufgebaut, daher keine Handler pro Zeile.
+  $('#drawer-body').addEventListener('click', (e) => {
+    const row = (e.target as HTMLElement).closest('.mrow') as HTMLElement | null;
+    if (!row) return;
+    if (row.dataset.layer) {
+      toggleLayer(row.dataset.layer as LayerId, row);
+    } else if (row.dataset.mod) {
+      const mod = MODULES.find((m) => m.key === row.dataset.mod);
+      closeDrawer();
+      mod?.open(currentTime());
+    } else if (row.dataset.set === 'lang') {
+      setLang(lang === 'de' ? 'en' : 'de'); // baut den Drawer neu auf
+    } else if (row.dataset.set === 'wall') {
+      closeDrawer();
+      void toggleWall();
+    } else if (row.dataset.set === 'about') {
+      closeDrawer();
+      openAbout(t);
+    }
   });
 
   // Zeitreise (§24)
@@ -436,36 +585,6 @@ function wireEvents(): void {
 
   // Teilen/Export (§33)
   $('#t-share').addEventListener('click', () => void exportCurrentView());
-
-  // Modul-Menü — bündelt die optionalen Fähigkeits-Panels (§7.4, §11)
-  $('#modules-open').addEventListener('click', () => {
-    const now = currentTime();
-    const entries: ModuleEntry[] = [
-      { labelKey: 'chrono.button', glyph: '🌙', open: () => openChronobiology(solarOffset(now, location).minutes, t, () => rerender()) },
-      { labelKey: 'comfort.button', glyph: '🌡️', open: () => openComfort(location, now, t) },
-      { labelKey: 'outdoor.button', glyph: '🧭', open: () => openOutdoor(location, now, t) },
-      { labelKey: 'solar.button', glyph: '⚡', open: () => openSolarYield(location, now, t) },
-      { labelKey: 'arch.button', glyph: '🏠', open: () => openArchitecture(location, now, t) },
-      { labelKey: 'garden.button', glyph: '🌱', open: () => openGarden(location, now, t) },
-      { labelKey: 'wildlife.button', glyph: '🦊', open: () => openWildlife(location, now, t) },
-      { labelKey: 'meteor.button', glyph: '☄️', open: () => openMeteorShowers(location, now, t) },
-      { labelKey: 'drone.button', glyph: '🚁', open: () => openDrone(location, now, t) },
-      { labelKey: 'prayer.button', glyph: '🕌', open: () => openPrayerTimes(location, now, t) },
-      { labelKey: 'wheel.button', glyph: '☀', open: () => openWheelOfYear(now, t) },
-      { labelKey: 'kids.button', glyph: '🧒', open: () => openKids(location, now, t) },
-      { labelKey: 'sat.button', glyph: '🛰️', open: () => openSatellites(location, now, t) },
-    ];
-    openModuleMenu(entries, t);
-  });
-
-  // Info & Unterstützen (§36, §38.3)
-  $('#about-open').addEventListener('click', () => openAbout(t));
-
-  $('#wall-toggle').addEventListener('click', async () => {
-    if (wall.isActive) wall.exit();
-    else await wall.enter();
-    applyStaticI18n();
-  });
 
   const search = $('#loc-search') as HTMLFormElement;
   const input = $('#loc-input') as HTMLInputElement;
@@ -502,7 +621,8 @@ function wireEvents(): void {
 
   // Wandmodus: Tippen blendet die volle Oberfläche kurz ein (§25).
   app.addEventListener('click', (e) => {
-    if (wall.isActive && !(e.target as HTMLElement).closest('#wall-toggle')) {
+    const el = e.target as HTMLElement;
+    if (wall.isActive && !el.closest('#burger') && !el.closest('.drawer')) {
       app.classList.add('wall-peek');
       window.setTimeout(() => app.classList.remove('wall-peek'), 3000);
     }

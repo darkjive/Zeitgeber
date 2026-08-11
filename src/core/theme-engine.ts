@@ -76,14 +76,14 @@ const NIGHT: Palette = {
   text: '#ECECEC',
   textDim: '#A6ACBA',
   onAccent: '#08221D',
-  // Deutlich angehobene Nacht-Ringe: die Dämmerungszonen bleiben auf dem
-  // dunklen Grund klar unterscheidbar (Lesbarkeit vor maximaler Dimmung).
-  ringDay: '#6B7F45',
-  ringGolden: '#9C6F3C',
-  ringCivil: '#7A5480',
-  ringNautical: '#465286',
-  ringAstro: '#2C3566',
-  ringNight: '#1B2138',
+  // Natürlicher Sonnenuntergangs-Verlauf (Gold → Amber → Rosé → Violett →
+  // Indigo → Nachtblau), gedimmt für den dunklen Grund. Kein Grün.
+  ringDay: '#C9A94B',
+  ringGolden: '#BE7B41',
+  ringCivil: '#9A5570',
+  ringNautical: '#5A5490',
+  ringAstro: '#333765',
+  ringNight: '#1E2140',
 };
 
 const hex = (h: string): [number, number, number] => [

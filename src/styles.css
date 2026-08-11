@@ -13,9 +13,11 @@
   --wall-drift-x: 0px;
   --wall-drift-y: 0px;
 
-  --font-head: 'Space Grotesk', system-ui, sans-serif;
+  /* Eine ruhige Schriftfamilie, leichte Schnitte. Zahlen laufen tabellarisch
+     (tnum), damit sie ohne klobige Monospace ausgerichtet bleiben. */
+  --font-head: 'Inter', system-ui, sans-serif;
   --font-ui: 'Inter', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-mono: 'Inter', system-ui, sans-serif;
 }
 
 * {
@@ -32,10 +34,14 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-ui);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.005em;
   transition:
     background 1.2s ease,
     color 1.2s ease;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 #app {
@@ -81,8 +87,9 @@ body {
 
 .brand__name {
   font-family: var(--font-head);
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
 }
 
 .brand__tag {
@@ -126,6 +133,36 @@ body {
 }
 
 .btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Icon-Button (Burger, Schließen) — quadratisch, dezent, Lucide-Icon 1em */
+.iconbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 22px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.iconbtn svg {
+  display: block;
+  stroke-width: 1.75;
+}
+
+.iconbtn:hover {
+  background: color-mix(in srgb, var(--text-dim) 16%, transparent);
+}
+
+.iconbtn:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
@@ -348,9 +385,10 @@ body {
 
 .readout__time {
   font-family: var(--font-mono);
-  font-size: 40px;
-  font-weight: 500;
-  letter-spacing: 0.01em;
+  font-size: 44px;
+  font-weight: 300;
+  letter-spacing: 0.005em;
+  line-height: 1.1;
 }
 
 .readout__solar {
@@ -494,7 +532,9 @@ body {
 
 .onboard__title {
   font-family: var(--font-head);
-  font-size: 22px;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
   margin: 0 0 10px;
 }
 
@@ -926,6 +966,189 @@ body {
 
 .modmenu__glyph {
   font-size: 24px;
+}
+
+/* Drawer-Menü (§11) — schiebt sich von rechts über die Seite */
+.drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+}
+
+.drawer[hidden] {
+  display: none;
+}
+
+.drawer__scrim {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, #05070c 55%, transparent);
+  opacity: 0;
+  transition: opacity 0.28s ease;
+}
+
+.drawer.is-open .drawer__scrim {
+  opacity: 1;
+}
+
+.drawer__panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: min(86vw, 360px);
+  background: var(--surface);
+  box-shadow: -18px 0 50px rgba(0, 0, 0, 0.28);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  padding: max(20px, env(safe-area-inset-top)) 8px 8px;
+}
+
+.drawer.is-open .drawer__panel {
+  transform: translateX(0);
+}
+
+.drawer__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px 8px 16px;
+}
+
+.drawer__title {
+  font-family: var(--font-head);
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.drawer__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 8px 20px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.drawer__section + .drawer__section {
+  margin-top: 18px;
+}
+
+.drawer__h {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 0 0 6px;
+  padding: 0 10px;
+}
+
+.mlist {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mrow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 12px 10px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 400;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.mrow:hover {
+  background: color-mix(in srgb, var(--text-dim) 12%, transparent);
+}
+
+.mrow:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.mrow__ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  font-size: 18px;
+  flex: none;
+  background: color-mix(in srgb, currentColor 14%, transparent);
+}
+
+.mrow__ic svg {
+  display: block;
+}
+
+.mrow__label {
+  flex: 1;
+  min-width: 0;
+}
+
+.mrow__chev {
+  color: var(--text-dim);
+  font-size: 18px;
+  display: inline-flex;
+}
+
+.mrow__val {
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+/* Kippschalter für die Himmels-Ebenen */
+.mrow__switch {
+  position: relative;
+  width: 40px;
+  height: 24px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text-dim) 35%, transparent);
+  flex: none;
+  transition: background 0.2s ease;
+}
+
+.mrow__switch::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+}
+
+.mrow[aria-checked='true'] .mrow__switch {
+  background: var(--accent);
+}
+
+.mrow[aria-checked='true'] .mrow__switch::after {
+  transform: translateX(16px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer__scrim,
+  .drawer__panel,
+  .mrow__switch,
+  .mrow__switch::after {
+    transition: none;
+  }
 }
 
 /* Sonnenstunden-Panels (§31.2, §31.3) */
