@@ -60,6 +60,7 @@ in allen Ansichten.
 | Outdoor & Survival | Restlicht-Countdown, blaue/goldene Stunde, Mondlicht-Prognose, Himmelsrichtung ohne Kompass |
 | Solarertrag | Modul-Ausrichtung/Neigung, Ertragsfenster, Sommer/Winter – reine Geometrie, keine kWh |
 | Gebetszeiten | etablierte Konventionen (auswählbar, mit Quelle), reine Zeitangabe |
+| Jahreskreis | Sonnenwenden, Tagundnachtgleichen und Zwischenfeste als exakter astronomischer Zeitpunkt |
 | Wetter | Beobachtungseignung über Open-Meteo, mit Offline-Rückfall |
 | Teilen & Export | aktuelle Ansicht als hochauflösendes PNG mit Fußzeile |
 | Wandmodus | lebende Wanduhr mit Abdunklung und Einbrennschutz |
@@ -113,12 +114,13 @@ src/
     prayer-times.ts      Gebetszeiten aus Sonnenhöhe
     chronobiology.ts     sozialer Jetlag & Chronotyp (MCTQ)
     outdoor.ts           Restlicht, blaue/goldene Stunde, Mondlicht, Richtung
+    wheel-of-year.ts     Sonnenwenden/Tagundnachtgleichen als exakte Zeitpunkte
     object-bus.ts        aggregiert aktive Provider, Fehlerisolierung pro Modul
     location.ts          GPS, manuelle Eingabe, lokale Persistenz
   providers/           Achse A – sun, moon, planets, stars
   views/               Achse B – dial, sky-map, object-list
-  features/            Achse C – onboarding, wallmode, weather, share,
-                                 solar-yield, prayer-times, chronobiology, outdoor
+  features/            Achse C – onboarding, wallmode, weather, share, solar-yield,
+                                 prayer-times, chronobiology, outdoor, wheel-of-year, about
   i18n/                DE/EN
   main.ts              App-Shell, verdrahtet die drei Achsen
 

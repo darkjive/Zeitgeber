@@ -851,6 +851,43 @@ body {
   margin: 0 0 16px;
 }
 
+/* Jahreskreis-Panel (§32.2) */
+.onboard__card.wheel {
+  text-align: left;
+  max-width: 420px;
+}
+
+.wheel__list {
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+}
+
+.wheel__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 9px 8px;
+  border-radius: 8px;
+  border-bottom: 1px solid color-mix(in srgb, var(--text-dim) 16%, transparent);
+}
+
+.wheel__row.is-next {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-bottom-color: transparent;
+}
+
+.wheel__name {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.wheel__date {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
 /* Wall mode (§25) */
 #app.is-wall .topbar,
 #app.is-wall .sky,

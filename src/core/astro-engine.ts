@@ -187,6 +187,16 @@ export function sunTimes(date: Date, loc: GeoLocation): SunTimes {
   };
 }
 
+/**
+ * Scheinbare geozentrische Ekliptiklänge der Sonne (Grad, 0…360).
+ * Grundlage für die exakten Zeitpunkte von Sonnenwenden und Tagundnacht-
+ * gleichen (Jahreskreis, §32.2): 0° Frühling, 90° Sommer, 180° Herbst,
+ * 270° Winter.
+ */
+export function sunEclipticLongitude(date: Date): number {
+  return mod360(sunApparentLong(julianCentury(julianDay(date))));
+}
+
 /** Sonnendeklination für den lokalen Kalendertag (Grad). */
 export function solarDeclination(date: Date): number {
   const noon = new Date(date);

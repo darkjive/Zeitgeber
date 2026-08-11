@@ -39,6 +39,7 @@ import { openPrayerTimes } from './features/prayer-times';
 import { openChronobiology, currentChrono } from './features/chronobiology';
 import { openOutdoor } from './features/outdoor';
 import { openAbout } from './features/about';
+import { openWheelOfYear } from './features/wheel-of-year';
 import {
   azimuthDirKey,
   createTranslator,
@@ -120,6 +121,7 @@ app.innerHTML = `
         <button class="chip" id="prayer-open" data-i18n="prayer.button"></button>
         <button class="chip" id="chrono-open" data-i18n="chrono.button"></button>
         <button class="chip" id="outdoor-open" data-i18n="outdoor.button"></button>
+        <button class="chip" id="wheel-open" data-i18n="wheel.button"></button>
       </div>
     </div>
 
@@ -419,6 +421,9 @@ function wireEvents(): void {
 
   // Outdoor & Survival (§29) — Panel bei Bedarf, offline
   $('#outdoor-open').addEventListener('click', () => openOutdoor(location, currentTime(), t));
+
+  // Jahreskreis (§32.2) — Panel bei Bedarf
+  $('#wheel-open').addEventListener('click', () => openWheelOfYear(currentTime(), t));
 
   // Info & Unterstützen (§36, §38.3)
   $('#about-open').addEventListener('click', () => openAbout(t));

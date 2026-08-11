@@ -115,6 +115,20 @@ const de: Dict = {
   'about.repo': 'Quellcode auf GitHub',
   'about.close': 'Schließen',
 
+  'wheel.button': 'Jahreskreis',
+  'wheel.title': 'Jahreskreis',
+  'wheel.subtitle': 'Exakte astronomische Zeitpunkte {year}',
+  'wheel.note': 'Reine Zeitangabe des astronomischen Zeitpunkts, keine Deutung. Das nächste Ereignis ist hervorgehoben.',
+  'wheel.close': 'Schließen',
+  'wheel.springEquinox': 'Frühlings-Tagundnachtgleiche',
+  'wheel.summerSolstice': 'Sommersonnenwende',
+  'wheel.autumnEquinox': 'Herbst-Tagundnachtgleiche',
+  'wheel.winterSolstice': 'Wintersonnenwende',
+  'wheel.imbolc': 'Imbolc (Frühlingsanfang)',
+  'wheel.beltane': 'Beltane (Maifeuer)',
+  'wheel.lughnasadh': 'Lughnasadh (Erntebeginn)',
+  'wheel.samhain': 'Samhain (Herbstende)',
+
   'map.a11y': 'Himmelskarte: {count} Objekte über dem Horizont, darunter {objects}. Hellster Stern: {star}.',
 
   'list.empty': 'Gerade ist nichts über dem Horizont.',
@@ -305,6 +319,20 @@ const en: Dict = {
   'about.support': 'Support',
   'about.repo': 'Source on GitHub',
   'about.close': 'Close',
+
+  'wheel.button': 'Wheel of the Year',
+  'wheel.title': 'Wheel of the Year',
+  'wheel.subtitle': 'Exact astronomical moments in {year}',
+  'wheel.note': 'The exact astronomical moment only, no interpretation. The next event is highlighted.',
+  'wheel.close': 'Close',
+  'wheel.springEquinox': 'Spring equinox',
+  'wheel.summerSolstice': 'Summer solstice',
+  'wheel.autumnEquinox': 'Autumn equinox',
+  'wheel.winterSolstice': 'Winter solstice',
+  'wheel.imbolc': 'Imbolc (early spring)',
+  'wheel.beltane': 'Beltane (May Day)',
+  'wheel.lughnasadh': 'Lughnasadh (early harvest)',
+  'wheel.samhain': 'Samhain (late autumn)',
 
   'map.a11y': 'Sky map: {count} objects above the horizon, including {objects}. Brightest star: {star}.',
 
