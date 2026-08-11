@@ -21,7 +21,8 @@ Zeit und die echte Lichtumgebung.
 Kein Konto, kein Server, keine Tracker. Alle Daten bleiben auf dem Gerät.
 
 Die vollständige technische Spezifikation liegt unter [`docs/SPEC.md`](./docs/SPEC.md)
-(Version 1.2, inkl. Umsetzungsstand in Abschnitt 40).
+(Version 1.2, inkl. Umsetzungsstand in Abschnitt 40). Änderungen je Version:
+[`CHANGELOG.md`](./CHANGELOG.md).
 
 ## Das Alleinstellungsmerkmal
 

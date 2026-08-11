@@ -1,6 +1,6 @@
 {
   "name": "sunclock-native",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Sun Clock — nativer Aufsatz (React Native + Expo). Teilt die UI-freie Berechnungsebene mit dem Web-Target.",
   "main": "index.ts",

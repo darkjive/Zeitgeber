@@ -1,6 +1,6 @@
 {
   "name": "sunclock",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Sun Clock — die Uhr, die zeigt, wie weit die soziale Zeit von der Sonnenzeit entfernt ist. Phase-1-MVP (Web-Target).",
   "license": "MIT",
