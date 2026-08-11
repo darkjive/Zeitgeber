@@ -48,6 +48,7 @@ dem Ziel von 500 KB Initial-Load (§35).
 | §33 Teilen & Export | Ansicht als PNG mit Fusszeile, Web Share API + Download |
 | §31.1 solar-yield | Modul-Ausrichtung/Neigung, Ertragsfenster, Sommer/Winter — reine Geometrie |
 | §32.1 prayer-times | etablierte Konventionen (auswählbar, mit Quelle), reine Zeitangabe |
+| §29 Outdoor & Survival | Restlicht-Countdown, blaue/goldene Stunde, Mondlicht, Richtung ohne Kompass |
 | §28 Wetter | Open-Meteo, Beobachtungseignung, Offline-Fallback |
 | §14 Onboarding | vier überspringbare Bildschirme |
 | §15 Lokalisierung | DE/EN, keine fest verdrahteten Strings |
@@ -72,10 +73,11 @@ src/
     solar-geometry.ts  Einstrahlungsgeometrie für PV (Einfallswinkel)
     prayer-times.ts    Gebetszeiten aus Sonnenhöhe (etablierte Konventionen)
     chronobiology.ts   sozialer Jetlag & Chronotyp (MCTQ)
+    outdoor.ts         Restlicht, blaue/goldene Stunde, Mondlicht, Richtung
   providers/           Achse A — sun, moon, planets, stars
   views/               Achse B — dial (mit drittem Ring), sky-map, object-list
   features/            Achse C — onboarding, wallmode, weather, share,
-                                 solar-yield, prayer-times, chronobiology
+                                 solar-yield, prayer-times, chronobiology, outdoor
   i18n/                DE/EN
   main.ts              App-Shell, verdrahtet die drei Achsen
 ```

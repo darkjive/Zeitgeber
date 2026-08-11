@@ -37,6 +37,7 @@ import { renderViewToBlob, shareOrDownload } from './features/share';
 import { openSolarYield } from './features/solar-yield';
 import { openPrayerTimes } from './features/prayer-times';
 import { openChronobiology, currentChrono } from './features/chronobiology';
+import { openOutdoor } from './features/outdoor';
 import {
   azimuthDirKey,
   createTranslator,
@@ -116,6 +117,7 @@ app.innerHTML = `
         <button class="chip" id="solar-open" data-i18n="solar.button"></button>
         <button class="chip" id="prayer-open" data-i18n="prayer.button"></button>
         <button class="chip" id="chrono-open" data-i18n="chrono.button"></button>
+        <button class="chip" id="outdoor-open" data-i18n="outdoor.button"></button>
       </div>
     </div>
 
@@ -412,6 +414,9 @@ function wireEvents(): void {
     const off = solarOffset(currentTime(), location).minutes;
     openChronobiology(off, t, () => rerender());
   });
+
+  // Outdoor & Survival (§29) — Panel bei Bedarf, offline
+  $('#outdoor-open').addEventListener('click', () => openOutdoor(location, currentTime(), t));
 
   $('#wall-toggle').addEventListener('click', async () => {
     if (wall.isActive) wall.exit();

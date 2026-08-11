@@ -735,6 +735,59 @@ body {
   flex-wrap: wrap;
 }
 
+/* Outdoor-Panel (§29) */
+.onboard__card.outdoor {
+  text-align: left;
+  max-width: 420px;
+}
+
+.outdoor__hero {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  margin: 4px 0 16px;
+}
+
+.outdoor__hero-k {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-dim);
+}
+
+.outdoor__hero-v {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.outdoor__block {
+  margin: 0 0 12px;
+}
+
+.outdoor__block div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 8px 4px;
+  border-bottom: 1px solid color-mix(in srgb, var(--text-dim) 18%, transparent);
+}
+
+.outdoor__block dt {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.outdoor__block dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
 /* Wall mode (§25) */
 #app.is-wall .topbar,
 #app.is-wall .sky,
