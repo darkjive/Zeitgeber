@@ -594,6 +594,62 @@ body {
   margin: 0 0 16px;
 }
 
+/* Gebetszeiten-Panel (§32.1) */
+.onboard__card.prayer {
+  text-align: left;
+  max-width: 420px;
+}
+
+.prayer__controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 8px 0 16px;
+}
+
+.prayer__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.prayer__field select {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--text-dim) 40%, transparent);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 14px;
+}
+
+.prayer__list {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+}
+
+.prayer__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 9px 4px;
+  border-bottom: 1px solid color-mix(in srgb, var(--text-dim) 18%, transparent);
+  font-size: 15px;
+}
+
+.prayer__row b {
+  font-family: var(--font-mono);
+}
+
+.prayer__ramadan {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin: 0 0 10px;
+}
+
 /* Wall mode (§25) */
 #app.is-wall .topbar,
 #app.is-wall .sky,

@@ -187,6 +187,35 @@ export function sunTimes(date: Date, loc: GeoLocation): SunTimes {
   };
 }
 
+/** Sonnendeklination für den lokalen Kalendertag (Grad). */
+export function solarDeclination(date: Date): number {
+  const noon = new Date(date);
+  noon.setUTCHours(12, 0, 0, 0);
+  return sunDeclination(julianCentury(julianDay(noon)));
+}
+
+/**
+ * Zeitpunkt, zu dem die Sonne eine bestimmte Höhe erreicht (Grad, auch
+ * negativ). `side` wählt Vormittag (rise) oder Nachmittag (set). Null bei
+ * Polartag/-nacht. Grundlage für Gebetszeiten (Fajr/Isha/Asr, §32.1).
+ */
+export function sunTimeAtAltitude(date: Date, loc: GeoLocation, altitudeDeg: number, side: 'rise' | 'set'): Date | null {
+  const noon = new Date(date);
+  noon.setUTCHours(12, 0, 0, 0);
+  const t = julianCentury(julianDay(noon));
+  const decl = sunDeclination(t);
+  const eqTime = equationOfTime(t);
+  const solarNoonUTCmin = 720 - 4 * loc.longitude - eqTime;
+  const dayStart = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+
+  const latR = loc.latitude * RAD;
+  const declR = decl * RAD;
+  const cosH = (Math.sin(altitudeDeg * RAD) - Math.sin(latR) * Math.sin(declR)) / (Math.cos(latR) * Math.cos(declR));
+  if (cosH > 1 || cosH < -1) return null;
+  const ha = Math.acos(clamp(cosH)) * DEG;
+  return new Date(dayStart.getTime() + (solarNoonUTCmin + (side === 'set' ? 1 : -1) * 4 * ha) * 60_000);
+}
+
 // --- Mond (Schlyter) --------------------------------------------------------
 
 export interface MoonInfo extends HorizontalCoords {

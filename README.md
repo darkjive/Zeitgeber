@@ -46,6 +46,7 @@ dem Ziel von 500 KB Initial-Load (§35).
 | §24 Zeitreise | jeder Zeitpunkt frei wählbar, Grundlage für „Himmel bei deiner Geburt" |
 | §33 Teilen & Export | Ansicht als PNG mit Fusszeile, Web Share API + Download |
 | §31.1 solar-yield | Modul-Ausrichtung/Neigung, Ertragsfenster, Sommer/Winter — reine Geometrie |
+| §32.1 prayer-times | etablierte Konventionen (auswählbar, mit Quelle), reine Zeitangabe |
 | §28 Wetter | Open-Meteo, Beobachtungseignung, Offline-Fallback |
 | §14 Onboarding | vier überspringbare Bildschirme |
 | §15 Lokalisierung | DE/EN, keine fest verdrahteten Strings |
@@ -68,9 +69,11 @@ src/
     planets.ts         geozentrische Planetenpositionen (Keplerelemente)
     stars.ts           heller Fixstern-Katalog (J2000) + Transformation
     solar-geometry.ts  Einstrahlungsgeometrie für PV (Einfallswinkel)
+    prayer-times.ts    Gebetszeiten aus Sonnenhöhe (etablierte Konventionen)
   providers/           Achse A — sun, moon, planets, stars
   views/               Achse B — dial, sky-map, object-list
-  features/            Achse C — onboarding, wallmode, weather, share, solar-yield
+  features/            Achse C — onboarding, wallmode, weather, share,
+                                 solar-yield, prayer-times
   i18n/                DE/EN
   main.ts              App-Shell, verdrahtet die drei Achsen
 ```
