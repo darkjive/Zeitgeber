@@ -73,15 +73,17 @@ const NIGHT: Palette = {
   surface: '#12151C',
   accent: '#6FE0C9',
   secondary: '#8D6FE7',
-  text: '#E8E8E8',
-  textDim: '#9AA0AD',
+  text: '#ECECEC',
+  textDim: '#A6ACBA',
   onAccent: '#08221D',
-  ringDay: '#3A4A2E',
-  ringGolden: '#5A4A2E',
-  ringCivil: '#4A3550',
-  ringNautical: '#2E3358',
-  ringAstro: '#1B2044',
-  ringNight: '#0E1224',
+  // Deutlich angehobene Nacht-Ringe: die Dämmerungszonen bleiben auf dem
+  // dunklen Grund klar unterscheidbar (Lesbarkeit vor maximaler Dimmung).
+  ringDay: '#6B7F45',
+  ringGolden: '#9C6F3C',
+  ringCivil: '#7A5480',
+  ringNautical: '#465286',
+  ringAstro: '#2C3566',
+  ringNight: '#1B2138',
 };
 
 const hex = (h: string): [number, number, number] => [

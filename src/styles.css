@@ -233,9 +233,10 @@ body {
   color-scheme: light dark;
 }
 
-/* Dezenter Hinweis, dass man sich nicht in der Gegenwart befindet */
-#app.is-travelling .readout__time {
-  color: var(--secondary);
+/* Zeitreise-Hinweis: dezenter Rahmen am Datumsfeld statt Einfärbung der
+   (sonst schlecht lesbaren) großen Uhrzeit. */
+#app.is-travelling .t-input {
+  border-color: var(--accent);
 }
 
 /* Objektliste (§24) */
