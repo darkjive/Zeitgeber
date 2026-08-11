@@ -14,6 +14,28 @@ const de: Dict = {
 
   'object.sun': 'Sonne',
   'object.moon': 'Mond',
+  'object.mercury': 'Merkur',
+  'object.venus': 'Venus',
+  'object.mars': 'Mars',
+  'object.jupiter': 'Jupiter',
+  'object.saturn': 'Saturn',
+  'object.uranus': 'Uranus',
+  'object.neptune': 'Neptun',
+
+  'layer.planets': 'Planeten',
+  'view.dial': 'Zifferblatt',
+  'view.list': 'Liste',
+
+  'list.empty': 'Gerade ist nichts über dem Horizont.',
+  'list.optics': 'nur mit Optik',
+
+  'weather.title': 'Beobachtung',
+  'weather.good': 'gut',
+  'weather.fair': 'mäßig',
+  'weather.poor': 'schlecht',
+  'weather.clouds': 'Bewölkung',
+  'weather.stamp': 'Stand {time}',
+  'weather.offline': 'Wetter offline',
 
   'zone.day': 'Tag',
   'zone.goldenHour': 'Goldene Stunde',
@@ -92,6 +114,28 @@ const en: Dict = {
 
   'object.sun': 'Sun',
   'object.moon': 'Moon',
+  'object.mercury': 'Mercury',
+  'object.venus': 'Venus',
+  'object.mars': 'Mars',
+  'object.jupiter': 'Jupiter',
+  'object.saturn': 'Saturn',
+  'object.uranus': 'Uranus',
+  'object.neptune': 'Neptune',
+
+  'layer.planets': 'Planets',
+  'view.dial': 'Dial',
+  'view.list': 'List',
+
+  'list.empty': 'Nothing above the horizon right now.',
+  'list.optics': 'optics only',
+
+  'weather.title': 'Observing',
+  'weather.good': 'good',
+  'weather.fair': 'fair',
+  'weather.poor': 'poor',
+  'weather.clouds': 'Cloud cover',
+  'weather.stamp': 'as of {time}',
+  'weather.offline': 'Weather offline',
 
   'zone.day': 'Day',
   'zone.goldenHour': 'Golden hour',

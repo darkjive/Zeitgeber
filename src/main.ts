@@ -25,9 +25,12 @@ import type { GeoLocation } from './core/astro-engine';
 import { sunTimes } from './core/astro-engine';
 import { sunProvider } from './providers/sun';
 import { moonProvider } from './providers/moon';
+import { planetsProvider } from './providers/planets';
 import { renderDial } from './views/dial';
+import { renderObjectList } from './views/object-list';
 import { showOnboarding, hasOnboarded } from './features/onboarding';
 import { WallMode } from './features/wallmode';
+import { fetchWeather, observationRating, type WeatherNow } from './features/weather';
 import {
   azimuthDirKey,
   createTranslator,
@@ -46,9 +49,12 @@ let location: GeoLocation = loadLocation() ?? DEFAULT_LOCATION;
 const bus = new ObjectBus();
 bus.register(sunProvider);
 bus.register(moonProvider);
+bus.register(planetsProvider); // optional, standardmäßig deaktiviert (§7.4)
 
 const app = document.getElementById('app') as HTMLElement;
 let wall: WallMode;
+let currentView: 'dial' | 'list' = 'dial';
+let weather: WeatherNow | null = null;
 
 // --- Formatierung -----------------------------------------------------------
 
@@ -85,10 +91,18 @@ app.innerHTML = `
       </div>
     </header>
 
-    <main class="stage">
-      <div class="dial-wrap" id="dial-wrap"></div>
+    <div class="controls">
+      <div class="seg" role="tablist">
+        <button class="seg__btn is-active" id="view-dial" data-i18n="view.dial"></button>
+        <button class="seg__btn" id="view-list" data-i18n="view.list"></button>
+      </div>
+      <button class="chip" id="planets-toggle" aria-pressed="false" data-i18n="layer.planets"></button>
+    </div>
 
-      <section class="readout" aria-live="polite">
+    <main class="stage">
+      <div class="view-wrap" id="view-wrap"></div>
+
+      <section class="readout" id="readout" aria-live="polite">
         <div class="readout__legal">
           <span class="readout__label" data-i18n="dial.legalTime"></span>
           <span class="readout__time" id="legal-time">–</span>
@@ -101,6 +115,12 @@ app.innerHTML = `
         <p class="offset__explain" id="offset-explain"></p>
       </section>
     </main>
+
+    <div class="weather" id="weather" hidden>
+      <span class="weather__k" data-i18n="weather.title"></span>
+      <span class="weather__badge" id="weather-badge">–</span>
+      <span class="weather__sub" id="weather-sub"></span>
+    </div>
 
     <section class="sky">
       <div class="sky__cell">
@@ -159,10 +179,16 @@ function render(now: Date): void {
   applyPalette(palette);
   wall?.setNightness(nightness);
 
-  // Zifferblatt
-  const { svg } = renderDial({ time: now, location, tzOffsetMinutes: tz, objects, t });
-  const wrap = $('#dial-wrap');
-  wrap.replaceChildren(svg);
+  // Ansicht (Achse B): Zifferblatt oder Objektliste
+  const wrap = $('#view-wrap');
+  if (currentView === 'dial') {
+    const { svg } = renderDial({ time: now, location, tzOffsetMinutes: tz, objects, t });
+    wrap.replaceChildren(svg);
+    $('#readout').hidden = false;
+  } else {
+    wrap.replaceChildren(renderObjectList(objects, t));
+    $('#readout').hidden = true;
+  }
 
   // Zeit-Readout
   $('#legal-time').textContent = fmtTime(now, true);
@@ -195,6 +221,30 @@ function render(now: Date): void {
   $('#sunset').textContent = times.sunset ? fmtTime(times.sunset) : '—';
 
   $('#loc-label').textContent = location.label ?? nearestCityLabel(location);
+
+  renderWeather(moon);
+}
+
+function renderWeather(moon?: { horizontal: { elevation: number }; metadata?: Record<string, unknown> }): void {
+  const panel = $('#weather');
+  if (!weather) {
+    panel.hidden = true;
+    return;
+  }
+  panel.hidden = false;
+  const moonUp = (moon?.horizontal.elevation ?? -90) > 0;
+  const illum = (moon?.metadata?.illumination as number) ?? 0;
+  const rating = observationRating(weather, illum, moonUp);
+  const badge = $('#weather-badge');
+  badge.textContent = t(`weather.${rating}`);
+  badge.dataset.rating = rating;
+  const stamp = t('weather.stamp', { time: fmtTime(new Date(weather.fetchedAt)) });
+  $('#weather-sub').textContent = `${t('weather.clouds')} ${Math.round(weather.cloudCover)} % · ${stamp}`;
+}
+
+async function refreshWeather(): Promise<void> {
+  weather = await fetchWeather(location);
+  renderWeather(bus.collect({ time: new Date(), location }).find((o) => o.kind === 'moon'));
 }
 
 function applyPalette(p: ReturnType<typeof paletteForElevation>['palette']): void {
@@ -221,10 +271,30 @@ function setLocation(loc: GeoLocation): void {
   location = { ...loc, label: loc.label ?? nearestCityLabel(loc) };
   saveLocation(location);
   render(new Date());
+  void refreshWeather(); // §28: Wetter am neuen Ort neu holen
+}
+
+function setView(view: 'dial' | 'list'): void {
+  currentView = view;
+  $('#view-dial').classList.toggle('is-active', view === 'dial');
+  $('#view-list').classList.toggle('is-active', view === 'list');
+  render(new Date());
 }
 
 function wireEvents(): void {
   $('#lang-toggle').addEventListener('click', () => setLang(lang === 'de' ? 'en' : 'de'));
+
+  $('#view-dial').addEventListener('click', () => setView('dial'));
+  $('#view-list').addEventListener('click', () => setView('list'));
+
+  $('#planets-toggle').addEventListener('click', () => {
+    const on = !bus.isEnabled('planets');
+    bus.setEnabled('planets', on);
+    const btn = $('#planets-toggle');
+    btn.classList.toggle('is-on', on);
+    btn.setAttribute('aria-pressed', String(on));
+    render(new Date());
+  });
 
   $('#wall-toggle').addEventListener('click', async () => {
     if (wall.isActive) wall.exit();
@@ -281,6 +351,7 @@ async function boot(): Promise<void> {
   wireEvents();
   applyStaticI18n();
   render(new Date());
+  void refreshWeather();
 
   if (!hasOnboarded()) {
     await showOnboarding(t);
@@ -288,6 +359,8 @@ async function boot(): Promise<void> {
 
   // Sekundentakt für den Zeiger; Ephemeriden nur bei Bedarf teuer (§8).
   window.setInterval(() => render(new Date()), 1000);
+  // Wetter deutlich seltener aktualisieren (§8, §28).
+  window.setInterval(() => void refreshWeather(), 15 * 60_000);
 }
 
 void boot();

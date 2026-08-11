@@ -187,6 +187,13 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
     svg.appendChild(label);
   }
 
+  // Planeten als dezente Marker (nur wenn der Layer aktiv ist, §7.4).
+  for (const p of objects.filter((o) => o.kind === 'planet')) {
+    if (p.horizontal.elevation <= -0.833) continue;
+    const [px, py] = polar(R_COMPASS, p.horizontal.azimuth);
+    svg.appendChild(el('circle', { cx: px, cy: py, r: 3.5, fill: palette.secondary, opacity: 0.9 }));
+  }
+
   const sun = objects.find((o) => o.kind === 'sun');
   const moon = objects.find((o) => o.kind === 'moon');
   for (const obj of [moon, sun]) {

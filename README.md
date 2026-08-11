@@ -39,6 +39,9 @@ dem Ziel von 500 KB Initial-Load (§35).
 | §22 Zifferblatt | `views/dial.ts` — 24-h-Zeitring mit Dämmerungszonen, Sonnenhöchststand-Marker, Kompassring mit Sonne/Mond |
 | §12 Theme-Engine | kontinuierliche Tag/Nacht-Interpolation nach Sonnenhöhe, echter Nachtsicht-Modus |
 | §17 Provider Sonne & Mond | Core-Provider, nicht deaktivierbar |
+| §18 Provider Planeten | Merkur…Neptun, Helligkeit/Elongation, optional (Layer-Toggle) |
+| §24 Ansicht Objektliste | „Heute Nacht sichtbar", sortiert nach Höhe |
+| §28 Wetter | Open-Meteo, Beobachtungseignung, Offline-Fallback |
 | §14 Onboarding | vier überspringbare Bildschirme |
 | §15 Lokalisierung | DE/EN, keine fest verdrahteten Strings |
 | §13 Barrierefreiheit | semantische Zifferblatt-Beschreibung, Fokus, Reduce-Motion |
@@ -57,22 +60,26 @@ src/
     object-bus.ts      aggregiert aktive Provider, Fehlerisolierung pro Modul
     location.ts        GPS, manuelle Eingabe, lokale Persistenz
     types.ts           CelestialObject / ObjectProvider / SkyView (§7.2/7.3)
-  providers/           Achse A — sun, moon
-  views/               Achse B — dial
-  features/            Achse C — onboarding, wallmode
+    planets.ts         geozentrische Planetenpositionen (Keplerelemente)
+  providers/           Achse A — sun, moon, planets
+  views/               Achse B — dial, object-list
+  features/            Achse C — onboarding, wallmode, weather
   i18n/                DE/EN
   main.ts              App-Shell, verdrahtet die drei Achsen
 ```
 
 ## Bewusst noch nicht enthalten (spätere Phasen)
 
-Gemäß Roadmap (§37) gehören in Phase 2+: Planeten/Sterne/Satelliten, Kamera-
-Liveview und Himmelskarte, Wetter (Open-Meteo), dynamischer Wecker,
-Chronobiologie mit Nutzereingabe (sozialer Jetlag), Teilen/Export, Klangebene
-sowie die anwendungsgebundenen Module (§31/§32). Die Architektur ist so
-angelegt, dass ein neuer Provider automatisch in allen Ansichten erscheint und
-eine neue Ansicht automatisch alle Objekte zeigt (§7.4) — diese Erweiterungen
-kommen ohne Kernumbau hinzu.
+Gemäß Roadmap (§37) gehören in weitere Phasen: Sterne/Satelliten/Flugzeuge,
+Kamera-Liveview und Himmelskarte, dynamischer Wecker (auf Web bewusst nicht,
+§27.2), Chronobiologie mit Nutzereingabe (sozialer Jetlag), Teilen/Export,
+Klangebene sowie die anwendungsgebundenen Module (§31/§32). Die Architektur ist
+so angelegt, dass ein neuer Provider automatisch in allen Ansichten erscheint
+und eine neue Ansicht automatisch alle Objekte zeigt (§7.4) — diese
+Erweiterungen kommen ohne Kernumbau hinzu.
+
+Der native Aufsatz (React Native + Expo, §6) liegt unter `native/` und teilt
+sich die UI-freie Berechnungsebene mit dem Web-Target.
 
 ## Lizenz
 
