@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "Sun Clock",
+    "slug": "sunclock",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "scheme": "sunclock",
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Dein Standort bestimmt den Sonnenstand und den Sonnenzeit-Versatz. Er wird nur lokal auf dem Gerät verarbeitet."
+      }
+    },
+    "android": {
+      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"]
+    },
+    "plugins": ["expo-location"]
+  }
+}
