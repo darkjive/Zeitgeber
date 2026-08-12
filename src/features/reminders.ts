@@ -14,7 +14,8 @@
 
 import type { GeoLocation } from '../core/astro-engine';
 import { collectReminders, dayKey, type ReminderCategory } from '../core/reminders';
-import type { Translator } from '../i18n';
+import type { Lang, Translator } from '../i18n';
+import { hasPushSubscription, pushSupported, subscribeToPush, unsubscribeFromPush, type PushMeta } from './push';
 
 const ENABLED_KEY = 'sunclock.reminders';
 const FIRED_KEY = 'sunclock.remindersFired';
@@ -25,10 +26,14 @@ const ACTIVE: ReminderCategory[] = ['comfort'];
 export interface ReminderDeps {
   getLocation: () => GeoLocation;
   getTranslator: () => Translator;
+  getLang: () => Lang;
 }
 
 let deps: ReminderDeps | null = null;
 let timer: number | null = null;
+// Hintergrund-Push aktiv? Dann übernimmt der Server die Zustellung und der
+// lokale Takt bleibt aus (sonst doppelte Hinweise).
+let pushActive = false;
 
 // --- Persistenz -------------------------------------------------------------
 
@@ -80,24 +85,62 @@ export function notifyPermission(): PermState {
 
 // --- Steuerung --------------------------------------------------------------
 
-export function initReminders(d: ReminderDeps): void {
-  deps = d;
-  if (remindersEnabled()) startLoop();
+function currentMeta(): PushMeta {
+  const loc = deps!.getLocation();
+  let tz: string | undefined;
+  try {
+    tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  } catch {
+    tz = undefined;
+  }
+  return { lat: loc.latitude, lon: loc.longitude, tz, lang: deps!.getLang(), categories: ACTIVE };
 }
 
-export async function enableReminders(): Promise<PermState> {
+export function initReminders(d: ReminderDeps): void {
+  deps = d;
+  if (!remindersEnabled()) return;
+  // Bei jedem Start das Server-Abo mit aktuellem Standort auffrischen (deckt
+  // auch abgelaufene Abos ab). Klappt Push, bleibt der lokale Takt aus.
+  void (async () => {
+    const granted = typeof Notification !== 'undefined' && Notification.permission === 'granted';
+    if (granted && (await hasPushSubscription())) {
+      pushActive = await subscribeToPush(currentMeta());
+    }
+    if (!pushActive) startLoop();
+  })();
+}
+
+export async function enableReminders(): Promise<{ perm: PermState; push: boolean }> {
   setEnabledFlag(true);
   let perm: PermState = 'unsupported';
   if (typeof Notification !== 'undefined') {
     perm = Notification.permission === 'default' ? await Notification.requestPermission() : Notification.permission;
   }
-  startLoop();
-  return perm;
+  pushActive = perm === 'granted' ? await subscribeToPush(currentMeta()) : false;
+  if (pushActive) stopLoop();
+  else startLoop(); // Rückfall: In-App-Hinweise (sichtbar) bzw. lokale System-Hinweise
+  return { perm, push: pushActive };
 }
 
 export function disableReminders(): void {
   setEnabledFlag(false);
   stopLoop();
+  pushActive = false;
+  void unsubscribeFromPush();
+}
+
+/** Standort geändert: falls Push aktiv, das Server-Abo aktualisieren. */
+export async function refreshReminderMeta(): Promise<void> {
+  if (remindersEnabled() && pushActive) await subscribeToPush(currentMeta());
+}
+
+/** Zustand fürs Panel. */
+export async function reminderStatus(): Promise<'off' | 'push' | 'foreground' | 'denied' | 'unsupported'> {
+  if (!remindersEnabled()) return 'off';
+  if (!pushSupported()) return typeof Notification === 'undefined' ? 'unsupported' : 'foreground';
+  if (Notification.permission === 'denied') return 'denied';
+  if (await hasPushSubscription()) return 'push';
+  return 'foreground';
 }
 
 function startLoop(): void {
@@ -188,7 +231,6 @@ export function openReminders(t: Translator, onChange?: () => void): void {
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-modal', 'true');
 
-  const perm = notifyPermission();
   const card = document.createElement('div');
   card.className = 'onboard__card outdoor';
   card.innerHTML = `
@@ -200,7 +242,7 @@ export function openReminders(t: Translator, onChange?: () => void): void {
       <span>${t('remind.enable')}</span>
     </label>
 
-    ${perm === 'denied' ? `<p class="loc__msg" style="text-align:left">${t('remind.denied')}</p>` : ''}
+    <p class="remind__status" id="rm-status"></p>
 
     <p class="solar__note">${t('remind.note')}</p>
 
@@ -212,23 +254,20 @@ export function openReminders(t: Translator, onChange?: () => void): void {
   overlay.appendChild(card);
   document.body.appendChild(overlay);
 
+  const statusEl = card.querySelector('#rm-status') as HTMLElement;
+  const paintStatus = async (): Promise<void> => {
+    const s = await reminderStatus();
+    statusEl.dataset.state = s;
+    statusEl.textContent = s === 'off' ? '' : t(`remind.status.${s}`);
+    statusEl.hidden = s === 'off';
+  };
+  void paintStatus();
+
   const cb = card.querySelector('#rm-on') as HTMLInputElement;
   cb.addEventListener('change', async () => {
-    if (cb.checked) {
-      const p = await enableReminders();
-      if (p === 'denied') {
-        const note = card.querySelector('.loc__msg');
-        if (!note) {
-          const el = document.createElement('p');
-          el.className = 'loc__msg';
-          el.style.textAlign = 'left';
-          el.textContent = t('remind.denied');
-          cb.closest('.pin-toggle')?.after(el);
-        }
-      }
-    } else {
-      disableReminders();
-    }
+    if (cb.checked) await enableReminders();
+    else disableReminders();
+    await paintStatus();
     onChange?.();
   });
 

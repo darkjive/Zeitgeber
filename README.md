@@ -180,6 +180,12 @@ inneren Planeten, korrekte Reihenfolge der Gebetszeiten). `npm test`.
 - Kein Backend, keine Konten, keine Synchronisation, keine Tracking-Bibliotheken.
 - Standort und alle Eingaben werden **nur lokal** verarbeitet.
 - Chronobiologie-Daten: Export als JSON und Löschung mit einem Tippen.
+- **Erinnerungen** (der „dynamische Wecker") laufen im Vordergrund und im
+  Wandmodus rein lokal. Echter **Hintergrund-Push** (auch bei geschlossener App)
+  ist ein **optionaler, selbst zu konfigurierender** Zusatz: er speichert nur die
+  Zustelldaten (Push-Endpunkt, grobe Koordinaten, Zeitzone, Sprache) – keine
+  Konten, kein Verlauf – und lässt sich mit einem Tippen wieder löschen.
+  Einrichtung: [`docs/PUSH_SETUP.md`](./docs/PUSH_SETUP.md).
 
 ## Regulatorisches
 

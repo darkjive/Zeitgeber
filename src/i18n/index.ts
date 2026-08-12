@@ -163,6 +163,10 @@ const de: Dict = {
   'remind.outdoor.lastlight':
     'Das Tageslicht wird bald knapp. Magst du langsam zusammenpacken?',
   'remind.test.body': 'So melde ich mich – freundlich und nur, wenn es gerade passt.',
+  'remind.status.push': 'Hintergrund-Push aktiv – Hinweise kommen auch bei geschlossener App.',
+  'remind.status.foreground': 'Aktiv, solange die App geöffnet ist (z. B. im Wandmodus).',
+  'remind.status.denied': 'Benachrichtigungen sind blockiert – bitte im Browser erlauben.',
+  'remind.status.unsupported': 'Dieser Browser kennt keine Benachrichtigungen – Hinweise erscheinen nur in der App.',
 
   'about.button': 'Info',
   'about.opensource': 'Open Source und werbefrei. Finanziert ausschließlich über freiwillige Spenden – kein Paywall, keine In-App-Käufe.',
@@ -529,6 +533,10 @@ const en: Dict = {
   'remind.outdoor.lastlight':
     'Daylight is running low. You might want to start packing up.',
   'remind.test.body': 'This is how I’ll reach out – friendly, and only when it fits.',
+  'remind.status.push': 'Background push active – nudges arrive even when the app is closed.',
+  'remind.status.foreground': 'Active while the app is open (e.g. in wall mode).',
+  'remind.status.denied': 'Notifications are blocked – please allow them in the browser.',
+  'remind.status.unsupported': 'This browser has no notifications – nudges only show inside the app.',
 
   'about.button': 'Info',
   'about.opensource': 'Open source and ad-free. Funded solely by voluntary donations – no paywall, no in-app purchases.',

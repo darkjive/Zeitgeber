@@ -10,15 +10,20 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "push:keys": "web-push generate-vapid-keys"
   },
   "devDependencies": {
+    "@types/web-push": "^3.6.4",
+    "@vercel/node": "^5.9.9",
     "axe-core": "^4.13.0",
     "typescript": "^5.6.3",
     "vite": "^5.4.10",
     "vitest": "^2.1.4"
   },
   "dependencies": {
-    "satellite.js": "^5.0.0"
+    "@upstash/redis": "^1.38.2",
+    "satellite.js": "^5.0.0",
+    "web-push": "^3.6.7"
   }
 }

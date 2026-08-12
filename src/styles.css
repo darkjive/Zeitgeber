@@ -240,6 +240,29 @@ body {
   cursor: pointer;
 }
 
+/* Erinnerungs-Status im Panel */
+.remind__status {
+  font-size: 13px;
+  margin: 4px 0 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  color: var(--text);
+  background: color-mix(in srgb, var(--secondary) 14%, transparent);
+}
+
+.remind__status[data-state='push'] {
+  background: color-mix(in srgb, #4caf7d 24%, transparent);
+}
+
+.remind__status[data-state='denied'] {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--text);
+}
+
+.remind__status[hidden] {
+  display: none;
+}
+
 /* In-App-Erinnerung (§reminders) — dezenter Hinweis unten */
 .toast {
   position: fixed;

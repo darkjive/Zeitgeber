@@ -1,0 +1,37 @@
+# Zeitgeber für den Web-Push-Dienst (kostenloser Weg ohne Vercel-Pro-Cron).
+#
+# Stößt alle 15 Minuten /api/cron an; der Endpunkt berechnet die fälligen
+# Erinnerungen und stellt sie per Web Push zu. GitHub-Actions-Zeitpläne können
+# sich um einige Minuten verzögern – das 20-Minuten-Fälligkeitsfenster im
+# Endpunkt fängt das ab.
+#
+# Voraussetzung: zwei Repository-Secrets
+#   SUNCLOCK_CRON_URL  z. B. https://sunclock.vercel.app/api/cron
+#   CRON_SECRET        derselbe Wert wie die Vercel-Umgebungsvariable CRON_SECRET
+#
+# Manuell testen: Tab „Actions" → „Push reminders (cron)" → „Run workflow".
+
+name: Push reminders (cron)
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+# Nur ein Lauf gleichzeitig; ausstehende überspringen.
+concurrency:
+  group: push-cron
+  cancel-in-progress: false
+
+jobs:
+  fire:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger reminder dispatch
+        run: |
+          curl -fsS -X GET "${SUNCLOCK_CRON_URL}" \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            --max-time 60
+        env:
+          SUNCLOCK_CRON_URL: ${{ secrets.SUNCLOCK_CRON_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}

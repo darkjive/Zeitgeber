@@ -28,6 +28,26 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// Web Push: eingehende Erinnerung als System-Benachrichtigung zeigen (§reminders).
+self.addEventListener('push', (event) => {
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch {
+    data = {};
+  }
+  const title = data.title || 'Sun Clock';
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body: data.body || '',
+      tag: data.tag || 'sunclock',
+      icon: './icon-192.png',
+      badge: './icon.svg',
+      data: { url: data.url || './' },
+    }),
+  );
+});
+
 // Tippt jemand eine Erinnerung an, die App in den Vordergrund holen (§reminders).
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();

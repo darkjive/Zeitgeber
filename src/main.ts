@@ -52,7 +52,7 @@ import { openWildlife } from './features/wildlife';
 import { openDrone } from './features/drone';
 import { openMeteorShowers } from './features/meteor-showers';
 import { openKids } from './features/kids';
-import { initReminders, openReminders, remindersEnabled } from './features/reminders';
+import { initReminders, openReminders, refreshReminderMeta, remindersEnabled } from './features/reminders';
 import { icon, type IconName } from './icons';
 import {
   azimuthDirKey,
@@ -566,6 +566,7 @@ function setLocation(loc: GeoLocation): void {
   saveLocation(location);
   rerender();
   void refreshWeather(); // §28: Wetter am neuen Ort neu holen
+  void refreshReminderMeta(); // §reminders: Push-Abo am neuen Ort aktualisieren
 }
 
 function setView(view: ViewId): void {
@@ -709,7 +710,7 @@ async function boot(): Promise<void> {
   rerender();
   void refreshWeather();
   // Erinnerungen (§reminders): läuft nur, wenn zuvor aktiviert.
-  initReminders({ getLocation: () => location, getTranslator: () => t });
+  initReminders({ getLocation: () => location, getTranslator: () => t, getLang: () => lang });
 
   if (!hasOnboarded()) {
     await showOnboarding(t);
