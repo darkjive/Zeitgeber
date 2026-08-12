@@ -16,10 +16,13 @@ import { solarOffset, utcOffsetMinutes } from './core/time-engine';
 import {
   DEFAULT_LOCATION,
   findCity,
+  geolocationGranted,
   loadLocation,
-  nearestCityLabel,
+  placeLabel,
   requestGeolocation,
   saveLocation,
+  type LocationSource,
+  type StoredLocation,
 } from './core/location';
 import type { GeoLocation } from './core/astro-engine';
 import { sunTimes } from './core/astro-engine';
@@ -67,7 +70,9 @@ import {
 
 let lang: Lang = detectLang();
 let t: Translator = createTranslator(lang);
-let location: GeoLocation = loadLocation() ?? DEFAULT_LOCATION;
+let location: StoredLocation = loadLocation() ?? DEFAULT_LOCATION;
+/** Ortssuche vom Nutzer aufgeklappt (nach fehlgeschlagenem GPS-Versuch). */
+let searchOpen = false;
 
 const bus = new ObjectBus();
 bus.register(sunProvider);
@@ -255,6 +260,7 @@ app.innerHTML = `
         <span class="loc__pin">📍</span>
         <span id="loc-label">–</span>
       </button>
+      <p class="loc__hint" id="loc-hint" hidden></p>
       <form class="loc-search" id="loc-search" hidden>
         <input id="loc-input" type="text" autocomplete="off" />
         <button class="btn btn--primary" type="submit" data-i18n="loc.manual"></button>
@@ -442,7 +448,7 @@ function render(now: Date): void {
   $('#sunrise').textContent = times.sunrise ? fmtTime(times.sunrise) : '—';
   $('#sunset').textContent = times.sunset ? fmtTime(times.sunset) : '—';
 
-  $('#loc-label').textContent = location.label ?? nearestCityLabel(location);
+  renderLocbar();
 
   renderWeather(moon);
   updateTimebar(now);
@@ -523,7 +529,7 @@ async function exportCurrentView(): Promise<void> {
   const now = currentTime();
   const css = getComputedStyle(document.documentElement);
   const fmt = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' });
-  const place = location.label ?? nearestCityLabel(location);
+  const place = placeLabel(location);
   try {
     const blob = await renderViewToBlob(svg as SVGElement, {
       title: t('app.title'),
@@ -561,8 +567,28 @@ function setLang(next: Lang): void {
   rerender();
 }
 
-function setLocation(loc: GeoLocation): void {
-  location = { ...loc, label: loc.label ?? nearestCityLabel(loc) };
+/**
+ * Standortleiste. Ein bloss angenommener Ort wird sichtbar als solcher
+ * ausgewiesen — sonst könnte der Nutzer nicht erkennen, ob die angezeigten
+ * Zeiten überhaupt für ihn gelten.
+ */
+function renderLocbar(): void {
+  const guessed = location.source === 'default';
+  $('#loc-label').textContent = guessed ? t('loc.unset') : placeLabel(location);
+  $('#loc-btn').classList.toggle('is-guess', guessed);
+  const hint = $('#loc-hint');
+  hint.hidden = !guessed;
+  hint.textContent = guessed ? t('loc.guessHint') : '';
+  // Ohne verlässlichen Ort steht die Ortssuche sofort bereit — sonst führte der
+  // einzige Weg über den GPS-Knopf und dessen Zeitablauf (§10). Sobald ein Ort
+  // feststeht, schliesst sie sich wieder.
+  $('#loc-search').hidden = !(guessed || searchOpen);
+}
+
+/** Nur die Koordinaten wandern in den Zustand — der Name wird stets neu abgeleitet. */
+function setLocation(loc: GeoLocation, source: LocationSource): void {
+  location = { latitude: loc.latitude, longitude: loc.longitude, source };
+  searchOpen = false; // Ort steht fest, die Suche darf zu.
   saveLocation(location);
   rerender();
   void refreshWeather(); // §28: Wetter am neuen Ort neu holen
@@ -666,11 +692,11 @@ function wireEvents(): void {
     msg.hidden = true;
     try {
       const geo = await requestGeolocation();
-      setLocation(geo);
-      search.hidden = true;
+      setLocation(geo, 'gps');
     } catch {
       // §10: Rückfall auf manuelle Eingabe, Kernuhr läuft weiter.
-      search.hidden = false;
+      searchOpen = true;
+      renderLocbar();
       msg.hidden = false;
       msg.textContent = t('loc.denied');
       input.focus();
@@ -681,8 +707,7 @@ function wireEvents(): void {
     e.preventDefault();
     const city = findCity(input.value);
     if (city) {
-      setLocation(city);
-      search.hidden = true;
+      setLocation(city, 'manual');
       msg.hidden = true;
       input.value = '';
     } else {
@@ -703,11 +728,29 @@ function wireEvents(): void {
 
 // --- Start ------------------------------------------------------------------
 
+/**
+ * Steht die Standortfreigabe bereits, wird sie beim Start still genutzt: eine
+ * einmal erteilte Erlaubnis soll nicht ungenutzt liegen bleiben, während die
+ * Uhr mit einem geratenen Ort rechnet. Ohne Freigabe wird bewusst kein Dialog
+ * ausgelöst — der Berechtigungsdialog gehört an den Standort-Knopf, nicht vor
+ * den ersten Blick auf die Uhr. Eine manuell gewählte Stadt bleibt unangetastet.
+ */
+async function adoptGpsIfAllowed(): Promise<void> {
+  if (location.source === 'manual') return;
+  if (!(await geolocationGranted())) return;
+  try {
+    setLocation(await requestGeolocation(), 'gps');
+  } catch {
+    /* §10: Die Uhr läuft mit dem bisherigen Ort weiter. */
+  }
+}
+
 async function boot(): Promise<void> {
   wall = new WallMode(app, () => applyStaticI18n());
   wireEvents();
   applyStaticI18n();
   rerender();
+  await adoptGpsIfAllowed();
   void refreshWeather();
   // Erinnerungen (§reminders): läuft nur, wenn zuvor aktiviert.
   initReminders({ getLocation: () => location, getTranslator: () => t, getLang: () => lang });

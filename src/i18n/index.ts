@@ -347,6 +347,8 @@ const de: Dict = {
   'loc.placeholder': 'Stadt eingeben …',
   'loc.denied': 'Kein Standort – bitte Ort manuell wählen. Die Uhr läuft weiter.',
   'loc.notFound': 'Ort nicht gefunden.',
+  'loc.unset': 'Standort wählen',
+  'loc.guessHint': 'Angenommener Ort – die Werte gelten noch nicht für dich.',
 
   'onboard.skip': 'Überspringen',
   'onboard.next': 'Weiter',
@@ -717,6 +719,8 @@ const en: Dict = {
   'loc.placeholder': 'Enter a city …',
   'loc.denied': 'No location – please pick a place manually. The clock keeps running.',
   'loc.notFound': 'Place not found.',
+  'loc.unset': 'Choose location',
+  'loc.guessHint': 'Assumed place – these values are not yours yet.',
 
   'onboard.skip': 'Skip',
   'onboard.next': 'Next',
