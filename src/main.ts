@@ -52,6 +52,7 @@ import { openWildlife } from './features/wildlife';
 import { openDrone } from './features/drone';
 import { openMeteorShowers } from './features/meteor-showers';
 import { openKids } from './features/kids';
+import { initReminders, openReminders, remindersEnabled } from './features/reminders';
 import { icon, type IconName } from './icons';
 import {
   azimuthDirKey,
@@ -336,6 +337,11 @@ function buildDrawer(): void {
       <span class="mrow__label">${t('settings.language')}</span>
       <span class="mrow__val">${langName}</span>
     </button>
+    <button class="mrow" data-set="reminders">
+      ${iconSpan('bell', '#E0A93C')}
+      <span class="mrow__label">${t('remind.button')}</span>
+      <span class="mrow__val">${remindersEnabled() ? t('remind.stateOn') : t('remind.stateOff')}</span>
+    </button>
     <button class="mrow" data-set="wall" aria-pressed="${wall?.isActive ? 'true' : 'false'}">
       ${iconSpan('monitor', '#8D7BC0')}
       <span class="mrow__label">${t(wall?.isActive ? 'wall.exit' : 'wall.enter')}</span>
@@ -614,6 +620,9 @@ function wireEvents(): void {
       mod?.open(currentTime());
     } else if (row.dataset.set === 'lang') {
       setLang(lang === 'de' ? 'en' : 'de'); // baut den Drawer neu auf
+    } else if (row.dataset.set === 'reminders') {
+      closeDrawer();
+      openReminders(t, () => buildDrawer());
     } else if (row.dataset.set === 'wall') {
       closeDrawer();
       void toggleWall();
@@ -699,6 +708,8 @@ async function boot(): Promise<void> {
   applyStaticI18n();
   rerender();
   void refreshWeather();
+  // Erinnerungen (§reminders): läuft nur, wenn zuvor aktiviert.
+  initReminders({ getLocation: () => location, getTranslator: () => t });
 
   if (!hasOnboarded()) {
     await showOnboarding(t);

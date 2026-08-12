@@ -138,6 +138,32 @@ const de: Dict = {
 
   'overlay.pin': 'Aufs Zifferblatt heften',
 
+  'remind.button': 'Erinnerungen',
+  'remind.title': 'Erinnerungen',
+  'remind.intro':
+    'Sun Clock kann sich melden, wenn ein guter Moment kommt – etwa die Südfassade zu verschatten oder abends zu lüften. Immer als freundlicher Hinweis, nie als Befehl.',
+  'remind.enable': 'Erinnerungen aktivieren',
+  'remind.note':
+    'Funktioniert, solange die App geöffnet ist – ideal im Wandmodus. Ohne Server gibt es keine Zustellung, wenn die App ganz geschlossen ist. Alles bleibt auf dem Gerät.',
+  'remind.denied':
+    'Benachrichtigungen sind im Browser blockiert. In den Website-Einstellungen kannst du sie wieder erlauben – sonst erscheinen Hinweise nur in der geöffneten App.',
+  'remind.test': 'Test-Erinnerung',
+  'remind.close': 'Schließen',
+  'remind.stateOn': 'An',
+  'remind.stateOff': 'Aus',
+  'remind.appTitle': 'Sun Clock',
+  'remind.comfort.south':
+    'Die Sonne wandert auf die Südseite. Wenn du magst, lass dort bald die Rolläden runter – dann bleibt es drinnen angenehm kühl.',
+  'remind.comfort.west':
+    'Gleich brennt die Nachmittagssonne auf die Westfassade. Vielleicht magst du dort verschatten?',
+  'remind.comfort.ventilate':
+    'Die Hitze lässt langsam nach. Jetzt wäre ein guter Moment zum Lüften.',
+  'remind.outdoor.golden':
+    'In einer Viertelstunde beginnt die goldene Stunde. Schönes Licht draußen, falls du magst.',
+  'remind.outdoor.lastlight':
+    'Das Tageslicht wird bald knapp. Magst du langsam zusammenpacken?',
+  'remind.test.body': 'So melde ich mich – freundlich und nur, wenn es gerade passt.',
+
   'about.button': 'Info',
   'about.opensource': 'Open Source und werbefrei. Finanziert ausschließlich über freiwillige Spenden – kein Paywall, keine In-App-Käufe.',
   'about.support': 'Unterstützen',
@@ -477,6 +503,32 @@ const en: Dict = {
   'outdoor.lightEnds': 'Usable light ends',
 
   'overlay.pin': 'Show on the dial',
+
+  'remind.button': 'Reminders',
+  'remind.title': 'Reminders',
+  'remind.intro':
+    'Sun Clock can nudge you when a good moment arrives – like shading the south facade, or airing out in the evening. Always a gentle suggestion, never an order.',
+  'remind.enable': 'Turn on reminders',
+  'remind.note':
+    'Works while the app is open – ideal in wall mode. Without a server there is no delivery once the app is fully closed. Everything stays on the device.',
+  'remind.denied':
+    'Notifications are blocked in the browser. You can allow them again in the site settings – otherwise nudges only show inside the open app.',
+  'remind.test': 'Test reminder',
+  'remind.close': 'Close',
+  'remind.stateOn': 'On',
+  'remind.stateOff': 'Off',
+  'remind.appTitle': 'Sun Clock',
+  'remind.comfort.south':
+    'The sun is swinging round to the south. If you like, lower the shutters there soon – it keeps things pleasantly cool inside.',
+  'remind.comfort.west':
+    'The afternoon sun will soon hit the west facade. You might want to shade it.',
+  'remind.comfort.ventilate':
+    'The heat is easing off. Now would be a good moment to air the place out.',
+  'remind.outdoor.golden':
+    'Golden hour starts in about fifteen minutes. Lovely light outside, if you fancy it.',
+  'remind.outdoor.lastlight':
+    'Daylight is running low. You might want to start packing up.',
+  'remind.test.body': 'This is how I’ll reach out – friendly, and only when it fits.',
 
   'about.button': 'Info',
   'about.opensource': 'Open source and ad-free. Funded solely by voluntary donations – no paywall, no in-app purchases.',
