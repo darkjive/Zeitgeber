@@ -23,7 +23,7 @@ Zeit und die echte Lichtumgebung.
 Kein Konto, kein Server, keine Tracker. Alle Daten bleiben auf dem Gerät.
 
 Die vollständige technische Spezifikation liegt unter [`docs/SPEC.md`](./docs/SPEC.md)
-(Version 1.2, inkl. Umsetzungsstand in Abschnitt 40). Änderungen je Version:
+(Version 1.3, inkl. Umsetzungsstand in Abschnitt 40). Änderungen je Version:
 [`CHANGELOG.md`](./CHANGELOG.md).
 
 ## Das Alleinstellungsmerkmal
@@ -201,8 +201,7 @@ deaktiviert.
 Sun Clock ist Open Source und wird ausschließlich über **freiwillige Spenden**
 finanziert – kein Paywall, keine In-App-Käufe, keine Werbung.
 
-- **GitHub Sponsors** — https://github.com/sponsors/darkjive
-- **PayPal** — im Info-Bereich der App verlinkt
+- **PayPal** — https://paypal.me/AlainRitter (auch im Info-Bereich der App verlinkt)
 
 Die Spenden-Hinweise stehen dezent im Info-Bereich, nie in der Hauptoberfläche.
 

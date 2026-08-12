@@ -12,12 +12,7 @@ export function openAbout(t: Translator): void {
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-modal', 'true');
 
-  const links: string[] = [
-    `<a class="about__link" href="${support.githubSponsors}" target="_blank" rel="noopener">GitHub Sponsors</a>`,
-  ];
-  if (support.paypal) {
-    links.push(`<a class="about__link" href="${support.paypal}" target="_blank" rel="noopener">PayPal</a>`);
-  }
+  const links = `<a class="about__link" href="${support.paypal}" target="_blank" rel="noopener">PayPal</a>`;
 
   const card = document.createElement('div');
   card.className = 'onboard__card about';
@@ -29,7 +24,7 @@ export function openAbout(t: Translator): void {
 
     <div class="about__support">
       <span class="about__support-k">${t('about.support')}</span>
-      <div class="about__links">${links.join('')}</div>
+      <div class="about__links">${links}</div>
     </div>
 
     <p class="about__meta">

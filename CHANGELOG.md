@@ -4,6 +4,13 @@ Alle nennenswerten Änderungen an Sun Clock. Format nach
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 Versionierung nach [SemVer](https://semver.org/lang/de/).
 
+## [Unveröffentlicht]
+
+### Geändert
+
+- Spenden laufen ausschließlich über PayPal (https://paypal.me/AlainRitter);
+  GitHub Sponsors entfällt (Spec §38.3)
+
 ## [1.0.0] — 2026-08-11
 
 Erste vollständige Ausgabe. Web-Client (installierbare, offline-fähige PWA)

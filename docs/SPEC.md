@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| **Version** | 1.2 |
-| **Stand** | 11. August 2026 |
+| **Version** | 1.3 |
+| **Stand** | 12. August 2026 |
 | **Status** | Referenz-Web-Client umgesetzt (Phase 1 vollständig, Phase 2/3 großteils); native App und Provider in Arbeit |
 | **Lizenz** | MIT, Open Source |
 | **Arbeitstitel** | Sun Clock |
@@ -28,7 +28,8 @@
 | 0.9 | Smarthome-Integration als eigenständiger Begleitdienst |
 | 1.0 | Vollständige Neustrukturierung in sieben Teile, durchlaufende Nummerierung, regulatorische Leitplanken konsolidiert, Meta-Kopf und Inhaltsverzeichnis ergänzt |
 | 1.1 | Sechs Grundsatzentscheidungen getroffen (Abschnitt 38): rein lokale Datenhaltung ohne Backend, keine Kamera-Ansicht auf Web, Spenden über GitHub Sponsors und PayPal, rechtliche Prüfung vor Phase 2, etablierte Konventionen für Gebetszeiten, `uv-window` gestrichen |
-| **1.2** | **Referenz-Web-Client umgesetzt und veröffentlicht. Neues Modul `comfort` (Hitzeschutz: Lüften & Verschattung, Abschnitt 31.8). Modul-Menü als Sammelstelle der optionalen Panels (Abschnitt 11.5). Monetarisierungsmodell bestätigt (Open Source + Spenden, kein In-App-Kauf). Umsetzungsstand dokumentiert (Abschnitt 40).** |
+| 1.2 | Referenz-Web-Client umgesetzt und veröffentlicht. Neues Modul `comfort` (Hitzeschutz: Lüften & Verschattung, Abschnitt 31.8). Modul-Menü als Sammelstelle der optionalen Panels (Abschnitt 11.5). Monetarisierungsmodell bestätigt (Open Source + Spenden, kein In-App-Kauf). Umsetzungsstand dokumentiert (Abschnitt 40). |
+| **1.3** | **Spenden ausschließlich über PayPal (Abschnitt 38.3); GitHub Sponsors gestrichen.** |
 
 ---
 
@@ -985,7 +986,7 @@ Begleitdienst und Wandmodus laufen sinnvoll auf derselben Hardware: Ein Einplati
 
 - **Open Source**, Lizenz MIT — permissiv, im React-Native- und Astronomie-Umfeld üblich, keine Einschränkung für Nutzer oder Beitragende
 - **Monetarisierung ausschließlich über Spenden** — kein Paywall, kein In-App-Kauf, keine Werbung
-- Wege: **GitHub Sponsors** (primär) und **PayPal** (Entscheidung in Abschnitt 38.3)
+- Weg: **PayPal** (Entscheidung in Abschnitt 38.3)
 - Platzierung dezent im Einstellungs- oder Info-Bereich, kein Banner in der Hauptoberfläche
 - Architektonische Konsequenz: keine Freischaltungs- oder Lizenzprüfung nötig (Abschnitt 7.4)
 - Repository von Beginn an öffentlich; CONTRIBUTING.md und CODE_OF_CONDUCT.md einplanen, sobald die Kernstruktur steht
@@ -1031,7 +1032,7 @@ Begleitdienst und Wandmodus laufen sinnvoll auf derselben Hardware: Ein Einplati
 - `wheel-of-year`, `drone`, `wildlife` — jeweils sehr geringer Aufwand
 - **`sunclock-bridge`** (Abschnitt 34) — eigenes Repository, Smarthome-Datenquelle
 
-**Vor Veröffentlichung von Phase 2**: rechtliche Durchsicht (Abschnitt 38.4). **Vor Phase 3**: fachlicher Abgleich `prayer-times` (Abschnitt 38.5). **Vor dem ersten öffentlichen Release**: GitHub Sponsors beantragen (Abschnitt 38.3).
+**Vor Veröffentlichung von Phase 2**: rechtliche Durchsicht (Abschnitt 38.4). **Vor Phase 3**: fachlicher Abgleich `prayer-times` (Abschnitt 38.5). **Vor dem ersten öffentlichen Release**: Spendenlink prüfen (Abschnitt 38.3).
 
 ---
 
@@ -1054,12 +1055,11 @@ Diese Punkte waren bis v1.0 offen und sind entschieden. Sie binden die weitere U
 - **Die 2D-Himmelskarte ist auf Web die vollwertige Hauptansicht**, nicht ein Notbehelf. Sie wird entsprechend gestaltet und kommuniziert.
 - Kein Hinweis in der Web-Version, dass „etwas fehlt" — stattdessen eine eigenständig gute Ansicht
 
-### 38.3 Spenden: GitHub Sponsors und PayPal
+### 38.3 Spenden: PayPal
 
-- **GitHub Sponsors** als primärer Weg — die stärkste Zielgruppe (Entwickelnde, Forschende, Abschnitt 3.2) ist ohnehin dort, die Hürde ist minimal
-- **PayPal** als zweiter Weg für alle übrigen
+- **PayPal** als einziger Weg — https://paypal.me/AlainRitter, ohne Freischaltungsverfahren sofort nutzbar
+- **Kein GitHub Sponsors** — erfordert eine Freischaltung samt Bankverbindung und bringt gegenüber PayPal keinen zusätzlichen Personenkreis, der nicht ohnehin spenden würde
 - **Kein Ko-fi** — bringt keinen zusätzlichen Personenkreis und verwässert die Darstellung
-- **Frühzeitig beantragen**: GitHub Sponsors erfordert eine Freischaltung samt Bankverbindung. Das gehört vor den ersten öffentlichen Release erledigt, nicht danach.
 
 ### 38.4 Rechtliche Durchsicht: vor Phase 2
 
@@ -1091,7 +1091,6 @@ Diese Punkte waren bis v1.0 offen und sind entschieden. Sie binden die weitere U
 | Finales Farbsystem — der Vorschlag in 11.2 ist am Web-Client erprobt, noch nicht am nativen Gerät | Phase 1 |
 | Genauigkeitsschwelle für den Wechsel auf JPL-Ephemeriden (Abschnitt 6.3) | Phase 2, abhängig von gemessener Abweichung |
 | Projektname und Domain | vor dem ersten öffentlichen Release |
-| PayPal-Spendenlink hinterlegen, GitHub Sponsors freischalten (Abschnitt 38.3) | vor dem ersten öffentlichen Release |
 | Rechtliche Durchsicht inkl. `comfort`-Strings (Abschnitt 5, 38.4) | vor Phase-2-Veröffentlichung |
 
 ---
