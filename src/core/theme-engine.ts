@@ -98,9 +98,44 @@ const mixHex = (a: string, b: string, t: number): string => {
   return `#${toHex(ar + (br - ar) * t)}${toHex(ag + (bg - ag) * t)}${toHex(ab + (bb - ab) * t)}`;
 };
 
+/** Relative Leuchtdichte nach WCAG 2.1 (0 = Schwarz, 1 = Weiß). */
+const relLuminance = (h: string): number => {
+  const lin = (c: number): number => {
+    const s = c / 255;
+    return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+  };
+  const [r, g, b] = hex(h);
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+};
+
+/** Kontrastverhältnis zweier Farben nach WCAG (1 = identisch, 21 = max). */
+const contrast = (a: string, b: string): number => {
+  const la = relLuminance(a);
+  const lb = relLuminance(b);
+  return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+};
+
+/**
+ * Hält eine (gedämpfte) Farbe lesbar: reicht der Kontrast zum Grund nicht,
+ * wird sie schrittweise zum kräftigen Anker gezogen, bis das Ziel erreicht ist.
+ */
+const ensureContrast = (color: string, bg: string, min: number, anchor: string): string => {
+  let out = color;
+  for (let t = 0.1; t <= 1 && contrast(out, bg) < min; t += 0.1) {
+    out = mixHex(color, anchor, t);
+  }
+  return out;
+};
+
 /**
  * Kontinuierliche Palette: Anteil `nightness` (0 = voller Tag, 1 = tiefe Nacht)
  * aus der Sonnenhöhe. Der Übergang atmet weich (§11.4), statt abrupt zu kippen.
+ *
+ * Wichtig: Flächen (bg, surface, Akzente, Ringe) werden weich gemischt, damit
+ * das Zifferblatt atmet. Die Schriftfarben dürfen jedoch nicht durch dasselbe
+ * Mittelgrau laufen wie der Grund — sonst kreuzen sich Text und Hintergrund bei
+ * Dämmerung und werden unlesbar. Sie kippen deshalb kontrastbasiert auf die
+ * lesbare Seite, statt linear gemischt zu werden.
  */
 export function paletteForElevation(elevation: number): { palette: Palette; nightness: number } {
   // Über +6° voll Tag, unter −6° voll Nacht, dazwischen linear gemischt.
@@ -109,5 +144,20 @@ export function paletteForElevation(elevation: number): { palette: Palette; nigh
   const palette = Object.fromEntries(
     keys.map((k) => [k, mixHex(DAY[k], NIGHT[k], nightness)]),
   ) as unknown as Palette;
+
+  // Textseite nach Hintergrundhelligkeit wählen (kein Durchmischen durch Grau).
+  const side = contrast(DAY.text, palette.bg) >= contrast(NIGHT.text, palette.bg) ? DAY : NIGHT;
+  // Am Dämmerungspunkt (Grund im Mittelgrau) reicht die Basisfarbe knapp nicht
+  // für AA — dort minimal Richtung Rein-Schwarz/-Weiß nachziehen. Tag/Nacht
+  // bleiben unberührt, weil ihr Kontrast dort ohnehin weit über der Schwelle liegt.
+  palette.text = ensureContrast(side.text, palette.bg, 4.5, side === DAY ? '#000000' : '#FFFFFF');
+  // Gedämpfter Text bleibt gedämpft, aber garantiert lesbar (Ziel ~AA für Fließtext).
+  palette.textDim = ensureContrast(side.textDim, palette.bg, 4, side.text);
+  // Text auf Akzentflächen an die tatsächlich gemischte Akzentfarbe koppeln.
+  palette.onAccent =
+    contrast(DAY.onAccent, palette.accent) >= contrast(NIGHT.onAccent, palette.accent)
+      ? DAY.onAccent
+      : NIGHT.onAccent;
+
   return { palette, nightness };
 }
