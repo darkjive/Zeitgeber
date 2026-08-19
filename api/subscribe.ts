@@ -4,8 +4,8 @@
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { hashEndpoint, redis, subKey, SUBS_SET, type StoredSubscription } from './_shared';
-import type { ReminderCategory } from '../src/core/reminders';
+import { hashEndpoint, redis, subKey, SUBS_SET, type StoredSubscription } from './_shared.js';
+import type { ReminderCategory } from '../src/core/reminders.js';
 
 const CATS: ReminderCategory[] = ['comfort', 'outdoor'];
 

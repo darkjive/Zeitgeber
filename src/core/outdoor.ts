@@ -7,8 +7,8 @@
  * vollständig offline (§29). Reine Funktionen.
  */
 
-import type { GeoLocation } from './astro-engine';
-import { moonInfo, sunPosition, sunTimeAtAltitude, sunTimes } from './astro-engine';
+import type { GeoLocation } from './astro-engine.js';
+import { moonInfo, sunPosition, sunTimeAtAltitude, sunTimes } from './astro-engine.js';
 
 /** Restlicht bis zum Ende der bürgerlichen Dämmerung (Sonne −6°). */
 export interface UsableLight {

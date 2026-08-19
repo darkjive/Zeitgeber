@@ -7,9 +7,9 @@
  * aussagen** (§5): es geht ums Kühlhalten und Verschatten, nicht um Gesundheit.
  */
 
-import type { GeoLocation } from './astro-engine';
-import { sunPosition, sunTimes } from './astro-engine';
-import { irradianceFactor } from './solar-geometry';
+import type { GeoLocation } from './astro-engine.js';
+import { sunPosition, sunTimes } from './astro-engine.js';
+import { irradianceFactor } from './solar-geometry.js';
 
 export interface Window {
   start: Date | null;

@@ -11,9 +11,9 @@
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { ensureVapid, hashEndpoint, redis, sentKey, subKey, SUBS_SET, webpush, type StoredSubscription } from './_shared';
-import { collectReminders } from '../src/core/reminders';
-import { createTranslator } from '../src/i18n';
+import { ensureVapid, hashEndpoint, redis, sentKey, subKey, SUBS_SET, webpush, type StoredSubscription } from './_shared.js';
+import { collectReminders } from '../src/core/reminders.js';
+import { createTranslator } from '../src/i18n/index.js';
 
 // Fällig, wenn die Benachrichtigungszeit in den letzten 20 Minuten liegt —
 // deckt Auslöse-Intervalle bis 20 min und leichte Verzögerungen ab.

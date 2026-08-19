@@ -9,9 +9,9 @@
  * Keine Befehle, nur Empfehlungen (§5): die Texte sind bewusst freundlich.
  */
 
-import type { GeoLocation } from './astro-engine';
-import { shutterWindow, ventilationByGeometry } from './comfort';
-import { goldenBlueWindows, usableLight } from './outdoor';
+import type { GeoLocation } from './astro-engine.js';
+import { shutterWindow, ventilationByGeometry } from './comfort.js';
+import { goldenBlueWindows, usableLight } from './outdoor.js';
 
 export interface ReminderEvent {
   /** Stabil je Tag & Art — der Notifier entdoppelt darüber. */

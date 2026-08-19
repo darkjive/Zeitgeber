@@ -7,8 +7,8 @@
  * Wechselrichter, Verschmutzung und Wetter ab).
  */
 
-import type { GeoLocation, HorizontalCoords } from './astro-engine';
-import { sunPosition } from './astro-engine';
+import type { GeoLocation, HorizontalCoords } from './astro-engine.js';
+import { sunPosition } from './astro-engine.js';
 
 const RAD = Math.PI / 180;
 

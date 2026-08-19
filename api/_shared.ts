@@ -10,7 +10,7 @@
 import crypto from 'node:crypto';
 import { Redis } from '@upstash/redis';
 import webpush from 'web-push';
-import type { ReminderCategory } from '../src/core/reminders';
+import type { ReminderCategory } from '../src/core/reminders.js';
 
 // Vercels Marketplace-Upstash-Integration setzt KV_REST_API_URL/TOKEN
 // (die vereinheitlichte "Vercel KV"-Benennung) statt der von Redis.fromEnv()
