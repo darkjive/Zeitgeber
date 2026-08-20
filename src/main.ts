@@ -271,7 +271,7 @@ app.innerHTML = `
 
   <div class="drawer" id="drawer" hidden>
     <div class="drawer__scrim" id="drawer-scrim"></div>
-    <aside class="drawer__panel" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+    <aside class="drawer__panel" id="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
       <div class="drawer__head">
         <span class="drawer__title" id="drawer-title" data-i18n="menu.title"></span>
         <button class="iconbtn" id="drawer-close" aria-label="Menü schließen">${icon('x')}</button>
@@ -360,6 +360,9 @@ function buildDrawer(): void {
     </button>`;
 }
 
+/** Ab dieser Breite steht der Drawer neben dem Inhalt statt darüber (§13). */
+const wideLayout = window.matchMedia('(min-width: 900px)');
+
 let lastFocus: HTMLElement | null = null;
 
 function openDrawer(): void {
@@ -370,6 +373,9 @@ function openDrawer(): void {
   void drawer.offsetWidth;
   drawer.classList.add('is-open');
   $('#burger').setAttribute('aria-expanded', 'true');
+  // Nebeneinander ist der Drawer kein modaler Dialog mehr — sonst meldeten
+  // Screenreader den Rest der Seite fälschlich als unerreichbar (§13).
+  $('#drawer-panel').setAttribute('aria-modal', String(!wideLayout.matches));
   ($('#drawer-close') as HTMLButtonElement).focus();
 }
 

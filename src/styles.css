@@ -1284,6 +1284,33 @@ body {
   }
 }
 
+/* Ab 900px sitzt der Drawer als eigene Spalte neben dem Zifferblatt statt
+   darüber: man will sehen, was ein Ebenen-Schalter am Bild verändert, statt
+   das Bild abgedunkelt zu bekommen. */
+@media (min-width: 900px) {
+  .drawer {
+    position: sticky;
+    inset: auto;
+    top: 0;
+    align-self: flex-start;
+    height: 100vh;
+    flex: none;
+  }
+
+  .drawer__scrim {
+    display: none;
+  }
+
+  .drawer__panel,
+  .drawer.is-open .drawer__panel {
+    position: static;
+    height: 100%;
+    width: 340px;
+    transform: none;
+    transition: none;
+  }
+}
+
 /* Sonnenstunden-Panels (§31.2, §31.3) */
 .onboard__card.sunhours {
   text-align: left;
