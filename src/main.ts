@@ -190,7 +190,7 @@ interface ModuleDef {
 }
 
 const MODULES: ModuleDef[] = [
-  { key: 'chrono', labelKey: 'chrono.button', icon: 'moon', color: '#8D6FE7', open: (now) => openChronobiology(solarOffset(now, location).minutes, t, () => rerender()) },
+  { key: 'chrono', labelKey: 'chrono.button', icon: 'moon', color: '#8D6FE7', open: (now) => openChronobiology(solarOffset(now, location).minutes, location, now, t, () => rerender()) },
   { key: 'comfort', labelKey: 'comfort.button', icon: 'thermometer-sun', color: '#E8794A', open: (now) => openComfort(location, now, t) },
   { key: 'outdoor', labelKey: 'outdoor.button', icon: 'compass', color: '#4F9E8C', open: (now) => openOutdoor(location, now, t, { pinned: dialOverlay === 'outdoor', onPin: (on) => setDialOverlay(on ? 'outdoor' : null) }) },
   { key: 'solar', labelKey: 'solar.button', icon: 'zap', color: '#E0A93C', open: (now) => openSolarYield(location, now, t) },

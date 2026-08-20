@@ -921,6 +921,52 @@ body {
   flex-wrap: wrap;
 }
 
+/* Äußere Zyklen im Rhythmus-Panel (§26): Mond und Luftdruck neben dem
+   eigenen Rhythmus, rein anzeigend. */
+.chrono__cycles {
+  margin: 4px 0 14px;
+  padding-top: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--text-dim) 22%, transparent);
+}
+
+.chrono__subh {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 0 0 8px;
+}
+
+.chrono__cycle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text);
+  margin: 0 0 6px;
+}
+
+/* display:flex würde [hidden] sonst aushebeln. */
+.chrono__cycle[hidden] {
+  display: none;
+}
+
+.chrono__cycle-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  flex: none;
+  font-size: 15px;
+  color: var(--text-dim);
+}
+
+.chrono__cycle-ic svg {
+  display: block;
+}
+
 /* Outdoor-Panel (§29) */
 .onboard__card.outdoor {
   text-align: left;
