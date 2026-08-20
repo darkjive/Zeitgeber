@@ -28,6 +28,7 @@ export interface StoredSubscription {
   tz?: string;
   lang: 'de' | 'en';
   categories: ReminderCategory[];
+  ars?: string;
   createdAt: number;
 }
 

@@ -13,6 +13,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { ensureVapid, hashEndpoint, redis, sentKey, subKey, SUBS_SET, webpush, type StoredSubscription } from './_shared.js';
 import { collectReminders } from '../src/core/reminders.js';
+import type { CivilWarning } from '../src/core/civil-warnings.js';
 import { createTranslator } from '../src/i18n/index.js';
 
 // Fällig, wenn die Benachrichtigungszeit in den letzten 20 Minuten liegt —
@@ -26,6 +27,28 @@ function authorized(req: VercelRequest): boolean {
   const header = req.headers.authorization;
   const key = req.query.key;
   return header === `Bearer ${secret}` || key === secret;
+}
+
+const warningsCache = new Map<string, Promise<CivilWarning[]>>();
+
+async function fetchWarningsForArs(ars: string): Promise<CivilWarning[]> {
+  try {
+    const res = await fetch(`https://warnung.bund.de/api31/dashboard/${ars}.json`);
+    if (!res.ok) return [];
+    const data = (await res.json()) as CivilWarning[];
+    return data.filter((w) => w.type !== 'Cancel');
+  } catch {
+    return [];
+  }
+}
+
+function warningsForArs(ars: string): Promise<CivilWarning[]> {
+  let p = warningsCache.get(ars);
+  if (!p) {
+    p = fetchWarningsForArs(ars);
+    warningsCache.set(ars, p);
+  }
+  return p;
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
@@ -74,6 +97,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
           await redis.del(subKey(hash));
           await redis.srem(SUBS_SET, hash);
           pruned++;
+        }
+      }
+    }
+
+    if (sub.categories.includes('civil-warning') && sub.ars) {
+      const warnings = await warningsForArs(sub.ars);
+      for (const w of warnings) {
+        const eventId = `${w.id}:${w.version}`;
+        const first = await redis.set(sentKey(hash, eventId), 1, { nx: true, ex: SENT_TTL_S });
+        if (!first) continue;
+        const title = w.i18nTitle[sub.lang] ?? w.i18nTitle.de ?? w.id;
+        const payload = JSON.stringify({ title: t('remind.appTitle'), body: title, tag: eventId, url: '/' });
+        try {
+          await webpush.sendNotification({ endpoint: sub.endpoint, keys: sub.keys }, payload);
+          sent++;
+        } catch (err) {
+          const code = (err as { statusCode?: number }).statusCode;
+          if (code === 404 || code === 410) {
+            await redis.del(subKey(hash));
+            await redis.srem(SUBS_SET, hash);
+            pruned++;
+          }
         }
       }
     }
