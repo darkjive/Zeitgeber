@@ -27,6 +27,27 @@ const R_TIME_IN = 150;
 const R_OVERLAY = 136;
 const R_COMPASS = 120;
 
+/**
+ * Planetenfarben, an den realen Farbeindruck angelehnt und gedämpft (§11).
+ * Schlüssel = Objekt-ID des planetsProvider.
+ */
+const PLANET_COLOR: Record<string, string> = {
+  mercury: '#9A9086',
+  venus: '#E8D9A8',
+  mars: '#C1603F',
+  jupiter: '#D9A468',
+  saturn: '#C9B27A',
+  uranus: '#7FC4C8',
+  neptune: '#5E7FC6',
+};
+
+/**
+ * Radius nach Helligkeit — dieselbe Staffelung wie bei den Sternen in
+ * sky-map.ts, nur mit größerem Basiswert: Planeten sollen vor dem Sternfeld
+ * erkennbar bleiben. Gedeckelt, damit Venus den Kompassring nicht sprengt.
+ */
+const planetRadius = (magnitude = 2): number => Math.min(6.5, Math.max(2, 4.6 - magnitude * 0.7));
+
 export interface DialState {
   time: Date;
   location: GeoLocation;
@@ -233,11 +254,31 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
     svg.appendChild(label);
   }
 
-  // Planeten als dezente Marker (nur wenn der Layer aktiv ist, §7.4).
+  // Planeten (nur wenn der Layer aktiv ist, §7.4): Größe nach Helligkeit,
+  // eigene Farbe, Name — sonst bleibt der Ebenen-Schalter ohne sichtbare Wirkung.
   for (const p of objects.filter((o) => o.kind === 'planet')) {
     if (p.horizontal.elevation <= -0.833) continue;
     const [px, py] = polar(R_COMPASS, p.horizontal.azimuth);
-    svg.appendChild(el('circle', { cx: px, cy: py, r: 3.5, fill: palette.secondary, opacity: 0.9 }));
+    svg.appendChild(
+      el('circle', {
+        cx: px,
+        cy: py,
+        r: planetRadius(p.magnitude),
+        fill: PLANET_COLOR[p.id] ?? palette.secondary,
+      }),
+    );
+    // Name nach innen versetzt, damit er die Himmelsrichtungen am Ring nicht überschreibt.
+    const [lx, ly] = polar(R_COMPASS - 13, p.horizontal.azimuth);
+    const label = el('text', {
+      x: lx,
+      y: ly,
+      fill: palette.textDim,
+      'font-size': 9,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+    });
+    label.textContent = t(p.nameKey);
+    svg.appendChild(label);
   }
 
   const sun = objects.find((o) => o.kind === 'sun');

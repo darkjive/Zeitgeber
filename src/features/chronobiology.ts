@@ -6,8 +6,12 @@
  * Rein beschreibend, keine Handlungsanweisung (§5, §26.6).
  */
 
+import type { GeoLocation } from '../core/astro-engine';
+import { fullMoonDistance, moonInfo } from '../core/astro-engine';
 import { analyzeSleep, combinedOffset, minutesToHHMM, type ChronoResult, type SleepLog } from '../core/chronobiology';
+import { icon } from '../icons';
 import type { Translator } from '../i18n';
+import { fetchPressureTrend } from './weather';
 
 const STORAGE_KEY = 'sunclock.chrono';
 
@@ -49,7 +53,13 @@ const fmtDur = (min: number, t: Translator): string => {
   return h === 0 ? `${m} ${t('unit.min')}` : `${h} ${t('unit.hour')} ${m} ${t('unit.min')}`;
 };
 
-export function openChronobiology(solarOffsetMin: number, t: Translator, onChange: () => void): void {
+export function openChronobiology(
+  solarOffsetMin: number,
+  location: GeoLocation,
+  now: Date,
+  t: Translator,
+  onChange: () => void,
+): void {
   const log: SleepLog = loadChronoLog() ?? { ...DEFAULT_LOG };
 
   const overlay = document.createElement('div');
@@ -79,6 +89,19 @@ export function openChronobiology(solarOffsetMin: number, t: Translator, onChang
     </dl>
     <p class="chrono__explain" id="c-explain"></p>
     <p class="solar__note">${t('chrono.disclaimer')}</p>
+
+    <section class="chrono__cycles">
+      <h3 class="chrono__subh">${t('chrono.cycles.title')}</h3>
+      <p class="chrono__cycle">
+        <span class="chrono__cycle-ic" aria-hidden="true">${icon('moon')}</span>
+        <span id="c-moon">–</span>
+      </p>
+      <p class="chrono__cycle" id="c-pressure-row" hidden>
+        <span class="chrono__cycle-ic" id="c-pressure-arrow" aria-hidden="true">→</span>
+        <span id="c-pressure">–</span>
+      </p>
+      <p class="solar__note">${t('chrono.moon.disclaimer')}</p>
+    </section>
 
     <div class="chrono__actions">
       <button class="btn btn--ghost" id="c-delete">${t('chrono.delete')}</button>
@@ -141,6 +164,36 @@ export function openChronobiology(solarOffsetMin: number, t: Translator, onChang
   $('#c-close').addEventListener('click', () => overlay.remove());
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) overlay.remove();
+  });
+
+  // Mond braucht kein Netz und steht deshalb sofort (§17).
+  const m = moonInfo(now, location);
+  const dist = fullMoonDistance(m.ageDays);
+  const fullKey =
+    dist.days === 0
+      ? 'chrono.moon.fullToday'
+      : dist.days === 1
+        ? dist.direction === 'to'
+          ? 'chrono.moon.dayToFull'
+          : 'chrono.moon.daySinceFull'
+        : dist.direction === 'to'
+          ? 'chrono.moon.daysToFull'
+          : 'chrono.moon.daysSinceFull';
+  $('#c-moon').textContent = [
+    t(m.phaseKey),
+    t('chrono.moon.illuminated', { p: Math.round(m.illumination * 100) }),
+    t(fullKey, { d: dist.days }),
+  ].join(' · ');
+
+  // Luftdruck nur, wenn das Netz etwas liefert; sonst bleibt die Zeile aus (§10).
+  const ARROW: Record<string, string> = { rising: '↑', falling: '↓', stable: '→' };
+  void fetchPressureTrend(location, now).then((change) => {
+    if (!change || !overlay.isConnected) return;
+    $('#c-pressure-arrow').textContent = ARROW[change.trend];
+    // Das Vorzeichen trägt schon das Trendwort — die Zahl bleibt positiv.
+    $('#c-pressure').textContent =
+      `${t('chrono.pressure.title')}: ${t(`chrono.pressure.${change.trend}`, { d: Math.abs(change.deltaHpa).toFixed(1) })}`;
+    $('#c-pressure-row').hidden = false;
   });
 
   update();

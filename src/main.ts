@@ -117,6 +117,35 @@ function setDialOverlay(id: OverlayId | null): void {
   rerender();
 }
 
+// Auf welcher Seite der Drawer im Breitbild-Layout sitzt (§11). Persistiert,
+// Default rechts — so, wie es vor dem Breitbild-Layout war.
+type DrawerSide = 'left' | 'right';
+const DRAWER_SIDE_KEY = 'sunclock.drawerSide';
+
+const loadDrawerSide = (): DrawerSide => {
+  try {
+    return localStorage.getItem(DRAWER_SIDE_KEY) === 'left' ? 'left' : 'right';
+  } catch {
+    return 'right';
+  }
+};
+
+let drawerSide: DrawerSide = loadDrawerSide();
+
+function applyDrawerSide(): void {
+  document.documentElement.dataset.drawerSide = drawerSide;
+}
+
+function toggleDrawerSide(): void {
+  drawerSide = drawerSide === 'right' ? 'left' : 'right';
+  try {
+    localStorage.setItem(DRAWER_SIDE_KEY, drawerSide);
+  } catch {
+    /* Seitenwahl ist Komfort, kein Zustand, ohne den die Uhr scheitert. */
+  }
+  applyDrawerSide();
+}
+
 // --- Formatierung -----------------------------------------------------------
 
 const fmtTime = (d: Date, withSeconds = false): string =>
@@ -161,7 +190,7 @@ interface ModuleDef {
 }
 
 const MODULES: ModuleDef[] = [
-  { key: 'chrono', labelKey: 'chrono.button', icon: 'moon', color: '#8D6FE7', open: (now) => openChronobiology(solarOffset(now, location).minutes, t, () => rerender()) },
+  { key: 'chrono', labelKey: 'chrono.button', icon: 'moon', color: '#8D6FE7', open: (now) => openChronobiology(solarOffset(now, location).minutes, location, now, t, () => rerender()) },
   { key: 'comfort', labelKey: 'comfort.button', icon: 'thermometer-sun', color: '#E8794A', open: (now) => openComfort(location, now, t) },
   { key: 'outdoor', labelKey: 'outdoor.button', icon: 'compass', color: '#4F9E8C', open: (now) => openOutdoor(location, now, t, { pinned: dialOverlay === 'outdoor', onPin: (on) => setDialOverlay(on ? 'outdoor' : null) }) },
   { key: 'solar', labelKey: 'solar.button', icon: 'zap', color: '#E0A93C', open: (now) => openSolarYield(location, now, t) },
@@ -188,7 +217,10 @@ app.innerHTML = `
           <div class="brand__tag" data-i18n="app.tagline"></div>
         </div>
       </div>
-      <button class="iconbtn" id="burger" aria-label="Menü" aria-haspopup="dialog" aria-expanded="false">${icon('menu')}</button>
+      <div class="topbar__actions">
+        <button class="iconbtn iconbtn--side" id="drawer-side" aria-label="Menüseite wechseln">${icon('panel-left')}</button>
+        <button class="iconbtn" id="burger" aria-label="Menü" aria-haspopup="dialog" aria-expanded="false">${icon('menu')}</button>
+      </div>
     </header>
 
     <div class="controls">
@@ -271,7 +303,7 @@ app.innerHTML = `
 
   <div class="drawer" id="drawer" hidden>
     <div class="drawer__scrim" id="drawer-scrim"></div>
-    <aside class="drawer__panel" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+    <aside class="drawer__panel" id="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
       <div class="drawer__head">
         <span class="drawer__title" id="drawer-title" data-i18n="menu.title"></span>
         <button class="iconbtn" id="drawer-close" aria-label="Menü schließen">${icon('x')}</button>
@@ -303,6 +335,7 @@ function applyStaticI18n(): void {
   });
   $('#burger').setAttribute('aria-label', t('menu.open'));
   $('#drawer-close').setAttribute('aria-label', t('menu.close'));
+  $('#drawer-side').setAttribute('aria-label', t('menu.side'));
   const locInput = $('#loc-input') as HTMLInputElement;
   locInput.placeholder = t('loc.placeholder');
   locInput.setAttribute('aria-label', t('loc.manual'));
@@ -360,6 +393,9 @@ function buildDrawer(): void {
     </button>`;
 }
 
+/** Ab dieser Breite steht der Drawer neben dem Inhalt statt darüber (§13). */
+const wideLayout = window.matchMedia('(min-width: 900px)');
+
 let lastFocus: HTMLElement | null = null;
 
 function openDrawer(): void {
@@ -370,6 +406,9 @@ function openDrawer(): void {
   void drawer.offsetWidth;
   drawer.classList.add('is-open');
   $('#burger').setAttribute('aria-expanded', 'true');
+  // Nebeneinander ist der Drawer kein modaler Dialog mehr — sonst meldeten
+  // Screenreader den Rest der Seite fälschlich als unerreichbar (§13).
+  $('#drawer-panel').setAttribute('aria-modal', String(!wideLayout.matches));
   ($('#drawer-close') as HTMLButtonElement).focus();
 }
 
@@ -630,6 +669,7 @@ function wireEvents(): void {
   $('#burger').addEventListener('click', openDrawer);
   $('#drawer-close').addEventListener('click', closeDrawer);
   $('#drawer-scrim').addEventListener('click', closeDrawer);
+  $('#drawer-side').addEventListener('click', toggleDrawerSide);
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !$('#drawer').hidden) closeDrawer();
   });
@@ -746,6 +786,7 @@ async function adoptGpsIfAllowed(): Promise<void> {
 }
 
 async function boot(): Promise<void> {
+  applyDrawerSide();
   wall = new WallMode(app, () => applyStaticI18n());
   wireEvents();
   applyStaticI18n();

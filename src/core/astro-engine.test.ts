@@ -7,7 +7,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { equationOfTime, julianDay, moonInfo, sunPosition, sunTimes } from './astro-engine';
+import { equationOfTime, fullMoonDistance, julianDay, moonInfo, sunPosition, sunTimes, SYNODIC_MONTH_DAYS } from './astro-engine';
 import type { GeoLocation } from './astro-engine';
 
 const KA: GeoLocation = { latitude: 49.0069, longitude: 8.4037 };
@@ -77,5 +77,29 @@ describe('moonInfo', () => {
     expect(m.illumination).toBeLessThanOrEqual(1);
     expect(m.ageDays).toBeGreaterThanOrEqual(0);
     expect(m.ageDays).toBeLessThan(29.6);
+  });
+});
+
+describe('fullMoonDistance', () => {
+  it('zählt vom Neumond aus einen halben Zyklus vorwärts', () => {
+    const r = fullMoonDistance(0);
+    expect(r.direction).toBe('to');
+    expect(r.days).toBe(15);
+  });
+
+  it('meldet am Vollmond selbst null Tage', () => {
+    expect(fullMoonDistance(SYNODIC_MONTH_DAYS / 2).days).toBe(0);
+  });
+
+  it('zählt kurz nach Vollmond rückwärts', () => {
+    const r = fullMoonDistance(SYNODIC_MONTH_DAYS / 2 + 1.2);
+    expect(r.direction).toBe('since');
+    expect(r.days).toBe(1);
+  });
+
+  it('wählt kurz vor Neumond die zurückliegende Seite, weil sie näher liegt', () => {
+    const r = fullMoonDistance(29);
+    expect(r.direction).toBe('since');
+    expect(r.days).toBe(14);
   });
 });

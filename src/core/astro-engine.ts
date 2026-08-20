@@ -261,6 +261,34 @@ export function equatorialToHorizontal(raDeg: number, decDeg: number, date: Date
   return { elevation: elev + refraction(elev), azimuth: az };
 }
 
+/** Länge des synodischen Monats in Tagen (Neumond → Neumond). */
+export const SYNODIC_MONTH_DAYS = 29.530588853;
+
+export interface FullMoonDistance {
+  /** Ganze Tage bis zum nächsten bzw. seit dem letzten Vollmond, immer ≥ 0. */
+  days: number;
+  /** 'to' = der Vollmond steht bevor, 'since' = er liegt zurück. */
+  direction: 'to' | 'since';
+}
+
+/**
+ * Abstand zum Vollmond aus dem Mondalter (§17). Es gewinnt die nähere Seite:
+ * kurz nach Vollmond zählt die Anzeige zurück, sonst vorwärts — das entspricht
+ * dem, wie Menschen den Zyklus benennen.
+ */
+export function fullMoonDistance(ageDays: number): FullMoonDistance {
+  const full = SYNODIC_MONTH_DAYS / 2;
+  const cycle = (x: number): number => ((x % SYNODIC_MONTH_DAYS) + SYNODIC_MONTH_DAYS) % SYNODIC_MONTH_DAYS;
+  const toNext = cycle(full - ageDays);
+  const sinceLast = cycle(ageDays - full);
+  // Beim exakten Halbzyklus können toNext/sinceLast durch Fließkomma-Rundung
+  // um ein paar 1e-15 auseinanderliegen — Toleranz verhindert eine zufällige
+  // Richtungswahl genau am Vollmond.
+  return toNext <= sinceLast + 1e-9
+    ? { days: Math.round(toNext), direction: 'to' }
+    : { days: Math.round(sinceLast), direction: 'since' };
+}
+
 export function moonInfo(date: Date, loc: GeoLocation): MoonInfo {
   const d = julianDay(date) - 2_451_543.5;
 
@@ -341,7 +369,7 @@ export function moonInfo(date: Date, loc: GeoLocation): MoonInfo {
   // Phase über Elongation.
   const elong = mod360((Lm - Ls) * DEG);
   const illumination = (1 - Math.cos(elong * RAD)) / 2;
-  const ageDays = (elong / 360) * 29.530588853;
+  const ageDays = (elong / 360) * SYNODIC_MONTH_DAYS;
 
   return {
     elevation: elev + refraction(elev),
@@ -353,7 +381,7 @@ export function moonInfo(date: Date, loc: GeoLocation): MoonInfo {
 }
 
 function phaseKeyFromAge(age: number): string {
-  const f = age / 29.530588853;
+  const f = age / SYNODIC_MONTH_DAYS;
   if (f < 0.02 || f > 0.98) return 'moon.new';
   if (f < 0.23) return 'moon.waxingCrescent';
   if (f < 0.27) return 'moon.firstQuarter';

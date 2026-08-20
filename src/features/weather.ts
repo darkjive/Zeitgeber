@@ -9,6 +9,7 @@
 
 import type { GeoLocation } from '../core/astro-engine';
 import type { HourTemp } from '../core/comfort';
+import { pressureTrend, type PressureChange, type PressurePoint } from '../core/pressure';
 
 export interface WeatherNow {
   cloudCover: number; // %
@@ -103,6 +104,37 @@ export async function fetchTemperatures(loc: GeoLocation): Promise<TemperatureFo
       temp: data.hourly!.temperature_2m[i],
     }));
     return { hours, maxToday: data.daily?.temperature_2m_max?.[0] ?? null };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Luftdruck-Verlauf des Tages, verdichtet auf den Trend der letzten ~3 h
+ * (§26, §28). Wie die anderen Abrufe über Open-Meteo, ohne Schlüssel und ohne
+ * Nutzerkennung. Ohne Netz null — die Anzeige blendet die Zeile dann aus,
+ * statt einen Fehlertext zu zeigen (§10).
+ */
+export async function fetchPressureTrend(loc: GeoLocation, now = new Date()): Promise<PressureChange | null> {
+  const url =
+    `${OPEN_METEO}?latitude=${loc.latitude.toFixed(4)}&longitude=${loc.longitude.toFixed(4)}` +
+    `&hourly=surface_pressure&forecast_days=1&timezone=auto`;
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 8000);
+    const res = await fetch(url, { signal: ctrl.signal });
+    clearTimeout(timer);
+    if (!res.ok) throw new Error(`http ${res.status}`);
+    const data = (await res.json()) as { hourly?: { time: string[]; surface_pressure: (number | null)[] } };
+    if (!data.hourly) throw new Error('no hourly');
+    // timezone=auto liefert lokale Zeitstempel ohne Offset — new Date() legt sie
+    // auf die Gerätezeit, wie schon bei fetchTemperatures.
+    const points: PressurePoint[] = [];
+    data.hourly.time.forEach((iso, i) => {
+      const hpa = data.hourly?.surface_pressure[i];
+      if (typeof hpa === 'number') points.push({ time: new Date(iso), hpa });
+    });
+    return pressureTrend(points, now);
   } catch {
     return null;
   }
