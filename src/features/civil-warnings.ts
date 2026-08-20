@@ -14,6 +14,15 @@ import type { Lang, Translator } from '../i18n';
 
 const WARN_API = 'https://warnung.bund.de/api31/dashboard';
 
+// Titel & Co. kommen von einer externen API (warnung.bund.de) — anders als
+// die übrigen Panels, die nur aus dem eigenen i18n-Wörterbuch interpolieren,
+// ist das hier echter Fremd-Content und muss vor dem Einsetzen in innerHTML
+// escaped werden (XSS-Härtung).
+const escapeHtml = (s: string): string =>
+  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+const KNOWN_SEVERITIES = ['Minor', 'Moderate', 'Severe', 'Extreme'] as const;
+
 /** Aktive Warnungen für den Kreis am Standort. `type: 'Cancel'` (Entwarnung) wird herausgefiltert. */
 export async function fetchCivilWarnings(loc: GeoLocation): Promise<CivilWarning[]> {
   const kreis = nearestKreis(loc);
@@ -48,12 +57,19 @@ export function openCivilWarnings(
   const items = warnings
     .map((w) => {
       const title = w.i18nTitle[lang] ?? w.i18nTitle.de ?? w.id;
+      // Laufzeit-Absicherung: `as CivilWarning[]` beim Parsen ist nur eine
+      // Type-Assertion, kein Schutz gegen unerwartete API-Werte. Ein
+      // unbekannter severity-Wert würde sonst als roher i18n-Key-String
+      // (Fallback in createTranslator()) ungeescaped ins DOM gelangen.
+      const severity = KNOWN_SEVERITIES.includes(w.severity as (typeof KNOWN_SEVERITIES)[number])
+        ? w.severity
+        : 'Moderate';
       return `
       <p class="warn__item">
         <span class="warn__ic" aria-hidden="true">${icon('triangle-alert')}</span>
         <span class="warn__body">
-          <span class="warn__sev" style="background:${severityColor(w.severity)}">${t(`warn.severity.${w.severity.toLowerCase()}`)}</span>
-          <span class="warn__title">${title}</span>
+          <span class="warn__sev" style="background:${severityColor(severity)}">${t(`warn.severity.${severity.toLowerCase()}`)}</span>
+          <span class="warn__title">${escapeHtml(title)}</span>
         </span>
       </p>`;
     })
