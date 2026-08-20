@@ -117,6 +117,35 @@ function setDialOverlay(id: OverlayId | null): void {
   rerender();
 }
 
+// Auf welcher Seite der Drawer im Breitbild-Layout sitzt (§11). Persistiert,
+// Default rechts — so, wie es vor dem Breitbild-Layout war.
+type DrawerSide = 'left' | 'right';
+const DRAWER_SIDE_KEY = 'sunclock.drawerSide';
+
+const loadDrawerSide = (): DrawerSide => {
+  try {
+    return localStorage.getItem(DRAWER_SIDE_KEY) === 'left' ? 'left' : 'right';
+  } catch {
+    return 'right';
+  }
+};
+
+let drawerSide: DrawerSide = loadDrawerSide();
+
+function applyDrawerSide(): void {
+  document.documentElement.dataset.drawerSide = drawerSide;
+}
+
+function toggleDrawerSide(): void {
+  drawerSide = drawerSide === 'right' ? 'left' : 'right';
+  try {
+    localStorage.setItem(DRAWER_SIDE_KEY, drawerSide);
+  } catch {
+    /* Seitenwahl ist Komfort, kein Zustand, ohne den die Uhr scheitert. */
+  }
+  applyDrawerSide();
+}
+
 // --- Formatierung -----------------------------------------------------------
 
 const fmtTime = (d: Date, withSeconds = false): string =>
@@ -188,7 +217,10 @@ app.innerHTML = `
           <div class="brand__tag" data-i18n="app.tagline"></div>
         </div>
       </div>
-      <button class="iconbtn" id="burger" aria-label="Menü" aria-haspopup="dialog" aria-expanded="false">${icon('menu')}</button>
+      <div class="topbar__actions">
+        <button class="iconbtn iconbtn--side" id="drawer-side" aria-label="Menüseite wechseln">${icon('panel-left')}</button>
+        <button class="iconbtn" id="burger" aria-label="Menü" aria-haspopup="dialog" aria-expanded="false">${icon('menu')}</button>
+      </div>
     </header>
 
     <div class="controls">
@@ -303,6 +335,7 @@ function applyStaticI18n(): void {
   });
   $('#burger').setAttribute('aria-label', t('menu.open'));
   $('#drawer-close').setAttribute('aria-label', t('menu.close'));
+  $('#drawer-side').setAttribute('aria-label', t('menu.side'));
   const locInput = $('#loc-input') as HTMLInputElement;
   locInput.placeholder = t('loc.placeholder');
   locInput.setAttribute('aria-label', t('loc.manual'));
@@ -636,6 +669,7 @@ function wireEvents(): void {
   $('#burger').addEventListener('click', openDrawer);
   $('#drawer-close').addEventListener('click', closeDrawer);
   $('#drawer-scrim').addEventListener('click', closeDrawer);
+  $('#drawer-side').addEventListener('click', toggleDrawerSide);
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !$('#drawer').hidden) closeDrawer();
   });
@@ -752,6 +786,7 @@ async function adoptGpsIfAllowed(): Promise<void> {
 }
 
 async function boot(): Promise<void> {
+  applyDrawerSide();
   wall = new WallMode(app, () => applyStaticI18n());
   wireEvents();
   applyStaticI18n();

@@ -158,6 +158,12 @@ body {
   stroke-width: 1.75;
 }
 
+/* Der Seiten-Toggle ergibt nur im Breitbild-Layout Sinn — schmal liegt der
+   Drawer ohnehin über der ganzen Seite. */
+.iconbtn--side {
+  display: none;
+}
+
 .iconbtn:hover {
   background: color-mix(in srgb, var(--text-dim) 16%, transparent);
 }
@@ -1308,6 +1314,20 @@ body {
     width: 340px;
     transform: none;
     transition: none;
+  }
+
+  .iconbtn--side {
+    display: inline-flex;
+  }
+
+  /* DOM-Reihenfolge ist .frame, dann .drawer — row-reverse zieht den Drawer
+     nach links und schiebt den Inhalt nach rechts. */
+  :root[data-drawer-side='left'] #app {
+    flex-direction: row-reverse;
+  }
+
+  :root[data-drawer-side='left'] .drawer__panel {
+    box-shadow: 18px 0 50px rgba(0, 0, 0, 0.28);
   }
 }
 

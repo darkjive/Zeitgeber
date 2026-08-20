@@ -195,6 +195,7 @@ const de: Dict = {
 
   'menu.open': 'Menü',
   'menu.close': 'Menü schließen',
+  'menu.side': 'Menüseite wechseln',
   'menu.title': 'Menü',
   'menu.layers': 'Am Himmel',
   'menu.modules': 'Module',
@@ -567,6 +568,7 @@ const en: Dict = {
 
   'menu.open': 'Menu',
   'menu.close': 'Close menu',
+  'menu.side': 'Switch menu side',
   'menu.title': 'Menu',
   'menu.layers': 'In the sky',
   'menu.modules': 'Modules',
