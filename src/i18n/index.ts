@@ -180,6 +180,18 @@ const de: Dict = {
   'remind.status.denied': 'Benachrichtigungen sind blockiert – bitte im Browser erlauben.',
   'remind.status.unsupported': 'Dieser Browser kennt keine Benachrichtigungen – Hinweise erscheinen nur in der App.',
 
+  'warn.button': 'Warnungen',
+  'warn.badge': 'Aktive Warnungen: {n}',
+  'warn.title': 'Zivilschutz-Warnungen',
+  'warn.empty': 'Keine aktiven Warnungen für {kreis}.',
+  'warn.close': 'Schließen',
+  'warn.severity.minor': 'Gering',
+  'warn.severity.moderate': 'Mittel',
+  'warn.severity.severe': 'Schwer',
+  'warn.severity.extreme': 'Extrem',
+  'warn.disclaimer':
+    'Amtliche Warnungen des Bundes für deinen Landkreis. Ersetzt keine offiziellen Kanäle, Sirenen oder Anweisungen vor Ort.',
+
   'about.button': 'Info',
   'about.opensource': 'Open Source und werbefrei. Finanziert ausschließlich über freiwillige Spenden – kein Paywall, keine In-App-Käufe.',
   'about.support': 'Unterstützen',
@@ -564,6 +576,18 @@ const en: Dict = {
   'remind.status.foreground': 'Active while the app is open (e.g. in wall mode).',
   'remind.status.denied': 'Notifications are blocked – please allow them in the browser.',
   'remind.status.unsupported': 'This browser has no notifications – nudges only show inside the app.',
+
+  'warn.button': 'Warnings',
+  'warn.badge': 'Active warnings: {n}',
+  'warn.title': 'Civil protection warnings',
+  'warn.empty': 'No active warnings for {kreis}.',
+  'warn.close': 'Close',
+  'warn.severity.minor': 'Minor',
+  'warn.severity.moderate': 'Moderate',
+  'warn.severity.severe': 'Severe',
+  'warn.severity.extreme': 'Extreme',
+  'warn.disclaimer':
+    'Official federal warnings for your district. Does not replace official channels, sirens, or on-site instructions.',
 
   'about.button': 'Info',
   'about.opensource': 'Open source and ad-free. Funded solely by voluntary donations – no paywall, no in-app purchases.',

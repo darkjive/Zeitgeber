@@ -164,6 +164,16 @@ body {
   display: none;
 }
 
+/* Badge für aktive Zivilschutz-Warnungen — sticht bewusst farblich hervor. */
+.iconbtn--warn {
+  color: var(--accent);
+}
+
+/* display:inline-flex (von .iconbtn) würde [hidden] sonst aushebeln. */
+.iconbtn--warn[hidden] {
+  display: none;
+}
+
 .iconbtn:hover {
   background: color-mix(in srgb, var(--text-dim) 16%, transparent);
 }
@@ -484,6 +494,47 @@ body {
 
 .weather__sub {
   color: var(--text-dim);
+}
+
+/* Zivilschutz-Warnungen (§5, §10, §38.1) */
+.warn__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.4;
+  margin: 0 0 12px;
+  text-align: left;
+}
+
+.warn__ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  font-size: 18px;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+.warn__body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.warn__sev {
+  align-self: flex-start;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: #fff;
+}
+
+.warn__title {
+  color: var(--text);
 }
 
 /* Readout */

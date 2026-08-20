@@ -42,6 +42,8 @@ import { buildOverlay, type DialOverlay, type OverlayId } from './core/dial-over
 import { showOnboarding, hasOnboarded } from './features/onboarding';
 import { WallMode } from './features/wallmode';
 import { fetchWeather, observationRating, type WeatherNow } from './features/weather';
+import { fetchCivilWarnings, openCivilWarnings } from './features/civil-warnings';
+import { nearestKreis, type CivilWarning } from './core/civil-warnings';
 import { renderViewToBlob, shareOrDownload } from './features/share';
 import { openSolarYield } from './features/solar-yield';
 import { openPrayerTimes } from './features/prayer-times';
@@ -89,6 +91,7 @@ type ViewId = 'dial' | 'list' | 'map';
 type LayerId = 'planets' | 'stars' | 'deep-sky' | 'satellites' | 'aircraft';
 let currentView: ViewId = 'dial';
 let weather: WeatherNow | null = null;
+let civilWarnings: CivilWarning[] = [];
 
 // Zeitreise (§24): null = Live (jetzt), sonst eingefrorener Zeitpunkt.
 let frozenTime: Date | null = null;
@@ -203,6 +206,7 @@ const MODULES: ModuleDef[] = [
   { key: 'wheel', labelKey: 'wheel.button', icon: 'orbit', color: '#C77FA8', open: (now) => openWheelOfYear(now, t) },
   { key: 'kids', labelKey: 'kids.button', icon: 'baby', color: '#E56B9B', open: (now) => openKids(location, now, t) },
   { key: 'sat', labelKey: 'sat.button', icon: 'satellite', color: '#9AA0AD', open: (now) => openSatellites(location, now, t) },
+  { key: 'warn', labelKey: 'warn.button', icon: 'triangle-alert', color: '#C94F3D', open: () => openCivilWarnings(civilWarnings, nearestKreis(location)?.name ?? null, lang, t) },
 ];
 
 // --- App-Gerüst -------------------------------------------------------------
@@ -218,6 +222,7 @@ app.innerHTML = `
         </div>
       </div>
       <div class="topbar__actions">
+        <button class="iconbtn iconbtn--warn" id="warn-badge" aria-label="Warnungen" hidden>${icon('triangle-alert')}</button>
         <button class="iconbtn iconbtn--side" id="drawer-side" aria-label="Menüseite wechseln">${icon('panel-left')}</button>
         <button class="iconbtn" id="burger" aria-label="Menü" aria-haspopup="dialog" aria-expanded="false">${icon('menu')}</button>
       </div>
@@ -336,6 +341,7 @@ function applyStaticI18n(): void {
   $('#burger').setAttribute('aria-label', t('menu.open'));
   $('#drawer-close').setAttribute('aria-label', t('menu.close'));
   $('#drawer-side').setAttribute('aria-label', t('menu.side'));
+  renderWarnBadge();
   const locInput = $('#loc-input') as HTMLInputElement;
   locInput.placeholder = t('loc.placeholder');
   locInput.setAttribute('aria-label', t('loc.manual'));
@@ -562,6 +568,17 @@ async function refreshWeather(): Promise<void> {
   renderWeather(bus.collect({ time: currentTime(), location }).find((o) => o.kind === 'moon'));
 }
 
+function renderWarnBadge(): void {
+  const btn = $('#warn-badge');
+  btn.hidden = civilWarnings.length === 0;
+  btn.setAttribute('aria-label', t('warn.badge', { n: civilWarnings.length }));
+}
+
+async function refreshCivilWarnings(): Promise<void> {
+  civilWarnings = await fetchCivilWarnings(location);
+  renderWarnBadge();
+}
+
 async function exportCurrentView(): Promise<void> {
   const svg = $('#view-wrap').querySelector('svg');
   if (!svg) return; // Listenansicht hat kein Bild
@@ -631,6 +648,7 @@ function setLocation(loc: GeoLocation, source: LocationSource): void {
   saveLocation(location);
   rerender();
   void refreshWeather(); // §28: Wetter am neuen Ort neu holen
+  void refreshCivilWarnings(); // Warnungen sind kreisgebunden, am neuen Ort neu holen
   void refreshReminderMeta(); // §reminders: Push-Abo am neuen Ort aktualisieren
 }
 
@@ -670,6 +688,9 @@ function wireEvents(): void {
   $('#drawer-close').addEventListener('click', closeDrawer);
   $('#drawer-scrim').addEventListener('click', closeDrawer);
   $('#drawer-side').addEventListener('click', toggleDrawerSide);
+  $('#warn-badge').addEventListener('click', () =>
+    openCivilWarnings(civilWarnings, nearestKreis(location)?.name ?? null, lang, t),
+  );
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !$('#drawer').hidden) closeDrawer();
   });
@@ -793,6 +814,7 @@ async function boot(): Promise<void> {
   rerender();
   await adoptGpsIfAllowed();
   void refreshWeather();
+  void refreshCivilWarnings();
   // Erinnerungen (§reminders): läuft nur, wenn zuvor aktiviert.
   initReminders({ getLocation: () => location, getTranslator: () => t, getLang: () => lang });
 
@@ -804,6 +826,7 @@ async function boot(): Promise<void> {
   window.setInterval(() => rerender(), 1000);
   // Wetter deutlich seltener aktualisieren (§8, §28).
   window.setInterval(() => void refreshWeather(), 15 * 60_000);
+  window.setInterval(() => void refreshCivilWarnings(), 15 * 60_000);
   // Flugzeuge nur bei aktiver Ansicht nachladen (§20, Rate-Limits beachten).
   window.setInterval(() => {
     if (bus.isEnabled('aircraft')) void fetchAircraft(location);
