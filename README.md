@@ -8,7 +8,8 @@ _12 Uhr ist fast nie Mittag._
 
 Open Source (MIT) · TypeScript strict · Web (PWA) + iOS/Android · offline · ohne Backend · DE/EN
 
-<img src="./docs/screenshot.png" alt="Sun Clock — Zifferblatt mit Dämmerungszonen, gesetzlicher Zeit und Sonnenzeit" width="320" />
+<img src="./docs/screenshot-dark.png" alt="Sun Clock — Zifferblatt im Dark Mode, mit Dämmerungszonen, gesetzlicher Zeit und Sonnenzeit" width="280" />
+<img src="./docs/screenshot-light.png" alt="Sun Clock — Zifferblatt im Light Mode, mit Dämmerungszonen, gesetzlicher Zeit und Sonnenzeit" width="280" />
 
 </div>
 
