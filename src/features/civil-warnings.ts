@@ -8,7 +8,7 @@
  */
 
 import type { GeoLocation } from '../core/astro-engine';
-import { arsFromAgs, nearestKreis, severityColor, type CivilWarning } from '../core/civil-warnings';
+import { arsFromAgs, nearestKreis, normalizeWarnings, severityColor, type CivilWarning } from '../core/civil-warnings';
 import { icon } from '../icons';
 import type { Lang, Translator } from '../i18n';
 
@@ -34,8 +34,8 @@ export async function fetchCivilWarnings(loc: GeoLocation): Promise<CivilWarning
     const res = await fetch(`${WARN_API}/${ars}.json`, { signal: ctrl.signal });
     clearTimeout(timer);
     if (!res.ok) throw new Error(`http ${res.status}`);
-    const data = (await res.json()) as CivilWarning[];
-    return data.filter((w) => w.type !== 'Cancel');
+    const data = await res.json();
+    return normalizeWarnings(data);
   } catch {
     return [];
   }
@@ -76,7 +76,14 @@ export function openCivilWarnings(
     .join('');
   card.innerHTML = `
     <h2 class="onboard__title">${t('warn.title')}</h2>
-    ${warnings.length ? items : `<p class="chrono__intro">${t('warn.empty', { kreis: kreisName ?? '' })}</p>`}
+    ${kreisName ? `<p class="chrono__intro">${escapeHtml(kreisName)}</p>` : ''}
+    ${
+      warnings.length
+        ? items
+        : kreisName
+          ? `<p class="chrono__intro">${t('warn.empty')}</p>`
+          : `<p class="chrono__intro">${t('warn.outsideDe')}</p>`
+    }
     <p class="solar__note">${t('warn.disclaimer')}</p>
     <div class="onboard__actions">
       <button class="btn btn--primary" id="warn-close">${t('warn.close')}</button>

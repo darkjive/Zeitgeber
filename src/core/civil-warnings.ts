@@ -88,3 +88,20 @@ const SEVERITY_COLOR: Record<Severity, string> = {
 export function severityColor(severity: Severity): string {
   return SEVERITY_COLOR[severity];
 }
+
+/**
+ * Bereinigt eine BBK-API-Antwort auf verlässlich nutzbare Warnungen. Die
+ * Antwort ist nur typisiert (`as CivilWarning[]`), keine Laufzeit-Garantie —
+ * ein kaputter Datensatz darf weder das Panel noch den Cron-Durchlauf für
+ * alle anderen Abos mitreissen (§10).
+ */
+export function normalizeWarnings(raw: unknown): CivilWarning[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter((w): w is CivilWarning => {
+    if (typeof w !== 'object' || w === null) return false;
+    const rec = w as Record<string, unknown>;
+    if (typeof rec.id !== 'string') return false;
+    if (typeof rec.i18nTitle !== 'object' || rec.i18nTitle === null) return false;
+    return rec.type !== 'Cancel';
+  });
+}
