@@ -29,24 +29,30 @@ function authorized(req: VercelRequest): boolean {
   return header === `Bearer ${secret}` || key === secret;
 }
 
-const warningsCache = new Map<string, Promise<CivilWarning[]>>();
-
 async function fetchWarningsForArs(ars: string): Promise<CivilWarning[]> {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 8000);
   try {
-    const res = await fetch(`https://warnung.bund.de/api31/dashboard/${ars}.json`);
+    const res = await fetch(`https://warnung.bund.de/api31/dashboard/${ars}.json`, { signal: ctrl.signal });
     if (!res.ok) return [];
     const data = (await res.json()) as CivilWarning[];
     return data.filter((w) => w.type !== 'Cancel');
   } catch {
     return [];
+  } finally {
+    clearTimeout(timer);
   }
 }
 
-function warningsForArs(ars: string): Promise<CivilWarning[]> {
-  let p = warningsCache.get(ars);
+// Cache wird pro handler()-Aufruf frisch angelegt (siehe unten) — nicht
+// modulweit, sonst würde er auf einem warmen Vercel-Container über mehrere
+// Cron-Durchläufe hinweg bestehen bleiben und veraltete/leere Ergebnisse
+// einfrieren.
+function warningsForArs(ars: string, cache: Map<string, Promise<CivilWarning[]>>): Promise<CivilWarning[]> {
+  let p = cache.get(ars);
   if (!p) {
     p = fetchWarningsForArs(ars);
-    warningsCache.set(ars, p);
+    cache.set(ars, p);
   }
   return p;
 }
@@ -66,6 +72,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   let checked = 0;
   let sent = 0;
   let pruned = 0;
+  // Pro Invocation frisch — entdoppelt nur innerhalb dieses Durchlaufs
+  // (mehrere Abos mit demselben ars teilen sich einen Fetch), lebt aber
+  // nicht über den Durchlauf hinaus.
+  const warningsCache = new Map<string, Promise<CivilWarning[]>>();
 
   for (const hash of hashes) {
     const sub = (await redis.get(subKey(hash))) as StoredSubscription | null;
@@ -102,7 +112,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     }
 
     if (sub.categories.includes('civil-warning') && sub.ars) {
-      const warnings = await warningsForArs(sub.ars);
+      const warnings = await warningsForArs(sub.ars, warningsCache);
       for (const w of warnings) {
         const eventId = `${w.id}:${w.version}`;
         const first = await redis.set(sentKey(hash, eventId), 1, { nx: true, ex: SENT_TTL_S });
