@@ -153,7 +153,7 @@ const de: Dict = {
   'remind.button': 'Erinnerungen',
   'remind.title': 'Erinnerungen',
   'remind.intro':
-    'Sun Clock kann sich melden, wenn ein guter Moment kommt – etwa die Südfassade zu verschatten oder abends zu lüften. Immer als freundlicher Hinweis, nie als Befehl.',
+    'Sun Clock kann sich melden, wenn ein guter Moment kommt – etwa die Südfassade zu verschatten oder abends zu lüften, sowie bei neuen amtlichen Zivilschutz-Warnungen für deinen Landkreis. Immer als freundlicher Hinweis, nie als Befehl.',
   'remind.enable': 'Erinnerungen aktivieren',
   'remind.note':
     'Funktioniert, solange die App geöffnet ist – ideal im Wandmodus. Ohne Server gibt es keine Zustellung, wenn die App ganz geschlossen ist. Alles bleibt auf dem Gerät.',
@@ -179,6 +179,19 @@ const de: Dict = {
   'remind.status.foreground': 'Aktiv, solange die App geöffnet ist (z. B. im Wandmodus).',
   'remind.status.denied': 'Benachrichtigungen sind blockiert – bitte im Browser erlauben.',
   'remind.status.unsupported': 'Dieser Browser kennt keine Benachrichtigungen – Hinweise erscheinen nur in der App.',
+
+  'warn.button': 'Warnungen',
+  'warn.badge': 'Aktive Warnungen: {n}',
+  'warn.title': 'Zivilschutz-Warnungen',
+  'warn.empty': 'Keine aktiven Warnungen.',
+  'warn.outsideDe': 'Zivilschutz-Warnungen des Bundes gibt es nur für Deutschland.',
+  'warn.close': 'Schließen',
+  'warn.severity.minor': 'Gering',
+  'warn.severity.moderate': 'Mittel',
+  'warn.severity.severe': 'Schwer',
+  'warn.severity.extreme': 'Extrem',
+  'warn.disclaimer':
+    'Amtliche Warnungen des Bundes für deinen Landkreis. Ersetzt keine offiziellen Kanäle, Sirenen oder Anweisungen vor Ort. Der zugeordnete Landkreis basiert auf einer groben Standort-Näherung.',
 
   'about.button': 'Info',
   'about.opensource': 'Open Source und werbefrei. Finanziert ausschließlich über freiwillige Spenden – kein Paywall, keine In-App-Käufe.',
@@ -538,7 +551,7 @@ const en: Dict = {
   'remind.button': 'Reminders',
   'remind.title': 'Reminders',
   'remind.intro':
-    'Sun Clock can nudge you when a good moment arrives – like shading the south facade, or airing out in the evening. Always a gentle suggestion, never an order.',
+    'Sun Clock can nudge you when a good moment arrives – like shading the south facade, airing out in the evening, or a new official civil protection warning for your district. Always a gentle suggestion, never an order.',
   'remind.enable': 'Turn on reminders',
   'remind.note':
     'Works while the app is open – ideal in wall mode. Without a server there is no delivery once the app is fully closed. Everything stays on the device.',
@@ -564,6 +577,19 @@ const en: Dict = {
   'remind.status.foreground': 'Active while the app is open (e.g. in wall mode).',
   'remind.status.denied': 'Notifications are blocked – please allow them in the browser.',
   'remind.status.unsupported': 'This browser has no notifications – nudges only show inside the app.',
+
+  'warn.button': 'Warnings',
+  'warn.badge': 'Active warnings: {n}',
+  'warn.title': 'Civil protection warnings',
+  'warn.empty': 'No active warnings.',
+  'warn.outsideDe': 'Federal civil protection warnings are only available for Germany.',
+  'warn.close': 'Close',
+  'warn.severity.minor': 'Minor',
+  'warn.severity.moderate': 'Moderate',
+  'warn.severity.severe': 'Severe',
+  'warn.severity.extreme': 'Extreme',
+  'warn.disclaimer':
+    'Official federal warnings for your district. Does not replace official channels, sirens, or on-site instructions. The assigned district is based on a rough location approximation.',
 
   'about.button': 'Info',
   'about.opensource': 'Open source and ad-free. Funded solely by voluntary donations – no paywall, no in-app purchases.',

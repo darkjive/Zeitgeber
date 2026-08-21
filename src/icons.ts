@@ -30,7 +30,8 @@ export type IconName =
   | 'bell'
   | 'info'
   | 'chevron-right'
-  | 'panel-left';
+  | 'panel-left'
+  | 'triangle-alert';
 
 // Nur der innere Pfad-Inhalt je Icon (Quelle: lucide-static v1.31, ISC).
 const PATHS: Record<IconName, string> = {
@@ -73,6 +74,8 @@ const PATHS: Record<IconName, string> = {
   info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
   'chevron-right': '<path d="m9 18 6-6-6-6"/>',
   'panel-left': '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/>',
+  'triangle-alert':
+    '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
 };
 
 export const icon = (name: IconName): string =>

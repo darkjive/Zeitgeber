@@ -18,6 +18,8 @@ export interface PushMeta {
   tz?: string;
   lang: 'de' | 'en';
   categories: string[];
+  /** Kreis-ARS (12-stellig) für Zivilschutz-Warnungen — client-seitig berechnet (§38.1). */
+  ars?: string;
 }
 
 export function pushSupported(): boolean {

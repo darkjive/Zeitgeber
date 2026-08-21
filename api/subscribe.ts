@@ -7,7 +7,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { hashEndpoint, redis, subKey, SUBS_SET, type StoredSubscription } from './_shared.js';
 import type { ReminderCategory } from '../src/core/reminders.js';
 
-const CATS: ReminderCategory[] = ['comfort', 'outdoor'];
+const CATS: ReminderCategory[] = ['comfort', 'outdoor', 'civil-warning'];
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
   if (req.method !== 'POST') {
@@ -37,6 +37,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     tz: typeof body.tz === 'string' ? body.tz : undefined,
     lang: body.lang === 'en' ? 'en' : 'de',
     categories: categories.length ? categories : ['comfort'],
+    // ars landet in cron.ts ungeprüft in einer server-seitigen Fetch-URL —
+    // nur exakt 12 Ziffern zulassen, sonst könnte ein beliebiger String
+    // (z. B. mit "../") in die ausgehende Request-URL gelangen.
+    ars: typeof body.ars === 'string' && /^\d{12}$/.test(body.ars) ? body.ars : undefined,
     createdAt: Date.now(),
   };
 
