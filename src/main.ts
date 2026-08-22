@@ -120,33 +120,35 @@ function setDialOverlay(id: OverlayId | null): void {
   rerender();
 }
 
-// Auf welcher Seite der Drawer im Breitbild-Layout sitzt (§11). Persistiert,
-// Default rechts — so, wie es vor dem Breitbild-Layout war.
-type DrawerSide = 'left' | 'right';
-const DRAWER_SIDE_KEY = 'zeitgeber.drawerSide';
+// Layout im Breitbild (ab 900px): gestapelt (wie mobil, nur zentriert) oder
+// zweispaltig (Zifferblatt links, Infos rechts). Persistiert, Default gestapelt
+// — so, wie es bisher immer war.
+type DesktopLayout = 'stacked' | 'columns';
+const DESKTOP_LAYOUT_KEY = 'zeitgeber.desktopLayout';
 
-const loadDrawerSide = (): DrawerSide => {
+const loadDesktopLayout = (): DesktopLayout => {
   try {
-    return localStorage.getItem(DRAWER_SIDE_KEY) === 'left' ? 'left' : 'right';
+    return localStorage.getItem(DESKTOP_LAYOUT_KEY) === 'columns' ? 'columns' : 'stacked';
   } catch {
-    return 'right';
+    return 'stacked';
   }
 };
 
-let drawerSide: DrawerSide = loadDrawerSide();
+let desktopLayout: DesktopLayout = loadDesktopLayout();
 
-function applyDrawerSide(): void {
-  document.documentElement.dataset.drawerSide = drawerSide;
+function applyDesktopLayout(): void {
+  document.documentElement.dataset.desktopLayout = desktopLayout;
+  $('#layout-toggle').classList.toggle('is-on', desktopLayout === 'columns');
 }
 
-function toggleDrawerSide(): void {
-  drawerSide = drawerSide === 'right' ? 'left' : 'right';
+function toggleDesktopLayout(): void {
+  desktopLayout = desktopLayout === 'stacked' ? 'columns' : 'stacked';
   try {
-    localStorage.setItem(DRAWER_SIDE_KEY, drawerSide);
+    localStorage.setItem(DESKTOP_LAYOUT_KEY, desktopLayout);
   } catch {
-    /* Seitenwahl ist Komfort, kein Zustand, ohne den die Uhr scheitert. */
+    /* Layout-Wahl ist Komfort, kein Zustand, ohne den die Uhr scheitert. */
   }
-  applyDrawerSide();
+  applyDesktopLayout();
 }
 
 // --- Formatierung -----------------------------------------------------------
@@ -223,7 +225,7 @@ app.innerHTML = `
       </div>
       <div class="topbar__actions">
         <button class="iconbtn iconbtn--warn" id="warn-badge" aria-label="Warnungen" hidden>${icon('triangle-alert')}</button>
-        <button class="iconbtn iconbtn--side" id="drawer-side" aria-label="Menüseite wechseln">${icon('panel-left')}</button>
+        <button class="iconbtn iconbtn--side" id="layout-toggle" aria-label="Desktop-Layout wechseln">${icon('columns-2')}</button>
         <button class="iconbtn" id="burger" aria-label="Menü" aria-haspopup="dialog" aria-expanded="false">${icon('menu')}</button>
       </div>
     </header>
@@ -255,55 +257,57 @@ app.innerHTML = `
       </section>
     </main>
 
-    <div class="timebar">
-      <div class="stepper">
-        <button class="chip chip--sm" id="t-day-back" data-i18n="time.dayBack"></button>
-        <button class="chip chip--sm" id="t-hr-back" data-i18n="time.hourBack"></button>
-        <button class="chip chip--sm" id="t-hr-fwd" data-i18n="time.hourFwd"></button>
-        <button class="chip chip--sm" id="t-day-fwd" data-i18n="time.dayFwd"></button>
+    <div class="info-col">
+      <div class="timebar">
+        <div class="stepper">
+          <button class="chip chip--sm" id="t-day-back" data-i18n="time.dayBack"></button>
+          <button class="chip chip--sm" id="t-hr-back" data-i18n="time.hourBack"></button>
+          <button class="chip chip--sm" id="t-hr-fwd" data-i18n="time.hourFwd"></button>
+          <button class="chip chip--sm" id="t-day-fwd" data-i18n="time.dayFwd"></button>
+        </div>
+        <input class="t-input" id="t-input" type="datetime-local" aria-label="Zeitpunkt" />
+        <button class="chip" id="t-now" data-i18n="time.now"></button>
+        <button class="chip" id="t-share" data-i18n="share.button"></button>
       </div>
-      <input class="t-input" id="t-input" type="datetime-local" aria-label="Zeitpunkt" />
-      <button class="chip" id="t-now" data-i18n="time.now"></button>
-      <button class="chip" id="t-share" data-i18n="share.button"></button>
+
+      <div class="weather" id="weather" hidden>
+        <span class="weather__k" data-i18n="weather.title"></span>
+        <span class="weather__badge" id="weather-badge">–</span>
+        <span class="weather__sub" id="weather-sub"></span>
+      </div>
+
+      <section class="sky">
+        <div class="sky__cell">
+          <span class="sky__k" data-i18n="object.sun"></span>
+          <span class="sky__v" id="sun-elev">–</span>
+          <span class="sky__sub" id="sun-dir">–</span>
+        </div>
+        <div class="sky__cell">
+          <span class="sky__k" data-i18n="object.moon"></span>
+          <span class="sky__v" id="moon-phase">–</span>
+          <span class="sky__sub" id="moon-illum">–</span>
+        </div>
+        <div class="sky__cell">
+          <span class="sky__k" data-i18n="dial.sunrise"></span>
+          <span class="sky__v" id="sunrise">–</span>
+          <span class="sky__sub" data-i18n="dial.sunset"></span>
+          <span class="sky__sub" id="sunset">–</span>
+        </div>
+      </section>
+
+      <footer class="locbar">
+        <button class="loc" id="loc-btn">
+          <span class="loc__pin">📍</span>
+          <span id="loc-label">–</span>
+        </button>
+        <p class="loc__hint" id="loc-hint" hidden></p>
+        <form class="loc-search" id="loc-search" hidden>
+          <input id="loc-input" type="text" autocomplete="off" />
+          <button class="btn btn--primary" type="submit" data-i18n="loc.manual"></button>
+        </form>
+        <p class="loc__msg" id="loc-msg" hidden></p>
+      </footer>
     </div>
-
-    <div class="weather" id="weather" hidden>
-      <span class="weather__k" data-i18n="weather.title"></span>
-      <span class="weather__badge" id="weather-badge">–</span>
-      <span class="weather__sub" id="weather-sub"></span>
-    </div>
-
-    <section class="sky">
-      <div class="sky__cell">
-        <span class="sky__k" data-i18n="object.sun"></span>
-        <span class="sky__v" id="sun-elev">–</span>
-        <span class="sky__sub" id="sun-dir">–</span>
-      </div>
-      <div class="sky__cell">
-        <span class="sky__k" data-i18n="object.moon"></span>
-        <span class="sky__v" id="moon-phase">–</span>
-        <span class="sky__sub" id="moon-illum">–</span>
-      </div>
-      <div class="sky__cell">
-        <span class="sky__k" data-i18n="dial.sunrise"></span>
-        <span class="sky__v" id="sunrise">–</span>
-        <span class="sky__sub" data-i18n="dial.sunset"></span>
-        <span class="sky__sub" id="sunset">–</span>
-      </div>
-    </section>
-
-    <footer class="locbar">
-      <button class="loc" id="loc-btn">
-        <span class="loc__pin">📍</span>
-        <span id="loc-label">–</span>
-      </button>
-      <p class="loc__hint" id="loc-hint" hidden></p>
-      <form class="loc-search" id="loc-search" hidden>
-        <input id="loc-input" type="text" autocomplete="off" />
-        <button class="btn btn--primary" type="submit" data-i18n="loc.manual"></button>
-      </form>
-      <p class="loc__msg" id="loc-msg" hidden></p>
-    </footer>
   </div>
 
   <div class="drawer" id="drawer" hidden>
@@ -340,7 +344,7 @@ function applyStaticI18n(): void {
   });
   $('#burger').setAttribute('aria-label', t('menu.open'));
   $('#drawer-close').setAttribute('aria-label', t('menu.close'));
-  $('#drawer-side').setAttribute('aria-label', t('menu.side'));
+  $('#layout-toggle').setAttribute('aria-label', t('layout.toggle'));
   renderWarnBadge();
   const locInput = $('#loc-input') as HTMLInputElement;
   locInput.placeholder = t('loc.placeholder');
@@ -687,7 +691,7 @@ function wireEvents(): void {
   $('#burger').addEventListener('click', openDrawer);
   $('#drawer-close').addEventListener('click', closeDrawer);
   $('#drawer-scrim').addEventListener('click', closeDrawer);
-  $('#drawer-side').addEventListener('click', toggleDrawerSide);
+  $('#layout-toggle').addEventListener('click', toggleDesktopLayout);
   $('#warn-badge').addEventListener('click', () =>
     openCivilWarnings(civilWarnings, nearestKreis(location)?.name ?? null, lang, t),
   );
@@ -807,7 +811,7 @@ async function adoptGpsIfAllowed(): Promise<void> {
 }
 
 async function boot(): Promise<void> {
-  applyDrawerSide();
+  applyDesktopLayout();
   wall = new WallMode(app, () => applyStaticI18n());
   wireEvents();
   applyStaticI18n();

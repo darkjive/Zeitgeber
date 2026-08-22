@@ -158,10 +158,14 @@ body {
   stroke-width: 1.75;
 }
 
-/* Der Seiten-Toggle ergibt nur im Breitbild-Layout Sinn — schmal liegt der
-   Drawer ohnehin über der ganzen Seite. */
+/* Der Layout-Toggle ergibt nur im Breitbild-Layout Sinn — schmal ist ohnehin
+   nur das gestapelte Layout vorgesehen. */
 .iconbtn--side {
   display: none;
+}
+
+.iconbtn--side.is-on {
+  color: var(--accent);
 }
 
 /* Badge für aktive Zivilschutz-Warnungen — sticht bewusst farblich hervor. */
@@ -377,6 +381,13 @@ body {
   padding: 5px 9px;
   font-size: 12px;
   font-family: var(--font-mono);
+}
+
+/* Nur ein Gruppierungs-Rahmen fürs Zweispalten-Layout — im gestapelten
+   Layout (Default + Mobile) unsichtbar, Kinder verhalten sich wie direkte
+   Kinder von .frame. */
+.info-col {
+  display: contents;
 }
 
 /* Zeitreise-Leiste (§24) + Teilen (§33) */
@@ -1417,14 +1428,62 @@ body {
     display: inline-flex;
   }
 
-  /* DOM-Reihenfolge ist .frame, dann .drawer — row-reverse zieht den Drawer
-     nach links und schiebt den Inhalt nach rechts. */
-  :root[data-drawer-side='left'] #app {
-    flex-direction: row-reverse;
+  /* Zweispaltiges Desktop-Layout: Zifferblatt links, Infos (Zeitreise,
+     Wetter, Himmel, Standort) rechts, statt untereinander gestapelt. Beide
+     Spalten liegen in derselben Grid-Zeile (kein Verteilen der Reststrecke
+     über mehrere Zeilen), damit die kürzere Spalte nicht künstlich
+     auseinandergezogen wird. */
+  :root[data-desktop-layout='columns'] .frame {
+    max-width: 760px;
+    display: grid;
+    grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+    gap: 18px 32px;
+    grid-template-areas:
+      'topbar topbar'
+      'controls controls'
+      'stage info';
   }
 
-  :root[data-drawer-side='left'] .drawer__panel {
-    box-shadow: 18px 0 50px rgba(0, 0, 0, 0.28);
+  :root[data-desktop-layout='columns'] .topbar {
+    grid-area: topbar;
+  }
+
+  :root[data-desktop-layout='columns'] .controls {
+    grid-area: controls;
+  }
+
+  :root[data-desktop-layout='columns'] .stage {
+    grid-area: stage;
+    align-self: start;
+  }
+
+  /* Rechte Spalte linksbündig statt zentriert — nebeneinander mit
+     unterschiedlich breiten Zeilen sähe zentriert unruhig/zerfasert aus.
+     Engerer Abstand zwischen den Info-Blöcken statt der großen Lücken der
+     Einzelspalte. */
+  :root[data-desktop-layout='columns'] .info-col {
+    grid-area: info;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-self: center;
+  }
+
+  :root[data-desktop-layout='columns'] .timebar {
+    justify-content: flex-start;
+  }
+
+  :root[data-desktop-layout='columns'] .weather {
+    justify-content: flex-start;
+  }
+
+  :root[data-desktop-layout='columns'] .sky__cell {
+    text-align: left;
+  }
+
+  :root[data-desktop-layout='columns'] .locbar {
+    align-items: flex-start;
+    margin-top: 0;
   }
 }
 

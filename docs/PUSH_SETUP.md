@@ -56,7 +56,7 @@ Er muss regelmäßig (etwa alle 15 Minuten) angestoßen werden.
 Der Workflow `.github/workflows/push-cron.yml` liegt schon bereit. Setze zwei
 Repository-Secrets (Settings → Secrets and variables → Actions):
 
-- `SUNCLOCK_CRON_URL` = `https://<deine-domain>/api/cron`
+- `ZEITGEBER_CRON_URL` = `https://<deine-domain>/api/cron`
 - `CRON_SECRET` = derselbe Wert wie oben
 
 **Variante B – Vercel Cron** (braucht den Pro-Plan für Intervalle unter 1 Tag):
