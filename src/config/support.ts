@@ -9,6 +9,6 @@
 export const APP_VERSION = '1.0.0';
 
 export const support = {
-  repo: 'https://github.com/darkjive/sunclock',
+  repo: 'https://github.com/darkjive/zeitgeber',
   paypal: 'https://paypal.me/AlainRitter',
 };

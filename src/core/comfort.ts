@@ -1,7 +1,7 @@
 /**
  * comfort — Hitzeschutz-Geometrie: Verschattung (Rolläden) und Lüften.
  *
- * Nicht in der Spezifikation vorgesehen, folgt aber deren Logik: Sun Clock
+ * Nicht in der Spezifikation vorgesehen, folgt aber deren Logik: Zeitgeber
  * kennt Sonnenstand und (über das Wetter-Modul) die Aussentemperatur ohnehin.
  * Reine Komfort-/Energie-Aussagen über Licht und Wärme — **keine Gesundheits-
  * aussagen** (§5): es geht ums Kühlhalten und Verschatten, nicht um Gesundheit.

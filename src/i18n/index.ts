@@ -9,7 +9,7 @@ export type Lang = 'de' | 'en';
 type Dict = Record<string, string>;
 
 const de: Dict = {
-  'app.title': 'Sun Clock',
+  'app.title': 'Zeitgeber',
   'app.tagline': '12 Uhr ist fast nie Mittag.',
 
   'object.sun': 'Sonne',
@@ -59,7 +59,7 @@ const de: Dict = {
   'time.hourFwd': '+1 h',
   'time.dayFwd': '+1 T',
   'share.button': 'Teilen',
-  'share.brand': 'Sun Clock · 12 Uhr ist fast nie Mittag',
+  'share.brand': 'Zeitgeber · 12 Uhr ist fast nie Mittag',
 
   'solar.button': 'Solar',
   'solar.title': 'Solarertrag (Geometrie)',
@@ -153,7 +153,7 @@ const de: Dict = {
   'remind.button': 'Erinnerungen',
   'remind.title': 'Erinnerungen',
   'remind.intro':
-    'Sun Clock kann sich melden, wenn ein guter Moment kommt – etwa die Südfassade zu verschatten oder abends zu lüften, sowie bei neuen amtlichen Zivilschutz-Warnungen für deinen Landkreis. Immer als freundlicher Hinweis, nie als Befehl.',
+    'Zeitgeber kann sich melden, wenn ein guter Moment kommt – etwa die Südfassade zu verschatten oder abends zu lüften, sowie bei neuen amtlichen Zivilschutz-Warnungen für deinen Landkreis. Immer als freundlicher Hinweis, nie als Befehl.',
   'remind.enable': 'Erinnerungen aktivieren',
   'remind.note':
     'Funktioniert, solange die App geöffnet ist – ideal im Wandmodus. Ohne Server gibt es keine Zustellung, wenn die App ganz geschlossen ist. Alles bleibt auf dem Gerät.',
@@ -163,7 +163,7 @@ const de: Dict = {
   'remind.close': 'Schließen',
   'remind.stateOn': 'An',
   'remind.stateOff': 'Aus',
-  'remind.appTitle': 'Sun Clock',
+  'remind.appTitle': 'Zeitgeber',
   'remind.comfort.south':
     'Die Sonne wandert auf die Südseite. Wenn du magst, lass dort bald die Rolläden runter – dann bleibt es drinnen angenehm kühl.',
   'remind.comfort.west':
@@ -407,7 +407,7 @@ const de: Dict = {
 };
 
 const en: Dict = {
-  'app.title': 'Sun Clock',
+  'app.title': 'Zeitgeber',
   'app.tagline': '12 o’clock is almost never noon.',
 
   'object.sun': 'Sun',
@@ -457,7 +457,7 @@ const en: Dict = {
   'time.hourFwd': '+1 h',
   'time.dayFwd': '+1 d',
   'share.button': 'Share',
-  'share.brand': 'Sun Clock · 12 o’clock is almost never noon',
+  'share.brand': 'Zeitgeber · 12 o’clock is almost never noon',
 
   'solar.button': 'Solar',
   'solar.title': 'Solar yield (geometry)',
@@ -551,7 +551,7 @@ const en: Dict = {
   'remind.button': 'Reminders',
   'remind.title': 'Reminders',
   'remind.intro':
-    'Sun Clock can nudge you when a good moment arrives – like shading the south facade, airing out in the evening, or a new official civil protection warning for your district. Always a gentle suggestion, never an order.',
+    'Zeitgeber can nudge you when a good moment arrives – like shading the south facade, airing out in the evening, or a new official civil protection warning for your district. Always a gentle suggestion, never an order.',
   'remind.enable': 'Turn on reminders',
   'remind.note':
     'Works while the app is open – ideal in wall mode. Without a server there is no delivery once the app is fully closed. Everything stays on the device.',
@@ -561,7 +561,7 @@ const en: Dict = {
   'remind.close': 'Close',
   'remind.stateOn': 'On',
   'remind.stateOff': 'Off',
-  'remind.appTitle': 'Sun Clock',
+  'remind.appTitle': 'Zeitgeber',
   'remind.comfort.south':
     'The sun is swinging round to the south. If you like, lower the shutters there soon – it keeps things pleasantly cool inside.',
   'remind.comfort.west':
@@ -806,7 +806,7 @@ const en: Dict = {
 
 const DICTS: Record<Lang, Dict> = { de, en };
 
-const STORAGE_KEY = 'sunclock.lang';
+const STORAGE_KEY = 'zeitgeber.lang';
 
 export function detectLang(): Lang {
   try {

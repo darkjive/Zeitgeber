@@ -99,7 +99,7 @@ const currentTime = (): Date => frozenTime ?? new Date();
 const rerender = (): void => render(currentTime());
 
 // Ans Zifferblatt geheftetes Modul-Overlay (§22, §29). Persistiert, Default aus.
-const OVERLAY_KEY = 'sunclock.dialOverlay';
+const OVERLAY_KEY = 'zeitgeber.dialOverlay';
 const loadOverlay = (): OverlayId | null => {
   try {
     return localStorage.getItem(OVERLAY_KEY) === 'outdoor' ? 'outdoor' : null;
@@ -123,7 +123,7 @@ function setDialOverlay(id: OverlayId | null): void {
 // Auf welcher Seite der Drawer im Breitbild-Layout sitzt (§11). Persistiert,
 // Default rechts — so, wie es vor dem Breitbild-Layout war.
 type DrawerSide = 'left' | 'right';
-const DRAWER_SIDE_KEY = 'sunclock.drawerSide';
+const DRAWER_SIDE_KEY = 'zeitgeber.drawerSide';
 
 const loadDrawerSide = (): DrawerSide => {
   try {
@@ -595,7 +595,7 @@ async function exportCurrentView(): Promise<void> {
       text: css.getPropertyValue('--text').trim() || '#E8E8E8',
       textDim: css.getPropertyValue('--text-dim').trim() || '#8A8F9C',
     });
-    await shareOrDownload(blob, `sunclock-${toLocalInputValue(now).replace(/[:T-]/g, '')}.png`, t('app.title'));
+    await shareOrDownload(blob, `zeitgeber-${toLocalInputValue(now).replace(/[:T-]/g, '')}.png`, t('app.title'));
   } catch (err) {
     console.warn('Export fehlgeschlagen:', err);
   }

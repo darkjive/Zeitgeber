@@ -48,7 +48,7 @@ export function ensureVapid(): boolean {
   const priv = process.env.VAPID_PRIVATE_KEY;
   if (!pub || !priv) return false;
   if (!vapidReady) {
-    webpush.setVapidDetails(process.env.VAPID_SUBJECT || 'mailto:admin@sunclock.app', pub, priv);
+    webpush.setVapidDetails(process.env.VAPID_SUBJECT || 'mailto:admin@zeitgeber.app', pub, priv);
     vapidReady = true;
   }
   return true;

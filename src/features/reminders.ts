@@ -18,8 +18,8 @@ import { arsFromAgs, nearestKreis } from '../core/civil-warnings';
 import type { Lang, Translator } from '../i18n';
 import { hasPushSubscription, pushSupported, subscribeToPush, unsubscribeFromPush, type PushMeta } from './push';
 
-const ENABLED_KEY = 'sunclock.reminders';
-const FIRED_KEY = 'sunclock.remindersFired';
+const ENABLED_KEY = 'zeitgeber.reminders';
+const FIRED_KEY = 'zeitgeber.remindersFired';
 
 // v1: kuratiert auf die Hitzeschutz-Hinweise (Fassade, Lüften). Erweiterbar.
 const ACTIVE: ReminderCategory[] = ['comfort', 'civil-warning'];

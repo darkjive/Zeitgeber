@@ -7,7 +7,7 @@
  * Wetter-Modul mit eigenem Zeitstempel-Cache.
  */
 
-const CACHE = 'sunclock-v1';
+const CACHE = 'zeitgeber-v1';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (event) => {
@@ -36,11 +36,11 @@ self.addEventListener('push', (event) => {
   } catch {
     data = {};
   }
-  const title = data.title || 'Sun Clock';
+  const title = data.title || 'Zeitgeber';
   event.waitUntil(
     self.registration.showNotification(title, {
       body: data.body || '',
-      tag: data.tag || 'sunclock',
+      tag: data.tag || 'zeitgeber',
       icon: './icon-192.png',
       badge: './icon.svg',
       data: { url: data.url || './' },

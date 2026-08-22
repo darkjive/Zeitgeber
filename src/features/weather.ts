@@ -20,7 +20,7 @@ export interface WeatherNow {
 
 export type ObservationRating = 'good' | 'fair' | 'poor';
 
-const STORAGE_KEY = 'sunclock.weather';
+const STORAGE_KEY = 'zeitgeber.weather';
 const OPEN_METEO = 'https://api.open-meteo.com/v1/forecast';
 
 function cache(loc: GeoLocation, w: WeatherNow): void {

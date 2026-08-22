@@ -1,4 +1,4 @@
-# Sun Clock — Technische Spezifikation
+# Zeitgeber — Technische Spezifikation
 
 | | |
 |---|---|
@@ -6,8 +6,8 @@
 | **Stand** | 12. August 2026 |
 | **Status** | Referenz-Web-Client umgesetzt (Phase 1 vollständig, Phase 2/3 großteils); native App und Provider in Arbeit |
 | **Lizenz** | MIT, Open Source |
-| **Arbeitstitel** | Sun Clock |
-| **Referenz-Implementierung** | https://github.com/darkjive/sunclock |
+| **Arbeitstitel** | Zeitgeber |
+| **Referenz-Implementierung** | https://github.com/darkjive/zeitgeber |
 
 > Eigenständiger Neubau. Konzeptionell inspiriert von Gordon's Sun Clock (dynamisches Zifferblatt nach Sonnenstand) und Sky Tonight (AR-Kamera-Liveview). Kein Code-Reuse, eigene Architektur, eigener Funktionsumfang.
 
@@ -913,7 +913,7 @@ Das Projekt ergänzt bestehende Systeme, statt mit ihnen zu konkurrieren.
 
 Eine mobile Anwendung kann keine zuverlässige Datenquelle für ein Smarthome sein — sie wird vom Betriebssystem beendet, hat keine feste Adresse im Netz und läuft nicht durchgehend.
 
-**Lösung: `sunclock-bridge`** — ein eigenständiger, schlanker Dienst im lokalen Netz.
+**Lösung: `zeitgeber-bridge`** — ein eigenständiger, schlanker Dienst im lokalen Netz.
 
 - Eigenes Repository, gleiche Lizenz, unabhängig von der Anwendung nutzbar
 - Zielplattform: Einplatinenrechner, NAS, beliebiger Linux-Host, Container
@@ -933,13 +933,13 @@ Eine mobile Anwendung kann keine zuverlässige Datenquelle für ein Smarthome se
 Beispielhafte MQTT-Topics:
 
 ```
-sunclock/sun/elevation          → aktuelle Sonnenhöhe in Grad
-sunclock/sun/azimuth            → aktuelles Azimut
-sunclock/sun/zone               → day | sunset | civil | nautical | night
-sunclock/sun/solar_noon         → echter Sonnenhöchststand (ISO 8601)
-sunclock/sun/offset_minutes     → Sonnenzeit-Versatz zur gesetzlichen Zeit
-sunclock/events/sunrise         → Ereignis bei Sonnenaufgang
-sunclock/solar/yield_window     → Ertragsfenster nach Modulkonfiguration
+zeitgeber/sun/elevation          → aktuelle Sonnenhöhe in Grad
+zeitgeber/sun/azimuth            → aktuelles Azimut
+zeitgeber/sun/zone               → day | sunset | civil | nautical | night
+zeitgeber/sun/solar_noon         → echter Sonnenhöchststand (ISO 8601)
+zeitgeber/sun/offset_minutes     → Sonnenzeit-Versatz zur gesetzlichen Zeit
+zeitgeber/events/sunrise         → Ereignis bei Sonnenaufgang
+zeitgeber/solar/yield_window     → Ertragsfenster nach Modulkonfiguration
 ```
 
 Damit werden Automatisierungen möglich, die bisher aufwendig waren — Beleuchtung, die dem tatsächlichen Dämmerungsverlauf folgt, oder Verbraucher, die sich am Ertragsfenster der eigenen Anlage orientieren.
@@ -1030,7 +1030,7 @@ Begleitdienst und Wandmodus laufen sinnvoll auf derselben Hardware: Ein Einplati
 
 ### Phase 4 — Ausbau
 - `wheel-of-year`, `drone`, `wildlife` — jeweils sehr geringer Aufwand
-- **`sunclock-bridge`** (Abschnitt 34) — eigenes Repository, Smarthome-Datenquelle
+- **`zeitgeber-bridge`** (Abschnitt 34) — eigenes Repository, Smarthome-Datenquelle
 
 **Vor Veröffentlichung von Phase 2**: rechtliche Durchsicht (Abschnitt 38.4). **Vor Phase 3**: fachlicher Abgleich `prayer-times` (Abschnitt 38.5). **Vor dem ersten öffentlichen Release**: Spendenlink prüfen (Abschnitt 38.3).
 
@@ -1101,7 +1101,7 @@ Diese Punkte waren bis v1.0 offen und sind entschieden. Sie binden die weitere U
 ## 40. Umsetzungsstand (Referenz-Web-Client)
 
 Stand Version 1.2. Die Referenz-Implementierung
-(https://github.com/darkjive/sunclock) ist ein eigenständiges Web-Target (kein
+(https://github.com/darkjive/zeitgeber) ist ein eigenständiges Web-Target (kein
 `react-native-web`), das die **UI-freie Berechnungsebene** (Abschnitt 6.3)
 umsetzt; ein nativer Aufsatz (React Native + Expo) teilt sich diese Ebene.
 
@@ -1133,7 +1133,7 @@ umsetzt; ein nativer Aufsatz (React Native + Expo) teilt sich diese Ebene.
 - **Provider:** Kometen (21, ereignisgetrieben — nur bei aktueller Erscheinung sinnvoll, Bahnelemente nachladbar)
 - **Ansichten:** Kamera-Liveview (23, nur nativ, 38.2)
 - **Fähigkeiten:** dynamischer Wecker (27, bewusst nicht auf Web, 27.2), Klangebene (16), antike Stunden
-- **Widgets** (25) und **Smarthome-Begleitdienst** `sunclock-bridge` (34)
+- **Widgets** (25) und **Smarthome-Begleitdienst** `zeitgeber-bridge` (34)
 - **Native Parität:** Panels, Karte und Onboarding im Expo-Aufsatz; Skia-Rendering (6.2)
 
 ### 40.3 Nicht-funktional (35)

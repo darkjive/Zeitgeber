@@ -1,6 +1,6 @@
-# Mitwirken an Sun Clock
+# Mitwirken an Zeitgeber
 
-Danke für dein Interesse! Sun Clock ist Open Source (MIT) und lebt von
+Danke für dein Interesse! Zeitgeber ist Open Source (MIT) und lebt von
 Beiträgen — besonders willkommen sind Genauigkeits-Prüfungen der Berechnungen
 und Übersetzungen.
 

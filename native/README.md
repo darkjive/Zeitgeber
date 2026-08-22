@@ -1,4 +1,4 @@
-# Sun Clock — nativer Aufsatz (React Native + Expo)
+# Zeitgeber — nativer Aufsatz (React Native + Expo)
 
 Der native Ziel-Stack aus der Spezifikation (§6): **React Native + Expo,
 TypeScript strict**. Diese App teilt sich die **UI-freie Berechnungsebene** mit

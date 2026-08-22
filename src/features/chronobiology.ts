@@ -13,7 +13,7 @@ import { icon } from '../icons';
 import type { Translator } from '../i18n';
 import { fetchPressureTrend } from './weather';
 
-const STORAGE_KEY = 'sunclock.chrono';
+const STORAGE_KEY = 'zeitgeber.chrono';
 
 const DEFAULT_LOG: SleepLog = { workOnset: '23:30', workWake: '06:30', freeOnset: '00:30', freeWake: '08:30' };
 
@@ -156,7 +156,7 @@ export function openChronobiology(
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'sunclock-chronobiology.json';
+    a.download = 'zeitgeber-chronobiology.json';
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 5000);
   });

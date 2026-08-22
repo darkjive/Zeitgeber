@@ -1,7 +1,7 @@
 /// <reference types="vitest/config" />
 import { defineConfig } from 'vitest/config';
 
-// Web-Target des Sun-Clock-MVP. Basis relativ, damit der statische Build
+// Web-Target des Zeitgeber-MVP. Basis relativ, damit der statische Build
 // (dist/) auch unter einem Unterpfad ausgeliefert werden kann.
 export default defineConfig({
   base: './',

@@ -6,7 +6,7 @@
 
 import type { Translator } from '../i18n';
 
-const STORAGE_KEY = 'sunclock.onboarded';
+const STORAGE_KEY = 'zeitgeber.onboarded';
 
 export function hasOnboarded(): boolean {
   try {

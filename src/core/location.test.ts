@@ -100,18 +100,18 @@ describe('Herkunft des Standorts', () => {
 
   test('persistiert kein Ortslabel — der Name wird stets neu aus den Koordinaten abgeleitet', () => {
     saveLocation({ ...DARMSTADT, source: 'gps' });
-    expect(localStorage.getItem('sunclock.location')).not.toContain('Darmstadt');
+    expect(localStorage.getItem('zeitgeber.location')).not.toContain('Darmstadt');
   });
 
   test('behandelt Altbestände ohne Herkunft als manuell gewählt', () => {
-    localStorage.setItem('sunclock.location', JSON.stringify({ ...DARMSTADT, label: 'Karlsruhe' }));
+    localStorage.setItem('zeitgeber.location', JSON.stringify({ ...DARMSTADT, label: 'Karlsruhe' }));
     const loaded = loadLocation();
     expect(loaded?.source).toBe('manual');
     expect(loaded?.latitude).toBeCloseTo(49.87, 1);
   });
 
   test('verwirft ein veraltet gespeichertes Label statt es weiterzuschleppen', () => {
-    localStorage.setItem('sunclock.location', JSON.stringify({ ...DARMSTADT, label: 'Karlsruhe' }));
+    localStorage.setItem('zeitgeber.location', JSON.stringify({ ...DARMSTADT, label: 'Karlsruhe' }));
     expect(placeLabel(loadLocation()!)).toBe('Darmstadt');
   });
 });

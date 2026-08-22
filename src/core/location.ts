@@ -21,7 +21,7 @@
 import type { GeoLocation } from './astro-engine';
 import { CITIES_PACKED } from '../data/cities';
 
-const STORAGE_KEY = 'sunclock.location';
+const STORAGE_KEY = 'zeitgeber.location';
 
 /** Woher der aktuelle Standort stammt — entscheidend für die Darstellung. */
 export type LocationSource = 'gps' | 'manual' | 'default';

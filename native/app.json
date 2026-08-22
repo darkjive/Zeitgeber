@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Sun Clock",
-    "slug": "sunclock",
+    "name": "Zeitgeber",
+    "slug": "zeitgeber",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
-    "scheme": "sunclock",
+    "scheme": "zeitgeber",
     "ios": {
       "supportsTablet": true,
       "infoPlist": {

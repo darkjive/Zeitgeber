@@ -1,6 +1,6 @@
 <div align="center">
 
-# Sun Clock
+# Zeitgeber
 
 **Die einzige Uhr, die zeigt, wie weit die soziale Zeit von der Sonnenzeit entfernt ist.**
 
@@ -8,16 +8,16 @@ _12 Uhr ist fast nie Mittag._
 
 Open Source (MIT) · TypeScript strict · Web (PWA) + iOS/Android · offline · ohne Backend · DE/EN
 
-<img src="./docs/screenshot-dark.png" alt="Sun Clock — Zifferblatt im Dark Mode, mit Dämmerungszonen, gesetzlicher Zeit und Sonnenzeit" width="280" />
-<img src="./docs/screenshot-light.png" alt="Sun Clock — Zifferblatt im Light Mode, mit Dämmerungszonen, gesetzlicher Zeit und Sonnenzeit" width="280" />
+<img src="./docs/screenshot-dark.png" alt="Zeitgeber — Zifferblatt im Dark Mode, mit Dämmerungszonen, gesetzlicher Zeit und Sonnenzeit" width="280" />
+<img src="./docs/screenshot-light.png" alt="Zeitgeber — Zifferblatt im Light Mode, mit Dämmerungszonen, gesetzlicher Zeit und Sonnenzeit" width="280" />
 
 </div>
 
 ---
 
-Sun Clock ist eine astronomisch korrekte Uhr, die nicht die Zeitzone anzeigt,
+Zeitgeber ist eine astronomisch korrekte Uhr, die nicht die Zeitzone anzeigt,
 sondern den **tatsächlichen Sonnenstand an deinem Ort** — und den Abstand
-dazwischen. Fast jede Uhr kennt nur deine Zeitzone, nicht deinen Ort. Sun Clock
+dazwischen. Fast jede Uhr kennt nur deine Zeitzone, nicht deinen Ort. Zeitgeber
 kennt beides und zeigt als einzige **beide Seiten der Gleichung**: die soziale
 Zeit und die echte Lichtumgebung.
 
@@ -29,7 +29,7 @@ Die vollständige technische Spezifikation liegt unter [`docs/SPEC.md`](./docs/S
 
 ## Das Alleinstellungsmerkmal
 
-Sun Clock verbindet zwei Größen, die sonst niemand zusammenführt:
+Zeitgeber verbindet zwei Größen, die sonst niemand zusammenführt:
 
 - **Sonnenzeit-Versatz** — der Abstand zwischen gesetzlichem Mittag und
   echtem Sonnenhöchststand. Reine Physik, keine Eingabe nötig.
@@ -39,7 +39,7 @@ Sun Clock verbindet zwei Größen, die sonst niemand zusammenführt:
 
 Wer einen späten Chronotyp hat *und* am Westrand einer Zeitzone lebt, erlebt
 beide Effekte **additiv** — den **kombinierten Gesamtversatz**, den es sonst
-nirgends gibt. Sun Clock zeigt ihn auf einem einzigen Zifferblatt.
+nirgends gibt. Zeitgeber zeigt ihn auf einem einzigen Zifferblatt.
 
 ## Funktionsumfang
 
@@ -158,7 +158,7 @@ native/                React-Native/Expo-Aufsatz auf derselben core-Engine
 
 Die Berechnungsebene ist bewusst **frei von UI-Abhängigkeiten**, damit sie
 unverändert in die native App und in einen späteren Smarthome-Begleitdienst
-(`sunclock-bridge`) übernommen werden kann.
+(`zeitgeber-bridge`) übernommen werden kann.
 
 ## Wissenschaftliche Grundlage
 
@@ -192,14 +192,14 @@ inneren Planeten, korrekte Reihenfolge der Gebetszeiten). `npm test`.
 
 ## Regulatorisches
 
-Sun Clock liefert **Informationen über Licht-, Zeit- und Himmelsverhältnisse** –
+Zeitgeber liefert **Informationen über Licht-, Zeit- und Himmelsverhältnisse** –
 niemals Diagnose, Therapie oder Rechtsauskunft. Module mit Gesundheits-,
 Rechts- oder Weltanschauungsbezug bleiben beschreibend und sind standardmäßig
 deaktiviert.
 
 ## Unterstützen
 
-Sun Clock ist Open Source und wird ausschließlich über **freiwillige Spenden**
+Zeitgeber ist Open Source und wird ausschließlich über **freiwillige Spenden**
 finanziert – kein Paywall, keine In-App-Käufe, keine Werbung.
 
 - **PayPal** — https://paypal.me/AlainRitter (auch im Info-Bereich der App verlinkt)

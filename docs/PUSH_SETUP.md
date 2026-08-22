@@ -1,6 +1,6 @@
 # Web Push einrichten (optional)
 
-Sun Clock läuft komplett ohne Server. Die Erinnerungen (§reminders) funktionieren
+Zeitgeber läuft komplett ohne Server. Die Erinnerungen (§reminders) funktionieren
 sofort **im Vordergrund und im Wandmodus** – ganz ohne das hier Beschriebene.
 
 Dieser Leitfaden schaltet zusätzlich **echten Hintergrund-Push** frei: Hinweise
