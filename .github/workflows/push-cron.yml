@@ -6,7 +6,7 @@
 # Endpunkt fängt das ab.
 #
 # Voraussetzung: zwei Repository-Secrets
-#   SUNCLOCK_CRON_URL  z. B. https://zeitgeber.vercel.app/api/cron
+#   SUNCLOCK_CRON_URL  z. B. https://zeitgeber-app.vercel.app/api/cron
 #   CRON_SECRET        derselbe Wert wie die Vercel-Umgebungsvariable CRON_SECRET
 #
 # Manuell testen: Tab „Actions" → „Push reminders (cron)" → „Run workflow".
