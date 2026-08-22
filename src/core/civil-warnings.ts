@@ -4,9 +4,9 @@
  * Netzwerk hier — der Abruf liegt in features/civil-warnings.ts.
  */
 
-import type { GeoLocation } from './astro-engine';
-import { distanceKm } from './location';
-import { KREISE_PACKED } from '../data/kreise';
+import type { GeoLocation } from './astro-engine.js';
+import { distanceKm } from './location.js';
+import { KREISE_PACKED } from '../data/kreise.js';
 
 export interface Kreis {
   ags: string;

@@ -18,8 +18,8 @@
  * Ortsnamen kommen aus einer mitgelieferten Liste, nicht aus dem Netz.
  */
 
-import type { GeoLocation } from './astro-engine';
-import { CITIES_PACKED } from '../data/cities';
+import type { GeoLocation } from './astro-engine.js';
+import { CITIES_PACKED } from '../data/cities.js';
 
 const STORAGE_KEY = 'zeitgeber.location';
 
