@@ -20,7 +20,7 @@ interface KidQuestion {
 
 export function openKids(location: GeoLocation, date: Date, t: Translator): void {
   const overlay = document.createElement('div');
-  overlay.className = 'onboard kids';
+  overlay.className = 'onboard onboard--sheet kids';
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-modal', 'true');
 

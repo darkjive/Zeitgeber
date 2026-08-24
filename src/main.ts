@@ -33,7 +33,7 @@ import { starsProvider } from './providers/stars';
 import { deepSkyProvider } from './providers/deep-sky';
 import { satellitesProvider } from './providers/satellites';
 import { aircraftProvider } from './providers/aircraft';
-import { openSatellites, refreshTles } from './features/satellites';
+import { renderSatCard, refreshTles } from './features/satellites';
 import { fetchAircraft } from './features/aircraft';
 import { renderDial } from './views/dial';
 import { renderObjectList } from './views/object-list';
@@ -42,20 +42,20 @@ import { buildOverlay, type DialOverlay, type OverlayId } from './core/dial-over
 import { showOnboarding, hasOnboarded } from './features/onboarding';
 import { WallMode } from './features/wallmode';
 import { fetchWeather, observationRating, type WeatherNow } from './features/weather';
-import { fetchCivilWarnings, openCivilWarnings } from './features/civil-warnings';
+import { fetchCivilWarnings, renderWarnCard } from './features/civil-warnings';
 import { nearestKreis, type CivilWarning } from './core/civil-warnings';
 import { renderViewToBlob, shareOrDownload } from './features/share';
 import { openSolarYield } from './features/solar-yield';
 import { openPrayerTimes } from './features/prayer-times';
 import { openChronobiology, currentChrono } from './features/chronobiology';
-import { openOutdoor } from './features/outdoor';
+import { renderOutdoorCard } from './features/outdoor';
 import { openAbout } from './features/about';
-import { openWheelOfYear } from './features/wheel-of-year';
+import { renderWheelCard } from './features/wheel-of-year';
 import { openGarden, openArchitecture } from './features/sun-hours-panels';
-import { openComfort } from './features/comfort';
-import { openWildlife } from './features/wildlife';
-import { openDrone } from './features/drone';
-import { openMeteorShowers } from './features/meteor-showers';
+import { renderComfortCard, refreshComfortTemps } from './features/comfort';
+import { renderWildlifeCard } from './features/wildlife';
+import { renderDroneCard } from './features/drone';
+import { renderMeteorCard } from './features/meteor-showers';
 import { openKids } from './features/kids';
 import { initReminders, openReminders, refreshReminderMeta, remindersEnabled } from './features/reminders';
 import { icon, type IconName } from './icons';
@@ -188,7 +188,7 @@ const LAYERS: LayerDef[] = [
   { id: 'aircraft', labelKey: 'layer.aircraft', icon: 'plane', color: '#5AA0D6' },
 ];
 
-interface ModuleDef {
+interface ToolModuleDef {
   key: string;
   labelKey: string;
   icon: IconName;
@@ -196,22 +196,100 @@ interface ModuleDef {
   open: (now: Date) => void;
 }
 
-const MODULES: ModuleDef[] = [
+// Werkzeuge — Formulare/Rechner, öffnen als Bottom-Sheet, auf Zuruf (§7.4).
+const TOOL_MODULES: ToolModuleDef[] = [
   { key: 'chrono', labelKey: 'chrono.button', icon: 'moon', color: '#8D6FE7', open: (now) => openChronobiology(solarOffset(now, location).minutes, location, now, t, () => rerender()) },
-  { key: 'comfort', labelKey: 'comfort.button', icon: 'thermometer-sun', color: '#E8794A', open: (now) => openComfort(location, now, t) },
-  { key: 'outdoor', labelKey: 'outdoor.button', icon: 'compass', color: '#4F9E8C', open: (now) => openOutdoor(location, now, t, { pinned: dialOverlay === 'outdoor', onPin: (on) => setDialOverlay(on ? 'outdoor' : null) }) },
   { key: 'solar', labelKey: 'solar.button', icon: 'zap', color: '#E0A93C', open: (now) => openSolarYield(location, now, t) },
   { key: 'arch', labelKey: 'arch.button', icon: 'building-2', color: '#7C93B0', open: (now) => openArchitecture(location, now, t) },
   { key: 'garden', labelKey: 'garden.button', icon: 'sprout', color: '#5FA968', open: (now) => openGarden(location, now, t) },
-  { key: 'wildlife', labelKey: 'wildlife.button', icon: 'bird', color: '#C98A5E', open: (now) => openWildlife(location, now, t) },
-  { key: 'meteor', labelKey: 'meteor.button', icon: 'sparkles', color: '#C9A94B', open: (now) => openMeteorShowers(location, now, t) },
-  { key: 'drone', labelKey: 'drone.button', icon: 'radar', color: '#5AA0D6', open: (now) => openDrone(location, now, t) },
   { key: 'prayer', labelKey: 'prayer.button', icon: 'moon-star', color: '#8FA6D8', open: (now) => openPrayerTimes(location, now, t) },
-  { key: 'wheel', labelKey: 'wheel.button', icon: 'orbit', color: '#C77FA8', open: (now) => openWheelOfYear(now, t) },
   { key: 'kids', labelKey: 'kids.button', icon: 'baby', color: '#E56B9B', open: (now) => openKids(location, now, t) },
-  { key: 'sat', labelKey: 'sat.button', icon: 'satellite', color: '#9AA0AD', open: (now) => openSatellites(location, now, t) },
-  { key: 'warn', labelKey: 'warn.button', icon: 'triangle-alert', color: '#C94F3D', open: () => openCivilWarnings(civilWarnings, nearestKreis(location)?.name ?? null, lang, t) },
 ];
+
+type InfoModuleKey = 'comfort' | 'outdoor' | 'wildlife' | 'meteor' | 'drone' | 'wheel' | 'sat' | 'warn';
+
+interface InfoModuleDef {
+  key: InfoModuleKey;
+  labelKey: string;
+  titleKey: string;
+  icon: IconName;
+  color: string;
+  render: (now: Date) => string;
+  /** Einmaliges Nachladen von Netzdaten, wenn die Karte eingeschaltet wird (§20). */
+  onEnable?: () => void;
+}
+
+// Info-Module — reine Anzeige, bleiben als Dauer-Karte im Content-Bereich
+// sichtbar, solange eingeschaltet (§7.4, persistiert).
+const INFO_MODULES: InfoModuleDef[] = [
+  {
+    key: 'comfort',
+    labelKey: 'comfort.button',
+    titleKey: 'comfort.title',
+    icon: 'thermometer-sun',
+    color: '#E8794A',
+    render: (now) => renderComfortCard(location, now, t),
+    onEnable: () => void refreshComfortTemps(location).then(() => rerender()),
+  },
+  {
+    key: 'outdoor',
+    labelKey: 'outdoor.button',
+    titleKey: 'outdoor.title',
+    icon: 'compass',
+    color: '#4F9E8C',
+    render: (now) => renderOutdoorCard(location, now, t, { pinned: dialOverlay === 'outdoor', onPin: (on: boolean) => setDialOverlay(on ? 'outdoor' : null) }),
+  },
+  { key: 'wildlife', labelKey: 'wildlife.button', titleKey: 'wildlife.title', icon: 'bird', color: '#C98A5E', render: (now) => renderWildlifeCard(location, now, t) },
+  { key: 'meteor', labelKey: 'meteor.button', titleKey: 'meteor.title', icon: 'sparkles', color: '#C9A94B', render: (now) => renderMeteorCard(location, now, t) },
+  { key: 'drone', labelKey: 'drone.button', titleKey: 'drone.title', icon: 'radar', color: '#5AA0D6', render: (now) => renderDroneCard(location, now, t) },
+  { key: 'wheel', labelKey: 'wheel.button', titleKey: 'wheel.title', icon: 'orbit', color: '#C77FA8', render: (now) => renderWheelCard(now, t) },
+  {
+    key: 'sat',
+    labelKey: 'sat.button',
+    titleKey: 'sat.title',
+    icon: 'satellite',
+    color: '#9AA0AD',
+    render: (now) => renderSatCard(location, now, t),
+    onEnable: () => void refreshTles().then(() => rerender()),
+  },
+  {
+    key: 'warn',
+    labelKey: 'warn.button',
+    titleKey: 'warn.title',
+    icon: 'triangle-alert',
+    color: '#C94F3D',
+    render: () => renderWarnCard(civilWarnings, nearestKreis(location)?.name ?? null, lang, t),
+  },
+];
+
+const INFO_MODULES_KEY = 'zeitgeber.infoModules';
+const loadEnabledInfoModules = (): Set<InfoModuleKey> => {
+  try {
+    const raw = JSON.parse(localStorage.getItem(INFO_MODULES_KEY) ?? '[]') as string[];
+    return new Set(raw.filter((k): k is InfoModuleKey => INFO_MODULES.some((m) => m.key === k)));
+  } catch {
+    return new Set();
+  }
+};
+let enabledInfoModules: Set<InfoModuleKey> = loadEnabledInfoModules();
+
+function saveEnabledInfoModules(): void {
+  try {
+    localStorage.setItem(INFO_MODULES_KEY, JSON.stringify([...enabledInfoModules]));
+  } catch {
+    /* Auswahl ist Komfort, kein Zustand, ohne den die Uhr scheitert. */
+  }
+}
+
+function toggleInfoModule(key: InfoModuleKey, row: HTMLElement): void {
+  const on = !enabledInfoModules.has(key);
+  if (on) enabledInfoModules.add(key);
+  else enabledInfoModules.delete(key);
+  row.setAttribute('aria-checked', String(on));
+  saveEnabledInfoModules();
+  if (on) INFO_MODULES.find((m) => m.key === key)?.onEnable?.();
+  rerender();
+}
 
 // --- App-Gerüst -------------------------------------------------------------
 
@@ -301,6 +379,8 @@ app.innerHTML = `
         </div>
       </section>
 
+      <div class="info-cards" id="info-cards" hidden></div>
+
       <footer class="locbar">
         <button class="loc" id="loc-btn">
           <span class="loc__pin">📍</span>
@@ -331,6 +411,10 @@ app.innerHTML = `
         <section class="drawer__section">
           <h3 class="drawer__h" data-i18n="menu.modules"></h3>
           <div class="mlist" id="drawer-modules"></div>
+        </section>
+        <section class="drawer__section">
+          <h3 class="drawer__h" data-i18n="menu.tools"></h3>
+          <div class="mlist" id="drawer-tools"></div>
         </section>
         <section class="drawer__section">
           <h3 class="drawer__h" data-i18n="menu.settings"></h3>
@@ -374,8 +458,18 @@ function buildDrawer(): void {
     </button>`,
   ).join('');
 
-  // Module — öffnen jeweils ein Panel.
-  $('#drawer-modules').innerHTML = MODULES.map(
+  // Info-Module — Kippschalter, Karte erscheint/verschwindet im Content-Bereich.
+  $('#drawer-modules').innerHTML = INFO_MODULES.map(
+    (m) => `
+    <button class="mrow" data-info="${m.key}" role="switch" aria-checked="${enabledInfoModules.has(m.key)}">
+      ${iconSpan(m.icon, m.color)}
+      <span class="mrow__label">${t(m.labelKey)}</span>
+      <span class="mrow__switch" aria-hidden="true"></span>
+    </button>`,
+  ).join('');
+
+  // Werkzeuge — öffnen jeweils ein Bottom-Sheet.
+  $('#drawer-tools').innerHTML = TOOL_MODULES.map(
     (m) => `
     <button class="mrow" data-mod="${m.key}">
       ${iconSpan(m.icon, m.color)}
@@ -502,7 +596,29 @@ function render(now: Date): void {
   renderLocbar();
 
   renderWeather(moon);
+  renderInfoCards(now);
   updateTimebar(now);
+}
+
+/** Dauer-Karten der eingeschalteten Info-Module (§7.4) — reine Ableitung aus
+ * bereits vorhandenen/gecachten Daten, kein Netz-Zugriff pro Tick. */
+function renderInfoCards(now: Date): void {
+  const active = INFO_MODULES.filter((m) => enabledInfoModules.has(m.key));
+  const container = $('#info-cards');
+  container.hidden = active.length === 0;
+  if (active.length === 0) return;
+  container.innerHTML = active
+    .map(
+      (m) => `
+    <section class="info-card" data-info-card="${m.key}">
+      <header class="info-card__head">
+        <span class="info-card__ic" style="color:${m.color}">${icon(m.icon)}</span>
+        <span class="info-card__title">${t(m.titleKey)}</span>
+      </header>
+      <div class="info-card__body">${m.render(now)}</div>
+    </section>`,
+    )
+    .join('');
 }
 
 const pad2 = (n: number): string => String(n).padStart(2, '0');
@@ -660,6 +776,7 @@ function setLocation(loc: GeoLocation, source: LocationSource): void {
   rerender();
   void refreshWeather(); // §28: Wetter am neuen Ort neu holen
   void refreshCivilWarnings(); // Warnungen sind kreisgebunden, am neuen Ort neu holen
+  if (enabledInfoModules.has('comfort')) void refreshComfortTemps(location).then(() => rerender()); // Temperaturprognose ist ortsgebunden
   void refreshReminderMeta(); // §reminders: Push-Abo am neuen Ort aktualisieren
 }
 
@@ -699,9 +816,14 @@ function wireEvents(): void {
   $('#drawer-close').addEventListener('click', closeDrawer);
   $('#drawer-scrim').addEventListener('click', closeDrawer);
   $('#layout-toggle').addEventListener('click', toggleDesktopLayout);
-  $('#warn-badge').addEventListener('click', () =>
-    openCivilWarnings(civilWarnings, nearestKreis(location)?.name ?? null, lang, t),
-  );
+  $('#warn-badge').addEventListener('click', () => {
+    if (!enabledInfoModules.has('warn')) {
+      enabledInfoModules.add('warn');
+      saveEnabledInfoModules();
+      rerender();
+    }
+    $('#info-cards').querySelector('[data-info-card="warn"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !$('#drawer').hidden) closeDrawer();
   });
@@ -713,8 +835,10 @@ function wireEvents(): void {
     if (!row) return;
     if (row.dataset.layer) {
       toggleLayer(row.dataset.layer as LayerId, row);
+    } else if (row.dataset.info) {
+      toggleInfoModule(row.dataset.info as InfoModuleKey, row);
     } else if (row.dataset.mod) {
-      const mod = MODULES.find((m) => m.key === row.dataset.mod);
+      const mod = TOOL_MODULES.find((m) => m.key === row.dataset.mod);
       closeDrawer();
       mod?.open(currentTime());
     } else if (row.dataset.set === 'lang') {
@@ -728,6 +852,15 @@ function wireEvents(): void {
     } else if (row.dataset.set === 'about') {
       closeDrawer();
       openAbout(t);
+    }
+  });
+
+  // Outdoor-Karte wird bei jedem Tick neu gerendert — die Pin-Checkbox meldet
+  // sich daher per Delegation statt per eigenem Listener (§7.4).
+  $('#info-cards').addEventListener('change', (e) => {
+    const el = e.target as HTMLElement;
+    if (el.matches('[data-action="outdoor-pin"]')) {
+      setDialOverlay((el as HTMLInputElement).checked ? 'outdoor' : null);
     }
   });
 
@@ -826,6 +959,9 @@ async function boot(): Promise<void> {
   await adoptGpsIfAllowed();
   void refreshWeather();
   void refreshCivilWarnings();
+  // Info-Karten mit Netzbezug: nur nachladen, wenn beim Start bereits eingeschaltet (§20).
+  if (enabledInfoModules.has('sat')) void refreshTles().then(() => rerender());
+  if (enabledInfoModules.has('comfort')) void refreshComfortTemps(location).then(() => rerender());
   // Erinnerungen (§reminders): läuft nur, wenn zuvor aktiviert.
   initReminders({ getLocation: () => location, getTranslator: () => t, getLang: () => lang });
 
@@ -838,6 +974,11 @@ async function boot(): Promise<void> {
   // Wetter deutlich seltener aktualisieren (§8, §28).
   window.setInterval(() => void refreshWeather(), 15 * 60_000);
   window.setInterval(() => void refreshCivilWarnings(), 15 * 60_000);
+  // Info-Karten mit Netzbezug ebenso — nur solange eingeschaltet (§20).
+  window.setInterval(() => {
+    if (enabledInfoModules.has('sat')) void refreshTles().then(() => rerender());
+    if (enabledInfoModules.has('comfort')) void refreshComfortTemps(location).then(() => rerender());
+  }, 15 * 60_000);
   // Flugzeuge nur bei aktiver Ansicht nachladen (§20, Rate-Limits beachten).
   window.setInterval(() => {
     if (bus.isEnabled('aircraft')) void fetchAircraft(location);

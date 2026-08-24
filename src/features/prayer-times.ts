@@ -19,7 +19,7 @@ export function openPrayerTimes(location: GeoLocation, date: Date, t: Translator
   let madhab: AsrMadhab = 'standard';
 
   const overlay = document.createElement('div');
-  overlay.className = 'onboard';
+  overlay.className = 'onboard onboard--sheet';
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-modal', 'true');
 

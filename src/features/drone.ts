@@ -15,12 +15,7 @@ const fmt = (d: Date | null): string =>
   d ? new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(d) : '—';
 const range = (a: Date | null, b: Date | null): string => (a && b ? `${fmt(a)} – ${fmt(b)}` : '—');
 
-export function openDrone(location: GeoLocation, date: Date, t: Translator): void {
-  const overlay = document.createElement('div');
-  overlay.className = 'onboard';
-  overlay.setAttribute('role', 'dialog');
-  overlay.setAttribute('aria-modal', 'true');
-
+export function renderDroneCard(location: GeoLocation, date: Date, t: Translator): string {
   const times = sunTimes(date, location);
   const sun = sunPosition(date, location);
 
@@ -38,10 +33,7 @@ export function openDrone(location: GeoLocation, date: Date, t: Translator): voi
     countdown = h === 0 ? `${m} ${t('unit.min')}` : `${h} ${t('unit.hour')} ${m} ${t('unit.min')}`;
   }
 
-  const card = document.createElement('div');
-  card.className = 'onboard__card comfort';
-  card.innerHTML = `
-    <h2 class="onboard__title">${t('drone.title')}</h2>
+  return `
     <div class="comfort__section">
       <span class="comfort__k">${t('drone.status')}</span>
       <p class="comfort__v">${t(statusKey)}${countdown ? ` · ${t('drone.remaining', { dur: countdown })}` : ''}</p>
@@ -51,13 +43,5 @@ export function openDrone(location: GeoLocation, date: Date, t: Translator): voi
       <div><dt>${t('drone.daylight')}</dt><dd>${range(times.sunrise, times.sunset)}</dd></div>
     </dl>
     <p class="solar__note">${t('drone.legal')}</p>
-    <div class="onboard__actions"><span></span><button class="btn btn--primary" data-close>${t('drone.close')}</button></div>
   `;
-  overlay.appendChild(card);
-  document.body.appendChild(overlay);
-
-  (card.querySelector('[data-close]') as HTMLElement).addEventListener('click', () => overlay.remove());
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) overlay.remove();
-  });
 }

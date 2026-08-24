@@ -10,20 +10,12 @@ import type { Translator } from '../i18n';
 const fmtDate = (d: Date): string =>
   new Intl.DateTimeFormat(undefined, { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }).format(d);
 
-export function openWheelOfYear(date: Date, t: Translator): void {
-  const overlay = document.createElement('div');
-  overlay.className = 'onboard';
-  overlay.setAttribute('role', 'dialog');
-  overlay.setAttribute('aria-modal', 'true');
-
+export function renderWheelCard(date: Date, t: Translator): string {
   const year = date.getUTCFullYear();
   const events = wheelOfYear(year);
   const next = nextWheelEvent(date);
 
-  const card = document.createElement('div');
-  card.className = 'onboard__card wheel';
-  card.innerHTML = `
-    <h2 class="onboard__title">${t('wheel.title')}</h2>
+  return `
     <p class="chrono__intro">${t('wheel.subtitle', { year: String(year) })}</p>
     <ul class="wheel__list">
       ${events
@@ -37,16 +29,5 @@ export function openWheelOfYear(date: Date, t: Translator): void {
         .join('')}
     </ul>
     <p class="solar__note">${t('wheel.note')}</p>
-    <div class="onboard__actions">
-      <span></span>
-      <button class="btn btn--primary" id="woy-close">${t('wheel.close')}</button>
-    </div>
   `;
-  overlay.appendChild(card);
-  document.body.appendChild(overlay);
-
-  (card.querySelector('#woy-close') as HTMLElement).addEventListener('click', () => overlay.remove());
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) overlay.remove();
-  });
 }

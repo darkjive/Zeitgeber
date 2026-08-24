@@ -41,19 +41,7 @@ export async function fetchCivilWarnings(loc: GeoLocation): Promise<CivilWarning
   }
 }
 
-export function openCivilWarnings(
-  warnings: CivilWarning[],
-  kreisName: string | null,
-  lang: Lang,
-  t: Translator,
-): void {
-  const overlay = document.createElement('div');
-  overlay.className = 'onboard';
-  overlay.setAttribute('role', 'dialog');
-  overlay.setAttribute('aria-modal', 'true');
-
-  const card = document.createElement('div');
-  card.className = 'onboard__card outdoor'; // reicht: gleiche Breite/Ausrichtung wie das Outdoor-Panel
+export function renderWarnCard(warnings: CivilWarning[], kreisName: string | null, lang: Lang, t: Translator): string {
   const items = warnings
     .map((w) => {
       const title = w.i18nTitle[lang] ?? w.i18nTitle.de ?? w.id;
@@ -74,8 +62,7 @@ export function openCivilWarnings(
       </p>`;
     })
     .join('');
-  card.innerHTML = `
-    <h2 class="onboard__title">${t('warn.title')}</h2>
+  return `
     ${kreisName ? `<p class="chrono__intro">${escapeHtml(kreisName)}</p>` : ''}
     ${
       warnings.length
@@ -85,15 +72,5 @@ export function openCivilWarnings(
           : `<p class="chrono__intro">${t('warn.outsideDe')}</p>`
     }
     <p class="solar__note">${t('warn.disclaimer')}</p>
-    <div class="onboard__actions">
-      <button class="btn btn--primary" id="warn-close">${t('warn.close')}</button>
-    </div>
   `;
-  overlay.appendChild(card);
-  document.body.appendChild(overlay);
-
-  (card.querySelector('#warn-close') as HTMLElement).addEventListener('click', () => overlay.remove());
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) overlay.remove();
-  });
 }

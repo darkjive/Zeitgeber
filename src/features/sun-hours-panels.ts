@@ -16,7 +16,7 @@ function fmtH(min: number, t: Translator): string {
 
 function shell(titleKey: string, t: Translator): { overlay: HTMLElement; body: HTMLElement } {
   const overlay = document.createElement('div');
-  overlay.className = 'onboard';
+  overlay.className = 'onboard onboard--sheet';
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-modal', 'true');
   const card = document.createElement('div');

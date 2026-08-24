@@ -45,57 +45,30 @@ export async function refreshTles(): Promise<boolean> {
 const fmt = (d: Date): string =>
   new Intl.DateTimeFormat(undefined, { weekday: 'short', hour: '2-digit', minute: '2-digit' }).format(d);
 
-export function openSatellites(location: GeoLocation, date: Date, t: Translator): void {
-  const overlay = document.createElement('div');
-  overlay.className = 'onboard';
-  overlay.setAttribute('role', 'dialog');
-  overlay.setAttribute('aria-modal', 'true');
+export function renderSatCard(location: GeoLocation, date: Date, t: Translator): string {
+  const iss = getTles().find((s) => s.nameKey === 'sat.iss') ?? FALLBACK_TLES[0];
+  const now = satellitePosition(iss, date, location);
+  const pass = nextPass(iss, date, location, 48);
+  const ageWarn = now && Math.abs(now.tleAgeDays) > 7;
 
-  const card = document.createElement('div');
-  card.className = 'onboard__card comfort';
-  card.innerHTML = `
-    <h2 class="onboard__title">${t('sat.title')}</h2>
-    <div class="sat__body" id="sat-body"></div>
-    <div class="onboard__actions"><span></span><button class="btn btn--primary" data-close>${t('sat.close')}</button></div>
+  const passLine = pass
+    ? `<dl class="comfort__rows">
+        <div><dt>${t('sat.rise')}</dt><dd>${fmt(pass.rise)}</dd></div>
+        <div><dt>${t('sat.max')}</dt><dd>${fmt(pass.max)} · ${pass.maxElevation}°</dd></div>
+        <div><dt>${t('sat.set')}</dt><dd>${fmt(pass.set)}</dd></div>
+      </dl>`
+    : `<p class="comfort__v">${t('sat.noPass')}</p>`;
+
+  return `
+    <div class="comfort__section">
+      <span class="comfort__k">${t('sat.issNow')}</span>
+      <p class="comfort__v">${now && now.above ? t('sat.visible', { elev: String(Math.round(now.elevation)) }) : t('sat.below')}</p>
+    </div>
+    <div class="comfort__section">
+      <span class="comfort__k">${t('sat.nextPass')}</span>
+      ${passLine}
+    </div>
+    ${ageWarn ? `<p class="solar__note">⚠︎ ${t('sat.stale', { days: String(Math.round(Math.abs(now!.tleAgeDays))) })}</p>` : ''}
+    <p class="solar__note">${t('sat.note')}</p>
   `;
-  overlay.appendChild(card);
-  document.body.appendChild(overlay);
-  (card.querySelector('[data-close]') as HTMLElement).addEventListener('click', () => overlay.remove());
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) overlay.remove();
-  });
-
-  const render = (): void => {
-    const iss = getTles().find((s) => s.nameKey === 'sat.iss') ?? FALLBACK_TLES[0];
-    const now = satellitePosition(iss, date, location);
-    const pass = nextPass(iss, date, location, 48);
-    const ageWarn = now && Math.abs(now.tleAgeDays) > 7;
-
-    const passLine = pass
-      ? `<dl class="comfort__rows">
-          <div><dt>${t('sat.rise')}</dt><dd>${fmt(pass.rise)}</dd></div>
-          <div><dt>${t('sat.max')}</dt><dd>${fmt(pass.max)} · ${pass.maxElevation}°</dd></div>
-          <div><dt>${t('sat.set')}</dt><dd>${fmt(pass.set)}</dd></div>
-        </dl>`
-      : `<p class="comfort__v">${t('sat.noPass')}</p>`;
-
-    (card.querySelector('#sat-body') as HTMLElement).innerHTML = `
-      <div class="comfort__section">
-        <span class="comfort__k">${t('sat.issNow')}</span>
-        <p class="comfort__v">${now && now.above ? t('sat.visible', { elev: String(Math.round(now.elevation)) }) : t('sat.below')}</p>
-      </div>
-      <div class="comfort__section">
-        <span class="comfort__k">${t('sat.nextPass')}</span>
-        ${passLine}
-      </div>
-      ${ageWarn ? `<p class="solar__note">⚠︎ ${t('sat.stale', { days: String(Math.round(Math.abs(now!.tleAgeDays))) })}</p>` : ''}
-      <p class="solar__note">${t('sat.note')}</p>
-    `;
-  };
-
-  render();
-  // Frische Daten holen; danach neu rendern (auf dem Gerät mit Netz).
-  void refreshTles().then((ok) => {
-    if (ok && overlay.isConnected) render();
-  });
 }

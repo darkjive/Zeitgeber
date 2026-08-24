@@ -805,6 +805,49 @@ body {
   gap: 12px;
 }
 
+/* Bottom-Sheet-Variante für die Werkzeuge (§7.4): schiebt sich von unten hoch,
+   lässt den Hintergrund durchscheinen, statt ihn vollständig zu verdecken. */
+.onboard--sheet {
+  align-items: flex-end;
+  padding: 0;
+  background: color-mix(in srgb, var(--bg) 55%, transparent);
+}
+
+.onboard--sheet .onboard__card {
+  max-width: 560px;
+  border-radius: 20px 20px 0 0;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 24px 24px calc(20px + env(safe-area-inset-bottom));
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.25);
+  animation: onboard-sheet-in 0.28s ease;
+}
+
+.onboard--sheet .onboard__card::before {
+  content: '';
+  display: block;
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--hair-strong, color-mix(in srgb, var(--text-dim) 40%, transparent));
+  margin: 0 auto 16px;
+}
+
+@keyframes onboard-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .onboard--sheet .onboard__card {
+    animation: none;
+  }
+}
+
 /* Solar-Ertrag-Panel (§31.1) */
 .onboard__card.solar {
   text-align: left;
@@ -2069,6 +2112,43 @@ body {
   text-transform: uppercase;
   border-radius: var(--radius);
   padding: 4px 10px;
+}
+
+/* 7b — Info-Karten (Dauer-Karten der eingeschalteten Info-Module, §7.4) ──── */
+
+.info-cards[hidden] {
+  display: none;
+}
+
+.info-card {
+  text-align: left;
+  padding-top: 18px;
+  border-top: 1px solid var(--hair);
+}
+
+.info-card + .info-card {
+  margin-top: 18px;
+}
+
+.info-card__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.info-card__ic {
+  display: inline-flex;
+  font-size: 17px;
+}
+
+.info-card__title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
 }
 
 /* 8 — Standort ───────────────────────────────────────────────────────────── */

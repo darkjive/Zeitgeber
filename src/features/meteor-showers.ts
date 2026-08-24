@@ -11,12 +11,7 @@ import type { Translator } from '../i18n';
 
 const fmtDate = (d: Date): string => new Intl.DateTimeFormat(undefined, { day: '2-digit', month: 'short' }).format(d);
 
-export function openMeteorShowers(location: GeoLocation, date: Date, t: Translator): void {
-  const overlay = document.createElement('div');
-  overlay.className = 'onboard';
-  overlay.setAttribute('role', 'dialog');
-  overlay.setAttribute('aria-modal', 'true');
-
+export function renderMeteorCard(location: GeoLocation, date: Date, t: Translator): string {
   const overview = showerOverview(date, location).slice(0, 5);
   const moon = moonlightForecast(date, location);
 
@@ -37,22 +32,11 @@ export function openMeteorShowers(location: GeoLocation, date: Date, t: Translat
     })
     .join('');
 
-  const card = document.createElement('div');
-  card.className = 'onboard__card meteor';
-  card.innerHTML = `
-    <h2 class="onboard__title">${t('meteor.title')}</h2>
+  return `
     <ul class="meteor__list">${rows}</ul>
     <p class="comfort__temp">${t('meteor.moon', { level: t(`outdoor.moon.${moon.level}`), pct: String(Math.round(moon.illumination * 100)) })}</p>
     <p class="solar__note">${t('meteor.note')}</p>
-    <div class="onboard__actions"><span></span><button class="btn btn--primary" data-close>${t('meteor.close')}</button></div>
   `;
-  overlay.appendChild(card);
-  document.body.appendChild(overlay);
-
-  (card.querySelector('[data-close]') as HTMLElement).addEventListener('click', () => overlay.remove());
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) overlay.remove();
-  });
 }
 
 function nextPeakDate(peak: [number, number], date: Date): Date {

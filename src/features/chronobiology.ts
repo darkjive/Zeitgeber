@@ -63,7 +63,7 @@ export function openChronobiology(
   const log: SleepLog = loadChronoLog() ?? { ...DEFAULT_LOG };
 
   const overlay = document.createElement('div');
-  overlay.className = 'onboard';
+  overlay.className = 'onboard onboard--sheet';
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-modal', 'true');
 

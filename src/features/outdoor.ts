@@ -18,12 +18,9 @@ export interface OutdoorPin {
   onPin: (on: boolean) => void;
 }
 
-export function openOutdoor(location: GeoLocation, date: Date, t: Translator, pin?: OutdoorPin): void {
-  const overlay = document.createElement('div');
-  overlay.className = 'onboard';
-  overlay.setAttribute('role', 'dialog');
-  overlay.setAttribute('aria-modal', 'true');
-
+/** Card wird bei jedem Tick neu gerendert — die Pin-Checkbox meldet sich daher
+ * per Event-Delegation (`data-action="outdoor-pin"`) statt per eigenem Listener. */
+export function renderOutdoorCard(location: GeoLocation, date: Date, t: Translator, pin?: OutdoorPin): string {
   const light = usableLight(date, location);
   const windows = goldenBlueWindows(date, location);
   const moon = moonlightForecast(date, location);
@@ -39,11 +36,7 @@ export function openOutdoor(location: GeoLocation, date: Date, t: Translator, pi
     return t('outdoor.remaining', { dur });
   })();
 
-  const card = document.createElement('div');
-  card.className = 'onboard__card outdoor';
-  card.innerHTML = `
-    <h2 class="onboard__title">${t('outdoor.title')}</h2>
-
+  return `
     <div class="outdoor__hero">
       <span class="outdoor__hero-k">${t('outdoor.usableLight')}</span>
       <span class="outdoor__hero-v">${lightText}</span>
@@ -61,25 +54,8 @@ export function openOutdoor(location: GeoLocation, date: Date, t: Translator, pi
       <div><dt>${t('outdoor.direction')}</dt><dd>${dir.above ? `${t('outdoor.sunIn')} ${t(azimuthDirKey(dir.azimuth))} (${Math.round(dir.azimuth)}°)` : t('outdoor.sunDown')}</dd></div>
     </dl>
 
-    ${pin ? `<label class="pin-toggle"><input type="checkbox" id="od-pin" ${pin.pinned ? 'checked' : ''} /><span>${t('overlay.pin')}</span></label>` : ''}
+    ${pin ? `<label class="pin-toggle"><input type="checkbox" data-action="outdoor-pin" ${pin.pinned ? 'checked' : ''} /><span>${t('overlay.pin')}</span></label>` : ''}
 
     <p class="solar__note">${t('outdoor.note')}</p>
-    <div class="onboard__actions">
-      <span></span>
-      <button class="btn btn--primary" id="od-close">${t('outdoor.close')}</button>
-    </div>
   `;
-  overlay.appendChild(card);
-  document.body.appendChild(overlay);
-
-  if (pin) {
-    (card.querySelector('#od-pin') as HTMLInputElement).addEventListener('change', (e) => {
-      pin.onPin((e.target as HTMLInputElement).checked);
-    });
-  }
-
-  (card.querySelector('#od-close') as HTMLElement).addEventListener('click', () => overlay.remove());
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) overlay.remove();
-  });
 }

@@ -224,6 +224,7 @@ const de: Dict = {
   'menu.title': 'Menü',
   'menu.layers': 'Am Himmel',
   'menu.modules': 'Module',
+  'menu.tools': 'Werkzeuge',
   'menu.settings': 'Einstellungen',
 
   'sunhours.close': 'Schließen',
@@ -622,6 +623,7 @@ const en: Dict = {
   'menu.title': 'Menu',
   'menu.layers': 'In the sky',
   'menu.modules': 'Modules',
+  'menu.tools': 'Tools',
   'menu.settings': 'Settings',
 
   'sunhours.close': 'Close',
