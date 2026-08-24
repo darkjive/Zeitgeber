@@ -17,7 +17,6 @@
      (tnum), damit sie ohne klobige Monospace ausgerichtet bleiben. */
   --font-head: 'Inter', system-ui, sans-serif;
   --font-ui: 'Inter', system-ui, sans-serif;
-  --font-mono: 'Inter', system-ui, sans-serif;
 }
 
 * {
@@ -1752,5 +1751,483 @@ body {
   .frame,
   .view-wrap {
     transition: none;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Zeitgeber — Instrument-Optik (Runde 2, Optionen 2a hell / 2b Nacht)
+   Ergänzung zu src/styles.css. Enthält nur Regeln, die bestehende Blöcke
+   überschreiben oder ergänzen — Reihenfolge: NACH dem bisherigen Inhalt
+   einfügen (oder die genannten Blöcke direkt ersetzen).
+
+   Farben kommen weiterhin aus der Theme-Engine: 2a ist der Tag-Zustand,
+   2b derselbe Code bei niedriger Sonne. Keine neue Palette.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* 1 — Tokens ─────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Zahlen und Mikro-Labels laufen ab jetzt echt monospaced. */
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+
+  /* Haarlinien statt Kapselrahmen. */
+  --hair: color-mix(in srgb, var(--text-dim) 26%, transparent);
+  --hair-strong: color-mix(in srgb, var(--text-dim) 45%, transparent);
+  --radius: 3px;
+
+  /* Mikro-Typografie */
+  --micro-size: 10px;
+  --micro-track: 0.28em;
+}
+
+/* Feines Messraster im Grund — trägt die Instrument-Anmutung, ohne Farbe. */
+body {
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--text-dim) 8%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--text-dim) 8%, transparent) 1px, transparent 1px);
+  background-size: 64px 64px;
+  background-attachment: fixed;
+}
+
+@media (max-width: 899px) {
+  body {
+    background-size: 48px 48px;
+  }
+}
+
+/* 2 — Topbar ─────────────────────────────────────────────────────────────── */
+
+.topbar {
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--hair);
+}
+
+.brand__name {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}
+
+.brand__tag {
+  font-size: 11px;
+}
+
+/* Der Ansicht-Umschalter zieht im Breitbild in die Kopfzeile (§ Layout 1b).
+   Dazu wandert `.seg` im Markup in `.topbar` — siehe patch/README.md, Schritt 3. */
+.topbar__mid {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* 3 — Bedienelemente: kantig, monospaced, Haarlinien ─────────────────────── */
+
+.seg {
+  border: 1px solid var(--hair-strong);
+  border-radius: var(--radius);
+  padding: 0;
+  overflow: hidden;
+}
+
+.seg__btn {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  border-radius: 0;
+  padding: 8px 16px;
+}
+
+.seg__btn + .seg__btn {
+  border-left: 1px solid var(--hair-strong);
+}
+
+.chip,
+.btn,
+.t-input,
+.loc-search input {
+  border-radius: var(--radius);
+}
+
+.chip {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-color: var(--hair-strong);
+  color: var(--text);
+}
+
+.chip--sm {
+  letter-spacing: 0.08em;
+  text-transform: none;
+  padding: 7px 12px;
+}
+
+/* Die vier Zeitschritte sitzen als ein Block zusammen, nicht als vier Kapseln. */
+.stepper {
+  gap: 0;
+  border: 1px solid var(--hair-strong);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.stepper .chip {
+  border: none;
+  border-radius: 0;
+  color: var(--text-dim);
+}
+
+.stepper .chip + .chip {
+  border-left: 1px solid var(--hair-strong);
+}
+
+.t-input {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  border-color: var(--hair-strong);
+}
+
+.iconbtn {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius);
+  border: 1px solid var(--hair-strong);
+  font-size: 19px;
+}
+
+.iconbtn svg {
+  stroke-width: 1.75;
+}
+
+.iconbtn--side.is-on,
+.iconbtn--warn {
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+}
+
+.btn--primary {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* 4 — Zifferblatt mit Eckwinkeln ─────────────────────────────────────────── */
+
+.view-wrap {
+  position: relative;
+  padding: 20px;
+  width: min(100%, 660px);
+}
+
+.view-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--hair-strong) 0 0), linear-gradient(var(--hair-strong) 0 0),
+    linear-gradient(var(--hair-strong) 0 0), linear-gradient(var(--hair-strong) 0 0),
+    linear-gradient(var(--hair-strong) 0 0), linear-gradient(var(--hair-strong) 0 0),
+    linear-gradient(var(--hair-strong) 0 0), linear-gradient(var(--hair-strong) 0 0);
+  background-size:
+    24px 1px, 1px 24px,
+    24px 1px, 1px 24px,
+    24px 1px, 1px 24px,
+    24px 1px, 1px 24px;
+  background-position:
+    left top, left top,
+    right top, right top,
+    left bottom, left bottom,
+    right bottom, right bottom;
+  background-repeat: no-repeat;
+}
+
+/* 5 — Ablesung ───────────────────────────────────────────────────────────── */
+
+.readout {
+  text-align: left;
+  gap: 10px;
+}
+
+.readout__label {
+  font-family: var(--font-mono);
+  font-size: var(--micro-size);
+  letter-spacing: var(--micro-track);
+  margin-right: 0;
+}
+
+/* Label + Haarlinie in einer Zeile: `.readout__legal` bekommt die Linie. */
+.readout__legal {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.readout__legal::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--hair);
+}
+
+.readout__time {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: clamp(46px, 5.6vw, 88px);
+  font-weight: 200;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+/* Sekunden im Akzent — braucht den Span aus README-Schritt 4. */
+.readout__sec {
+  color: var(--accent);
+}
+
+.readout__solar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.readout__solar-time {
+  font-family: var(--font-mono);
+  font-size: 30px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+/* Δ-Feld für den Versatz (neues Element, README-Schritt 5) */
+.delta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);
+  border-radius: var(--radius);
+  padding: 5px 10px;
+}
+
+.offset {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.4;
+  max-width: 32ch;
+  margin-inline: 0;
+  text-wrap: pretty;
+}
+
+.offset__explain {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  max-width: 44ch;
+  margin-inline: 0;
+  text-wrap: pretty;
+}
+
+/* 6 — Kennwerte als gerissene Datenzeile ─────────────────────────────────── */
+
+.sky {
+  gap: 0;
+  padding-top: 0;
+  border-top: 1px solid var(--hair);
+  border-bottom: 1px solid var(--hair);
+}
+
+.sky__cell {
+  gap: 6px;
+  text-align: left;
+  padding: 18px 20px;
+}
+
+.sky__cell:first-child {
+  padding-left: 0;
+}
+
+.sky__cell:last-child {
+  padding-right: 0;
+}
+
+.sky__cell + .sky__cell {
+  border-left: 1px solid var(--hair);
+}
+
+.sky__k {
+  font-family: var(--font-mono);
+  font-size: var(--micro-size);
+  letter-spacing: 0.22em;
+}
+
+.sky__v {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  font-weight: 300;
+}
+
+/* 7 — Wetter / Beobachtung ───────────────────────────────────────────────── */
+
+.weather {
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+.weather__k {
+  font-family: var(--font-mono);
+  font-size: var(--micro-size);
+  letter-spacing: 0.22em;
+}
+
+.weather__badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: var(--radius);
+  padding: 4px 10px;
+}
+
+/* 8 — Standort ───────────────────────────────────────────────────────────── */
+
+.locbar {
+  align-items: flex-start;
+  gap: 10px;
+  border-top: 1px solid var(--hair);
+  padding-top: 18px;
+}
+
+.loc {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.loc.is-guess {
+  border-radius: var(--radius);
+  padding: 7px 12px;
+}
+
+.loc-search {
+  max-width: 360px;
+}
+
+.loc-search input {
+  border-color: var(--hair-strong);
+}
+
+.loc__hint,
+.loc__msg {
+  text-align: left;
+  max-width: 44ch;
+}
+
+/* 9 — Breitbild-Layout (Option 1b) ───────────────────────────────────────── */
+
+@media (min-width: 900px) {
+  /* Kein Strecken der Grid-Zeilen mehr: der Block sitzt mittig, die Zeilen
+     behalten ihre natürliche Höhe. Das war die Hauptursache des Leerraums. */
+  :root[data-desktop-layout='columns'] .frame {
+    max-width: 1400px;
+    padding: 26px 44px 32px;
+    grid-template-columns: minmax(0, 660px) minmax(0, 1fr);
+    gap: 0 96px;
+    grid-template-areas:
+      'topbar topbar'
+      'stage info';
+    grid-template-rows: auto 1fr;
+    align-content: stretch;
+  }
+
+  /* Der Umschalter lebt in der Kopfzeile; die eigene Controls-Zeile entfällt. */
+  :root[data-desktop-layout='columns'] .controls {
+    display: none;
+  }
+
+  :root[data-desktop-layout='columns'] .stage,
+  :root[data-desktop-layout='columns'] .info-col {
+    align-self: center;
+  }
+
+  :root[data-desktop-layout='columns'] .stage {
+    gap: 26px;
+  }
+
+  :root[data-desktop-layout='columns'] .info-col {
+    gap: 26px;
+  }
+
+  :root[data-desktop-layout='columns'] .timebar {
+    justify-content: center;
+  }
+}
+
+/* 10 — Mobil ─────────────────────────────────────────────────────────────── */
+
+@media (max-width: 899px) {
+  .frame {
+    gap: 12px;
+    padding: 14px 18px 18px;
+  }
+
+  .topbar {
+    padding-bottom: 14px;
+  }
+
+  /* Umschalter über die volle Breite, gleiche Blockform wie im Breitbild. */
+  .controls .seg {
+    display: flex;
+    width: 100%;
+  }
+
+  .controls .seg__btn {
+    flex: 1;
+    padding: 9px 0;
+    letter-spacing: 0.14em;
+  }
+
+  .view-wrap {
+    padding: 14px;
+    width: min(74vw, 266px);
+  }
+
+  .readout__time {
+    font-size: 46px;
+  }
+
+  .readout__solar-time {
+    font-size: 22px;
+  }
+
+  .offset {
+    font-size: 15px;
+  }
+
+  .offset__explain {
+    font-size: 12px;
+  }
+
+  .sky__cell {
+    padding: 11px 10px;
+    gap: 4px;
+  }
+
+  .sky__v {
+    font-size: 20px;
+  }
+
+  .locbar {
+    margin-top: auto;
+  }
+
+  .loc-search {
+    width: 100%;
   }
 }

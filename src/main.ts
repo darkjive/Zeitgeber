@@ -139,6 +139,8 @@ let desktopLayout: DesktopLayout = loadDesktopLayout();
 function applyDesktopLayout(): void {
   document.documentElement.dataset.desktopLayout = desktopLayout;
   $('#layout-toggle').classList.toggle('is-on', desktopLayout === 'columns');
+  const target = desktopLayout === 'columns' ? $('.topbar__mid') : $('.controls');
+  target.appendChild($('.seg'));
 }
 
 function toggleDesktopLayout(): void {
@@ -223,6 +225,7 @@ app.innerHTML = `
           <div class="brand__tag" data-i18n="app.tagline"></div>
         </div>
       </div>
+      <div class="topbar__mid"></div>
       <div class="topbar__actions">
         <button class="iconbtn iconbtn--warn" id="warn-badge" aria-label="Warnungen" hidden>${icon('triangle-alert')}</button>
         <button class="iconbtn iconbtn--side" id="layout-toggle" aria-label="Desktop-Layout wechseln">${icon('columns-2')}</button>
@@ -251,6 +254,7 @@ app.innerHTML = `
         <div class="readout__solar">
           <span class="readout__label" data-i18n="dial.solarTime"></span>
           <span class="readout__solar-time" id="solar-time">–</span>
+          <span class="delta" id="delta">–</span>
         </div>
         <p class="offset" id="offset-line"></p>
         <p class="offset__explain" id="offset-explain"></p>
@@ -468,11 +472,13 @@ function render(now: Date): void {
   }
 
   // Zeit-Readout
-  $('#legal-time').textContent = fmtTime(now, true);
+  const legal = fmtTime(now, true);
+  $('#legal-time').innerHTML = `${legal.slice(0, -2)}<span class="readout__sec">${legal.slice(-2)}</span>`;
 
   const off = solarOffset(now, location);
   const solarClock = new Date(now.getTime() - off.minutes * 60_000);
   $('#solar-time').textContent = fmtTime(solarClock);
+  $('#delta').textContent = Math.abs(off.minutes) < 2 ? '—' : `Δ ${fmtDuration(off.minutes)}`;
 
   const line = $('#offset-line');
   if (Math.abs(off.minutes) < 2) line.textContent = t('offset.exact');
