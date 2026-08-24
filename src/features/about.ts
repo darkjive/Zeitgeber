@@ -8,7 +8,7 @@ import type { Translator } from '../i18n';
 
 export function openAbout(t: Translator): void {
   const overlay = document.createElement('div');
-  overlay.className = 'onboard';
+  overlay.className = 'onboard onboard--sheet';
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-modal', 'true');
 
