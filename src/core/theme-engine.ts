@@ -181,7 +181,17 @@ const skyGradient = (
   isDay: boolean,
   textColor: string,
 ): { top: string; bottom: string } => {
-  if (isDay) return { top: DAY.bg, bottom: DAY.bg };
+  if (isDay) {
+    // Auch tagsüber kein flaches Weiß: horizontnah (niedrige Sonnenhöhe) ein
+    // blasses Gold, im Zenit reines Grundweiß — dieselbe Ringfarbe wie in der
+    // Golden Hour, nur stark verdünnt, damit der Übergang an der Zonengrenze
+    // nicht abrupt kippt.
+    const warmth = Math.min(1, Math.max(0, (30 - elevation) / 24));
+    return {
+      top: mixHex(DAY.bg, palette.ringGolden, warmth * 0.08),
+      bottom: mixHex(DAY.bg, palette.ringGolden, warmth * 0.22),
+    };
+  }
   const top = darkenForContrast(zoneBackground(elevation - SKY_SPREAD, palette), textColor, 4.5);
   const bottom = darkenForContrast(
     zoneBackground(Math.min(elevation + SKY_SPREAD, 6), palette),
