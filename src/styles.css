@@ -2172,7 +2172,7 @@ body {
 
   .view-wrap {
     padding: 14px;
-    width: min(74vw, 266px);
+    width: 100%;
   }
 
   .readout__time {
