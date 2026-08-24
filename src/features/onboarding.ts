@@ -31,10 +31,26 @@ const SLIDES = [
   { titleKey: 'onboard.4.title', bodyKey: 'onboard.4.body', glyph: '🌙' },
 ];
 
-/** Zeigt das Onboarding; löst auf, wenn der Nutzer fertig ist. */
-export function showOnboarding(t: Translator): Promise<void> {
+export type OnboardProfile = 'outdoor' | 'space' | 'solar' | 'sleep';
+
+const PROFILES: { key: OnboardProfile; labelKey: string; glyph: string }[] = [
+  { key: 'outdoor', labelKey: 'onboard.profile.outdoor', glyph: '🥾' },
+  { key: 'space', labelKey: 'onboard.profile.space', glyph: '🔭' },
+  { key: 'solar', labelKey: 'onboard.profile.solar', glyph: '⚡' },
+  { key: 'sleep', labelKey: 'onboard.profile.sleep', glyph: '😴' },
+];
+
+/**
+ * Zeigt das Onboarding; löst mit dem gewählten Bedürfnis-Profil auf (oder
+ * `null`, wenn übersprungen bzw. keine Auswahl getroffen wurde). Die erste
+ * Slide fragt das Profil ab, damit main.ts die passenden Module vorauswählen
+ * kann — ohne die restlichen, generischen Erklär-Slides zu verändern.
+ */
+export function showOnboarding(t: Translator): Promise<OnboardProfile | null> {
   return new Promise((resolve) => {
     let index = 0;
+    let selectedProfile: OnboardProfile | null = null;
+    const totalSlides = SLIDES.length + 1;
 
     const overlay = document.createElement('div');
     overlay.className = 'onboard';
@@ -51,6 +67,10 @@ export function showOnboarding(t: Translator): Promise<void> {
     const body = document.createElement('p');
     body.className = 'onboard__body';
 
+    const profileList = document.createElement('div');
+    profileList.className = 'onboard__profiles';
+    profileList.setAttribute('role', 'radiogroup');
+
     const dots = document.createElement('div');
     dots.className = 'onboard__dots';
 
@@ -64,27 +84,60 @@ export function showOnboarding(t: Translator): Promise<void> {
     const finish = () => {
       markOnboarded();
       overlay.remove();
-      resolve();
+      resolve(selectedProfile);
+    };
+
+    const paintProfiles = () => {
+      profileList.innerHTML = '';
+      PROFILES.forEach((p) => {
+        const opt = document.createElement('button');
+        opt.type = 'button';
+        opt.className = 'onboard__profile' + (selectedProfile === p.key ? ' is-selected' : '');
+        opt.setAttribute('role', 'radio');
+        opt.setAttribute('aria-checked', String(selectedProfile === p.key));
+        const optGlyph = document.createElement('span');
+        optGlyph.className = 'onboard__profile-glyph';
+        optGlyph.textContent = p.glyph;
+        const optLabel = document.createElement('span');
+        optLabel.textContent = t(p.labelKey);
+        opt.append(optGlyph, optLabel);
+        opt.addEventListener('click', () => {
+          selectedProfile = p.key;
+          paintProfiles();
+        });
+        profileList.appendChild(opt);
+      });
     };
 
     const paint = () => {
-      const s = SLIDES[index];
-      glyph.textContent = s.glyph;
-      title.textContent = t(s.titleKey);
-      body.textContent = t(s.bodyKey);
+      const isProfileSlide = index === 0;
+      glyph.hidden = isProfileSlide;
+      profileList.hidden = !isProfileSlide;
+
+      if (isProfileSlide) {
+        title.textContent = t('onboard.profile.title');
+        body.textContent = t('onboard.profile.body');
+        paintProfiles();
+      } else {
+        const s = SLIDES[index - 1];
+        glyph.textContent = s.glyph;
+        title.textContent = t(s.titleKey);
+        body.textContent = t(s.bodyKey);
+      }
+
       skip.textContent = t('onboard.skip');
-      next.textContent = index === SLIDES.length - 1 ? t('onboard.start') : t('onboard.next');
+      next.textContent = index === totalSlides - 1 ? t('onboard.start') : t('onboard.next');
       dots.innerHTML = '';
-      SLIDES.forEach((_, i) => {
+      for (let i = 0; i < totalSlides; i += 1) {
         const dot = document.createElement('span');
         dot.className = 'onboard__dot' + (i === index ? ' is-active' : '');
         dots.appendChild(dot);
-      });
+      }
     };
 
     skip.addEventListener('click', finish);
     next.addEventListener('click', () => {
-      if (index === SLIDES.length - 1) finish();
+      if (index === totalSlides - 1) finish();
       else {
         index += 1;
         paint();
@@ -92,7 +145,7 @@ export function showOnboarding(t: Translator): Promise<void> {
     });
 
     actions.append(skip, next);
-    card.append(glyph, title, body, dots, actions);
+    card.append(glyph, title, body, profileList, dots, actions);
     overlay.append(card);
     document.body.append(overlay);
     paint();

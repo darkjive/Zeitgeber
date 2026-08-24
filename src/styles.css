@@ -781,6 +781,41 @@ body {
   margin: 0 0 22px;
 }
 
+.onboard__profiles {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 22px;
+  text-align: left;
+}
+
+.onboard__profiles[hidden] {
+  display: none;
+}
+
+.onboard__profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--text-dim) 25%, transparent);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.onboard__profile.is-selected {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.onboard__profile-glyph {
+  font-size: 22px;
+}
+
 .onboard__dots {
   display: flex;
   justify-content: center;

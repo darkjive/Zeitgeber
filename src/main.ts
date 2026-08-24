@@ -39,7 +39,7 @@ import { renderDial } from './views/dial';
 import { renderObjectList } from './views/object-list';
 import { renderSkyMap } from './views/sky-map';
 import { buildOverlay, type DialOverlay, type OverlayId } from './core/dial-overlay';
-import { showOnboarding, hasOnboarded } from './features/onboarding';
+import { showOnboarding, hasOnboarded, type OnboardProfile } from './features/onboarding';
 import { WallMode } from './features/wallmode';
 import { fetchWeather, observationRating, type WeatherNow } from './features/weather';
 import { fetchCivilWarnings, renderWarnCard } from './features/civil-warnings';
@@ -281,13 +281,46 @@ function saveEnabledInfoModules(): void {
   }
 }
 
-function toggleInfoModule(key: InfoModuleKey, row: HTMLElement): void {
-  const on = !enabledInfoModules.has(key);
+/** Schaltet eine Info-Karte an/aus, persistiert und lädt bei Bedarf nach (§20). */
+function setInfoModuleEnabled(key: InfoModuleKey, on: boolean): void {
+  if (on === enabledInfoModules.has(key)) return;
   if (on) enabledInfoModules.add(key);
   else enabledInfoModules.delete(key);
-  row.setAttribute('aria-checked', String(on));
   saveEnabledInfoModules();
   if (on) INFO_MODULES.find((m) => m.key === key)?.onEnable?.();
+}
+
+function toggleInfoModule(key: InfoModuleKey, row: HTMLElement): void {
+  const on = !enabledInfoModules.has(key);
+  setInfoModuleEnabled(key, on);
+  row.setAttribute('aria-checked', String(on));
+  rerender();
+}
+
+// Bedürfnis-Profil aus dem Onboarding (§14-Erweiterung) → passende Module vorauswählen.
+// solar/sleep sind Werkzeuge ohne An/Aus-Zustand (TOOL_MODULES) — statt sie zu
+// „aktivieren“, öffnen wir sie einmalig als Kennenlern-Moment.
+function applyOnboardProfile(profile: OnboardProfile | null): void {
+  if (!profile) return;
+  switch (profile) {
+    case 'outdoor':
+      (['outdoor', 'wildlife', 'comfort'] as const).forEach((k) => setInfoModuleEnabled(k, true));
+      break;
+    case 'space':
+      (['sat', 'meteor', 'wheel'] as const).forEach((k) => setInfoModuleEnabled(k, true));
+      (['stars', 'planets', 'deep-sky', 'satellites'] as const).forEach((id) => bus.setEnabled(id, true));
+      void refreshTles().then(() => rerender());
+      break;
+    case 'solar':
+      setInfoModuleEnabled('comfort', true);
+      TOOL_MODULES.find((m) => m.key === 'solar')?.open(currentTime());
+      break;
+    case 'sleep':
+      setInfoModuleEnabled('comfort', true);
+      TOOL_MODULES.find((m) => m.key === 'chrono')?.open(currentTime());
+      break;
+  }
+  buildDrawer(); // Menü zeigt sonst noch den vor-onboarding Stand (§11)
   rerender();
 }
 
@@ -818,8 +851,7 @@ function wireEvents(): void {
   $('#layout-toggle').addEventListener('click', toggleDesktopLayout);
   $('#warn-badge').addEventListener('click', () => {
     if (!enabledInfoModules.has('warn')) {
-      enabledInfoModules.add('warn');
-      saveEnabledInfoModules();
+      setInfoModuleEnabled('warn', true);
       rerender();
     }
     $('#info-cards').querySelector('[data-info-card="warn"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -966,7 +998,7 @@ async function boot(): Promise<void> {
   initReminders({ getLocation: () => location, getTranslator: () => t, getLang: () => lang });
 
   if (!hasOnboarded()) {
-    await showOnboarding(t);
+    applyOnboardProfile(await showOnboarding(t));
   }
 
   // Sekundentakt für den Zeiger; Ephemeriden nur bei Bedarf teuer (§8).
