@@ -298,8 +298,8 @@ function toggleInfoModule(key: InfoModuleKey, row: HTMLElement): void {
 }
 
 // Bedürfnis-Profil aus dem Onboarding (§14-Erweiterung) → passende Module vorauswählen.
-// solar/sleep sind Werkzeuge ohne An/Aus-Zustand (TOOL_MODULES) — statt sie zu
-// „aktivieren“, öffnen wir sie einmalig als Kennenlern-Moment.
+// solar/sleep enthalten zusätzlich ein Werkzeug ohne An/Aus-Zustand (TOOL_MODULES) —
+// statt es zu „aktivieren“, öffnen wir es einmalig als Kennenlern-Moment.
 function applyOnboardProfile(profile: OnboardProfile | null): void {
   if (!profile) return;
   switch (profile) {
@@ -312,11 +312,11 @@ function applyOnboardProfile(profile: OnboardProfile | null): void {
       void refreshTles().then(() => rerender());
       break;
     case 'solar':
-      setInfoModuleEnabled('comfort', true);
+      (['comfort', 'wheel'] as const).forEach((k) => setInfoModuleEnabled(k, true));
       TOOL_MODULES.find((m) => m.key === 'solar')?.open(currentTime());
       break;
     case 'sleep':
-      setInfoModuleEnabled('comfort', true);
+      (['comfort', 'wildlife'] as const).forEach((k) => setInfoModuleEnabled(k, true));
       TOOL_MODULES.find((m) => m.key === 'chrono')?.open(currentTime());
       break;
   }
