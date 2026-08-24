@@ -218,18 +218,32 @@ const MODULES: ModuleDef[] = [
 app.innerHTML = `
   <div class="frame">
     <header class="topbar">
-      <div class="brand">
-        <span class="brand__mark">☀</span>
-        <div>
-          <div class="brand__name" data-i18n="app.title"></div>
-          <div class="brand__tag" data-i18n="app.tagline"></div>
+      <div class="topbar__row">
+        <div class="brand">
+          <span class="brand__mark">☀</span>
+          <div>
+            <div class="brand__name" data-i18n="app.title"></div>
+            <div class="brand__tag" data-i18n="app.tagline"></div>
+          </div>
+        </div>
+        <div class="topbar__mid"></div>
+        <div class="topbar__actions">
+          <button class="iconbtn iconbtn--warn" id="warn-badge" aria-label="Warnungen" hidden>${icon('triangle-alert')}</button>
+          <button class="iconbtn iconbtn--side" id="layout-toggle" aria-label="Desktop-Layout wechseln">${icon('columns-2')}</button>
+          <button class="iconbtn" id="burger" aria-label="Menü" aria-haspopup="dialog" aria-expanded="false">${icon('menu')}</button>
         </div>
       </div>
-      <div class="topbar__mid"></div>
-      <div class="topbar__actions">
-        <button class="iconbtn iconbtn--warn" id="warn-badge" aria-label="Warnungen" hidden>${icon('triangle-alert')}</button>
-        <button class="iconbtn iconbtn--side" id="layout-toggle" aria-label="Desktop-Layout wechseln">${icon('columns-2')}</button>
-        <button class="iconbtn" id="burger" aria-label="Menü" aria-haspopup="dialog" aria-expanded="false">${icon('menu')}</button>
+
+      <div class="timebar">
+        <div class="stepper">
+          <button class="chip chip--sm" id="t-day-back" data-i18n="time.dayBack"></button>
+          <button class="chip chip--sm" id="t-hr-back" data-i18n="time.hourBack"></button>
+          <button class="chip chip--sm" id="t-hr-fwd" data-i18n="time.hourFwd"></button>
+          <button class="chip chip--sm" id="t-day-fwd" data-i18n="time.dayFwd"></button>
+        </div>
+        <input class="t-input" id="t-input" type="datetime-local" aria-label="Zeitpunkt" />
+        <button class="chip" id="t-now" data-i18n="time.now"></button>
+        <button class="chip" id="t-share" data-i18n="share.button"></button>
       </div>
     </header>
 
@@ -248,11 +262,11 @@ app.innerHTML = `
 
       <section class="readout" id="readout" aria-live="polite">
         <div class="readout__legal">
-          <span class="readout__label" data-i18n="dial.legalTime"></span>
+          <span class="readout__label">${icon('clock')}<span class="sr-only" data-i18n="dial.legalTime"></span></span>
           <span class="readout__time" id="legal-time">–</span>
         </div>
         <div class="readout__solar">
-          <span class="readout__label" data-i18n="dial.solarTime"></span>
+          <span class="readout__label">${icon('sun')}<span class="sr-only" data-i18n="dial.solarTime"></span></span>
           <span class="readout__solar-time" id="solar-time">–</span>
           <span class="delta" id="delta">–</span>
         </div>
@@ -262,39 +276,27 @@ app.innerHTML = `
     </main>
 
     <div class="info-col">
-      <div class="timebar">
-        <div class="stepper">
-          <button class="chip chip--sm" id="t-day-back" data-i18n="time.dayBack"></button>
-          <button class="chip chip--sm" id="t-hr-back" data-i18n="time.hourBack"></button>
-          <button class="chip chip--sm" id="t-hr-fwd" data-i18n="time.hourFwd"></button>
-          <button class="chip chip--sm" id="t-day-fwd" data-i18n="time.dayFwd"></button>
-        </div>
-        <input class="t-input" id="t-input" type="datetime-local" aria-label="Zeitpunkt" />
-        <button class="chip" id="t-now" data-i18n="time.now"></button>
-        <button class="chip" id="t-share" data-i18n="share.button"></button>
-      </div>
-
       <div class="weather" id="weather" hidden>
-        <span class="weather__k" data-i18n="weather.title"></span>
+        <span class="weather__k">${icon('eye')}<span class="sr-only" data-i18n="weather.title"></span></span>
         <span class="weather__badge" id="weather-badge">–</span>
         <span class="weather__sub" id="weather-sub"></span>
       </div>
 
       <section class="sky">
         <div class="sky__cell">
-          <span class="sky__k" data-i18n="object.sun"></span>
+          <span class="sky__k">${icon('sun')}<span class="sr-only" data-i18n="object.sun"></span></span>
           <span class="sky__v" id="sun-elev">–</span>
           <span class="sky__sub" id="sun-dir">–</span>
         </div>
         <div class="sky__cell">
-          <span class="sky__k" data-i18n="object.moon"></span>
+          <span class="sky__k">${icon('moon')}<span class="sr-only" data-i18n="object.moon"></span></span>
           <span class="sky__v" id="moon-phase">–</span>
           <span class="sky__sub" id="moon-illum">–</span>
         </div>
         <div class="sky__cell">
-          <span class="sky__k" data-i18n="dial.sunrise"></span>
+          <span class="sky__k">${icon('sunrise')}<span class="sr-only" data-i18n="dial.sunrise"></span></span>
           <span class="sky__v" id="sunrise">–</span>
-          <span class="sky__sub" data-i18n="dial.sunset"></span>
+          <span class="sky__k">${icon('sunset')}<span class="sr-only" data-i18n="dial.sunset"></span></span>
           <span class="sky__sub" id="sunset">–</span>
         </div>
       </section>
@@ -407,9 +409,6 @@ function buildDrawer(): void {
     </button>`;
 }
 
-/** Ab dieser Breite steht der Drawer neben dem Inhalt statt darüber (§13). */
-const wideLayout = window.matchMedia('(min-width: 900px)');
-
 let lastFocus: HTMLElement | null = null;
 
 function openDrawer(): void {
@@ -420,9 +419,6 @@ function openDrawer(): void {
   void drawer.offsetWidth;
   drawer.classList.add('is-open');
   $('#burger').setAttribute('aria-expanded', 'true');
-  // Nebeneinander ist der Drawer kein modaler Dialog mehr — sonst meldeten
-  // Screenreader den Rest der Seite fälschlich als unerreichbar (§13).
-  $('#drawer-panel').setAttribute('aria-modal', String(!wideLayout.matches));
   ($('#drawer-close') as HTMLButtonElement).focus();
 }
 
@@ -446,8 +442,8 @@ function render(now: Date): void {
   const moon = objects.find((o) => o.kind === 'moon');
 
   const tz = utcOffsetMinutes(now);
-  const { palette, nightness } = paletteForElevation(sun?.horizontal.elevation ?? -90);
-  applyPalette(palette);
+  const { palette, nightness, sky } = paletteForElevation(sun?.horizontal.elevation ?? -90);
+  applyPalette(palette, sky);
   wall?.setNightness(nightness);
 
   // Ansicht (Achse B): Zifferblatt, Himmelskarte oder Objektliste
@@ -611,9 +607,14 @@ async function exportCurrentView(): Promise<void> {
   }
 }
 
-function applyPalette(p: ReturnType<typeof paletteForElevation>['palette']): void {
+function applyPalette(
+  p: ReturnType<typeof paletteForElevation>['palette'],
+  sky: ReturnType<typeof paletteForElevation>['sky'],
+): void {
   const r = document.documentElement.style;
   r.setProperty('--bg', p.bg);
+  r.setProperty('--bg-top', sky.top);
+  r.setProperty('--bg-bottom', sky.bottom);
   r.setProperty('--surface', p.surface);
   r.setProperty('--accent', p.accent);
   r.setProperty('--secondary', p.secondary);

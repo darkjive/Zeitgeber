@@ -9,6 +9,8 @@
   --text: #1a1a1a;
   --text-dim: #5e5e5e;
   --on-accent: #ffffff;
+  --bg-top: var(--bg);
+  --bg-bottom: var(--bg);
   --wall-brightness: 1;
   --wall-drift-x: 0px;
   --wall-drift-y: 0px;
@@ -23,6 +25,19 @@
   box-sizing: border-box;
 }
 
+/* Für Screenreader: Text neben Icon-only-Labels erhalten, visuell aber weg. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 html,
 body {
   margin: 0;
@@ -30,7 +45,7 @@ body {
 }
 
 body {
-  background: var(--bg);
+  background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
   color: var(--text);
   font-family: var(--font-ui);
   font-weight: 400;
@@ -68,6 +83,12 @@ body {
 
 /* Topbar */
 .topbar {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.topbar__row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -122,7 +143,8 @@ body {
 }
 
 .btn--ghost:hover {
-  border-color: var(--text);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .btn--primary {
@@ -178,7 +200,8 @@ body {
 }
 
 .iconbtn:hover {
-  background: color-mix(in srgb, var(--text-dim) 16%, transparent);
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--accent);
 }
 
 .iconbtn:focus-visible {
@@ -359,6 +382,10 @@ body {
   color: var(--on-accent);
 }
 
+.seg__btn:not(.is-active):hover {
+  color: var(--accent);
+}
+
 .chip {
   border: 1px solid color-mix(in srgb, var(--text-dim) 40%, transparent);
   background: transparent;
@@ -368,6 +395,16 @@ body {
   padding: 6px 14px;
   border-radius: 999px;
   cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease,
+    background 0.15s ease;
+}
+
+.chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
 }
 
 .chip.is-on {
@@ -478,10 +515,9 @@ body {
 }
 
 .weather__k {
+  display: inline-flex;
   color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-size: 11px;
+  font-size: 17px;
 }
 
 .weather__badge {
@@ -556,9 +592,9 @@ body {
 }
 
 .readout__label {
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  font-size: 18px;
   color: var(--text-dim);
   margin-right: 8px;
 }
@@ -614,10 +650,10 @@ body {
 }
 
 .sky__k {
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  display: inline-flex;
+  justify-content: center;
   color: var(--text-dim);
+  font-size: 17px;
 }
 
 .sky__v {
@@ -1397,32 +1433,7 @@ body {
   }
 }
 
-/* Ab 900px sitzt der Drawer als eigene Spalte neben dem Zifferblatt statt
-   darüber: man will sehen, was ein Ebenen-Schalter am Bild verändert, statt
-   das Bild abgedunkelt zu bekommen. */
 @media (min-width: 900px) {
-  .drawer {
-    position: sticky;
-    inset: auto;
-    top: 0;
-    align-self: flex-start;
-    height: 100vh;
-    flex: none;
-  }
-
-  .drawer__scrim {
-    display: none;
-  }
-
-  .drawer__panel,
-  .drawer.is-open .drawer__panel {
-    position: static;
-    height: 100%;
-    width: 340px;
-    transform: none;
-    transition: none;
-  }
-
   .iconbtn--side {
     display: inline-flex;
   }
@@ -1887,47 +1898,33 @@ body {
   stroke-width: 1.75;
 }
 
-.iconbtn--side.is-on,
 .iconbtn--warn {
   border-color: color-mix(in srgb, var(--accent) 50%, transparent);
 }
 
-.btn--primary {
+#layout-toggle,
+#burger {
+  border: none;
+}
+
+#layout-toggle.is-on {
+  color: var(--accent);
+}
+
+.btn--primary,
+.btn--ghost {
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
-/* 4 — Zifferblatt mit Eckwinkeln ─────────────────────────────────────────── */
+/* 4 — Zifferblatt ────────────────────────────────────────────────────────── */
 
 .view-wrap {
   position: relative;
   padding: 20px;
   width: min(100%, 660px);
-}
-
-.view-wrap::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(var(--hair-strong) 0 0), linear-gradient(var(--hair-strong) 0 0),
-    linear-gradient(var(--hair-strong) 0 0), linear-gradient(var(--hair-strong) 0 0),
-    linear-gradient(var(--hair-strong) 0 0), linear-gradient(var(--hair-strong) 0 0),
-    linear-gradient(var(--hair-strong) 0 0), linear-gradient(var(--hair-strong) 0 0);
-  background-size:
-    24px 1px, 1px 24px,
-    24px 1px, 1px 24px,
-    24px 1px, 1px 24px,
-    24px 1px, 1px 24px;
-  background-position:
-    left top, left top,
-    right top, right top,
-    left bottom, left bottom,
-    right bottom, right bottom;
-  background-repeat: no-repeat;
 }
 
 /* 5 — Ablesung ───────────────────────────────────────────────────────────── */
@@ -1938,9 +1935,7 @@ body {
 }
 
 .readout__label {
-  font-family: var(--font-mono);
-  font-size: var(--micro-size);
-  letter-spacing: var(--micro-track);
+  font-size: 18px;
   margin-right: 0;
 }
 
@@ -2045,9 +2040,8 @@ body {
 }
 
 .sky__k {
-  font-family: var(--font-mono);
-  font-size: var(--micro-size);
-  letter-spacing: 0.22em;
+  font-size: 17px;
+  justify-content: flex-start;
 }
 
 .sky__v {
@@ -2064,9 +2058,7 @@ body {
 }
 
 .weather__k {
-  font-family: var(--font-mono);
-  font-size: var(--micro-size);
-  letter-spacing: 0.22em;
+  font-size: 17px;
 }
 
 .weather__badge {
