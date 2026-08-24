@@ -1780,21 +1780,6 @@ body {
   --micro-track: 0.28em;
 }
 
-/* Feines Messraster im Grund — trägt die Instrument-Anmutung, ohne Farbe. */
-body {
-  background-image:
-    linear-gradient(to right, color-mix(in srgb, var(--text-dim) 8%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in srgb, var(--text-dim) 8%, transparent) 1px, transparent 1px);
-  background-size: 64px 64px;
-  background-attachment: fixed;
-}
-
-@media (max-width: 899px) {
-  body {
-    background-size: 48px 48px;
-  }
-}
-
 /* 2 — Topbar ─────────────────────────────────────────────────────────────── */
 
 .topbar {
