@@ -1793,8 +1793,8 @@ body {
 
 /* 2 — Topbar ─────────────────────────────────────────────────────────────── */
 
-.topbar {
-  padding-bottom: 18px;
+.topbar__row {
+  padding-bottom: 14px;
   border-bottom: 1px solid var(--hair);
 }
 
