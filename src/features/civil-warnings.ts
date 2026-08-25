@@ -12,7 +12,11 @@ import { arsFromAgs, nearestKreis, normalizeWarnings, severityColor, type CivilW
 import { icon } from '../icons';
 import type { Lang, Translator } from '../i18n';
 
-const WARN_API = 'https://warnung.bund.de/api31/dashboard';
+// warnung.bund.de sendet kein Access-Control-Allow-Origin — ein Browser-Fetch
+// scheitert dort immer an CORS. Der eigene Server (api/warnings.ts) holt die
+// Daten deshalb stellvertretend, genau wie api/cron.ts es für Push-Zustellung
+// bereits tut.
+const WARN_API = `${import.meta.env.BASE_URL}api/warnings`;
 
 // Titel & Co. kommen von einer externen API (warnung.bund.de) — anders als
 // die übrigen Panels, die nur aus dem eigenen i18n-Wörterbuch interpolieren,

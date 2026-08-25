@@ -7,7 +7,10 @@
 import type { GeoLocation } from '../core/astro-engine';
 import { setAircraft, type Aircraft } from '../core/aircraft';
 
-const OPENSKY = 'https://opensky-network.org/api/states/all';
+// OpenSky sendet Access-Control-Allow-Origin nur für die eigene Origin — ein
+// Browser-Fetch von hier aus scheitert immer an CORS. Der eigene Server
+// (api/aircraft.ts) holt die Daten deshalb stellvertretend.
+const OPENSKY = `${import.meta.env.BASE_URL}api/aircraft`;
 
 /** Flugzeuge im Umkreis (~±1,5°) des Standorts holen. */
 export async function fetchAircraft(loc: GeoLocation): Promise<boolean> {
