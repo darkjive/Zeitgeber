@@ -35,7 +35,7 @@ export async function fetchCivilWarnings(loc: GeoLocation): Promise<CivilWarning
   try {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 8000);
-    const res = await fetch(`${WARN_API}/${ars}.json`, { signal: ctrl.signal });
+    const res = await fetch(`${WARN_API}?ars=${ars}`, { signal: ctrl.signal });
     clearTimeout(timer);
     if (!res.ok) throw new Error(`http ${res.status}`);
     const data = await res.json();
