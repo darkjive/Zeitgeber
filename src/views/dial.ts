@@ -20,7 +20,7 @@ import type { CelestialObject } from '../core/types';
 import { azimuthDirKey, type Translator } from '../i18n';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
-const SIZE = 400;
+const SIZE = 420;
 const C = SIZE / 2;
 const R_TIME_OUT = 190;
 const R_TIME_IN = 150;
@@ -178,7 +178,7 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
     const [x1, y1] = polar(R_TIME_OUT - 10, a);
     ticks.appendChild(el('line', { x1: x0, y1: y0, x2: x1, y2: y1, stroke: palette.textDim, 'stroke-width': 1 }));
     if (h % 6 === 0) {
-      const [lx, ly] = polar(R_TIME_OUT - 24, a);
+      const [lx, ly] = polar(R_TIME_OUT + 14, a);
       const label = el('text', {
         x: lx,
         y: ly,
@@ -268,12 +268,18 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
       }),
     );
     // Name nach innen versetzt, damit er die Himmelsrichtungen am Ring nicht überschreibt.
+    // Halo (Textkontur in Hintergrundfarbe) hält den Namen lesbar, egal welche
+    // Ring-/Overlay-Farbe gerade darunterliegt (§11: variabler Untergrund).
     const [lx, ly] = polar(R_COMPASS - 13, p.horizontal.azimuth);
     const label = el('text', {
       x: lx,
       y: ly,
-      fill: palette.textDim,
-      'font-size': 9,
+      fill: palette.text,
+      stroke: palette.bg,
+      'stroke-width': 3,
+      'paint-order': 'stroke fill',
+      'stroke-linejoin': 'round',
+      'font-size': 11,
       'text-anchor': 'middle',
       'dominant-baseline': 'central',
     });

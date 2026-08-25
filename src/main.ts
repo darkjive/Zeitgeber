@@ -243,6 +243,8 @@ interface InfoModuleDef {
   titleKey: string;
   icon: IconName;
   color: string;
+  /** Themenspalte im Breitbild-Layout: links = Vor-Ort/Umwelt, rechts = Himmel/Position (§9). */
+  side: 'left' | 'right';
   render: (now: Date) => string;
   /** Einmaliges Nachladen von Netzdaten, wenn die Karte eingeschaltet wird (§20). */
   onEnable?: () => void;
@@ -257,6 +259,7 @@ const INFO_MODULES: InfoModuleDef[] = [
     titleKey: 'comfort.title',
     icon: 'thermometer-sun',
     color: '#E8794A',
+    side: 'left',
     render: (now) => renderComfortCard(location, now, t),
     onEnable: () => void refreshComfortTemps(location).then(() => rerender()),
   },
@@ -266,29 +269,32 @@ const INFO_MODULES: InfoModuleDef[] = [
     titleKey: 'outdoor.title',
     icon: 'compass',
     color: '#4F9E8C',
+    side: 'left',
     render: (now) => renderOutdoorCard(location, now, t, { pinned: dialOverlay === 'outdoor', onPin: (on: boolean) => setDialOverlay(on ? 'outdoor' : null) }),
   },
-  { key: 'wildlife', labelKey: 'wildlife.button', titleKey: 'wildlife.title', icon: 'bird', color: '#C98A5E', render: (now) => renderWildlifeCard(location, now, t) },
-  { key: 'meteor', labelKey: 'meteor.button', titleKey: 'meteor.title', icon: 'sparkles', color: '#C9A94B', render: (now) => renderMeteorCard(location, now, t) },
-  { key: 'drone', labelKey: 'drone.button', titleKey: 'drone.title', icon: 'radar', color: '#5AA0D6', render: (now) => renderDroneCard(location, now, t) },
-  { key: 'wheel', labelKey: 'wheel.button', titleKey: 'wheel.title', icon: 'orbit', color: '#C77FA8', render: (now) => renderWheelCard(now, t) },
-  {
-    key: 'sat',
-    labelKey: 'sat.button',
-    titleKey: 'sat.title',
-    icon: 'satellite',
-    color: '#9AA0AD',
-    render: (now) => renderSatCard(location, now, t),
-    onEnable: () => void refreshTles().then(() => rerender()),
-  },
+  { key: 'wildlife', labelKey: 'wildlife.button', titleKey: 'wildlife.title', icon: 'bird', color: '#C98A5E', side: 'left', render: (now) => renderWildlifeCard(location, now, t) },
   {
     key: 'warn',
     labelKey: 'warn.button',
     titleKey: 'warn.title',
     icon: 'triangle-alert',
     color: '#C94F3D',
+    side: 'left',
     render: () => renderWarnCard(civilWarnings, nearestKreis(location)?.name ?? null, lang, t),
   },
+  { key: 'drone', labelKey: 'drone.button', titleKey: 'drone.title', icon: 'radar', color: '#5AA0D6', side: 'right', render: (now) => renderDroneCard(location, now, t) },
+  { key: 'wheel', labelKey: 'wheel.button', titleKey: 'wheel.title', icon: 'orbit', color: '#C77FA8', side: 'right', render: (now) => renderWheelCard(now, t) },
+  {
+    key: 'sat',
+    labelKey: 'sat.button',
+    titleKey: 'sat.title',
+    icon: 'satellite',
+    color: '#9AA0AD',
+    side: 'right',
+    render: (now) => renderSatCard(location, now, t),
+    onEnable: () => void refreshTles().then(() => rerender()),
+  },
+  { key: 'meteor', labelKey: 'meteor.button', titleKey: 'meteor.title', icon: 'sparkles', color: '#C9A94B', side: 'right', render: (now) => renderMeteorCard(location, now, t) },
 ];
 
 const INFO_MODULES_KEY = 'zeitgeber.infoModules';
@@ -434,16 +440,18 @@ app.innerHTML = `
       </section>
     </main>
 
-    <div class="info-col">
+    <aside class="side side--left">
       <div class="weather" id="weather" hidden>
         <span class="weather__k">${icon('eye')}<span class="sr-only" data-i18n="weather.title"></span></span>
         <span class="weather__badge" id="weather-badge">–</span>
         <span class="weather__sub" id="weather-sub"></span>
       </div>
 
-      <div class="info-cards" id="info-cards" hidden></div>
+      <div class="info-cards" id="info-cards-left" hidden></div>
+    </aside>
 
-      <footer class="locbar">
+    <aside class="side side--right">
+      <header class="locbar">
         <button class="loc" id="loc-btn">
           <span class="loc__pin">📍</span>
           <span id="loc-label">–</span>
@@ -453,8 +461,10 @@ app.innerHTML = `
           <button class="btn btn--primary" type="submit" data-i18n="loc.manual"></button>
         </form>
         <p class="loc__msg" id="loc-msg" hidden></p>
-      </footer>
-    </div>
+      </header>
+
+      <div class="info-cards" id="info-cards-right" hidden></div>
+    </aside>
   </div>
 
   <div class="drawer" id="drawer" hidden>
@@ -662,24 +672,24 @@ function render(now: Date): void {
 }
 
 /** Dauer-Karten der eingeschalteten Info-Module (§7.4) — reine Ableitung aus
- * bereits vorhandenen/gecachten Daten, kein Netz-Zugriff pro Tick. */
+ * bereits vorhandenen/gecachten Daten, kein Netz-Zugriff pro Tick. Zwei
+ * Container nach Themenspalte (§9), statt einer einzelnen Liste. */
 function renderInfoCards(now: Date): void {
-  const active = INFO_MODULES.filter((m) => enabledInfoModules.has(m.key));
-  const container = $('#info-cards');
-  container.hidden = active.length === 0;
-  if (active.length === 0) return;
-  container.innerHTML = active
-    .map(
-      (m) => `
+  const cardHtml = (m: InfoModuleDef): string => `
     <section class="info-card" data-info-card="${m.key}">
       <header class="info-card__head">
         <span class="info-card__ic" style="color:${m.color}">${icon(m.icon)}</span>
         <span class="info-card__title">${t(m.titleKey)}</span>
       </header>
       <div class="info-card__body">${m.render(now)}</div>
-    </section>`,
-    )
-    .join('');
+    </section>`;
+
+  for (const side of ['left', 'right'] as const) {
+    const active = INFO_MODULES.filter((m) => m.side === side && enabledInfoModules.has(m.key));
+    const container = $(`#info-cards-${side}`);
+    container.hidden = active.length === 0;
+    container.innerHTML = active.map(cardHtml).join('');
+  }
 }
 
 const pad2 = (n: number): string => String(n).padStart(2, '0');
@@ -876,7 +886,7 @@ function wireEvents(): void {
       setInfoModuleEnabled('warn', true);
       rerender();
     }
-    $('#info-cards').querySelector('[data-info-card="warn"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    $('#info-cards-left').querySelector('[data-info-card="warn"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !$('#drawer').hidden) closeDrawer();
@@ -909,13 +919,12 @@ function wireEvents(): void {
     }
   });
 
-  // Outdoor-Karte wird bei jedem Tick neu gerendert — die Pin-Checkbox meldet
+  // Outdoor-Karte wird bei jedem Tick neu gerendert — der Pin-Toggle meldet
   // sich daher per Delegation statt per eigenem Listener (§7.4).
-  $('#info-cards').addEventListener('change', (e) => {
-    const el = e.target as HTMLElement;
-    if (el.matches('[data-action="outdoor-pin"]')) {
-      setDialOverlay((el as HTMLInputElement).checked ? 'outdoor' : null);
-    }
+  $('#info-cards-left').addEventListener('click', (e) => {
+    const el = (e.target as HTMLElement).closest('[data-action="outdoor-pin"]') as HTMLElement | null;
+    if (!el) return;
+    setDialOverlay(el.getAttribute('aria-checked') === 'true' ? null : 'outdoor');
   });
 
   // Zeitreise (§24)

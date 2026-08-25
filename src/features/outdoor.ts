@@ -54,7 +54,11 @@ export function renderOutdoorCard(location: GeoLocation, date: Date, t: Translat
       <div><dt>${t('outdoor.direction')}</dt><dd>${dir.above ? `${t('outdoor.sunIn')} ${t(azimuthDirKey(dir.azimuth))} (${Math.round(dir.azimuth)}°)` : t('outdoor.sunDown')}</dd></div>
     </dl>
 
-    ${pin ? `<label class="pin-toggle"><input type="checkbox" data-action="outdoor-pin" ${pin.pinned ? 'checked' : ''} /><span>${t('overlay.pin')}</span></label>` : ''}
+    ${pin ? `
+    <button type="button" class="mrow mrow--pin" role="switch" aria-checked="${pin.pinned}" data-action="outdoor-pin">
+      <span class="mrow__label">${t('overlay.pin')}</span>
+      <span class="mrow__switch" aria-hidden="true"></span>
+    </button>` : ''}
 
     <p class="solar__note">${t('outdoor.note')}</p>
   `;
