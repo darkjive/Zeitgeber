@@ -217,6 +217,20 @@ body {
   gap: 14px;
 }
 
+/* Direkte Kinder dürfen nie schrumpfen: reicht die Höhe nicht (Breitbild,
+   .stage bekommt dort max-height+overflow-y), soll die Stage-Spalte intern
+   scrollen statt das Zifferblatt-SVG in die Ablesung hinein zu quetschen. */
+.stage > * {
+  flex-shrink: 0;
+}
+
+/* Sky-Zusammenfassung sitzt fest unter der Uhrzeit und soll die volle
+   Stage-Breite nutzen statt (wie Zifferblatt/Ablesung) auf Content-Breite
+   zu schrumpfen. */
+.stage .sky {
+  align-self: stretch;
+}
+
 .view-wrap {
   width: min(78vw, 340px);
   min-height: 200px;
@@ -2209,22 +2223,30 @@ body {
 }
 
 /* 9 — Breitbild-Layout (Option 1b) ───────────────────────────────────────── */
+/* Nutzt die volle Fensterbreite/-höhe: Zifferblatt fix oben links, die Module
+   rechts fließen per CSS-Multicolumn (statt fester Spaltenzahl) in 1 bis
+   mehrere Spalten — im Idealfall passt so alles ohne Scrollen auf große
+   Bildschirme. Reicht die Höhe trotzdem nicht, scrollt die jeweilige Spalte
+   (Zifferblatt bzw. Module) intern statt der ganzen Seite.
+
+   Wichtig: KEINE feste Höhe + column-fill:balance auf #info-cards. Das
+   zwingt den Browser bei zu viel Inhalt, zusätzliche Spalten nach rechts
+   anzuhängen statt vertikal zu scrollen — Ergebnis ist horizontaler
+   Overflow. Deshalb bekommt #info-cards keine explizite Höhe: die
+   Spaltenzahl ergibt sich rein aus column-width/verfügbarer Breite, und bei
+   zu viel Inhalt scrollt die ganze rechte Spalte (.info-col) vertikal. */
 
 @media (min-width: 900px) {
-  /* Kein Strecken der Grid-Zeilen mehr: die Zeilen behalten ihre natürliche
-     Höhe. Zifferblatt und Info-Spalte oben ausgerichtet statt vertikal
-     zentriert, sonst rutscht das Zifferblatt bei langer Info-Spalte weit
-     nach unten und man muss erst scrollen, um es zu sehen. */
   :root[data-desktop-layout='columns'] .frame {
-    max-width: 1400px;
+    max-width: none;
+    height: 100vh;
     padding: 26px 44px 32px;
-    grid-template-columns: minmax(0, 660px) minmax(0, 1fr);
-    gap: 0 96px;
+    grid-template-columns: minmax(320px, 480px) minmax(0, 1fr);
+    gap: 26px 64px;
     grid-template-areas:
       'topbar topbar'
       'stage info';
-    grid-template-rows: auto 1fr;
-    align-content: stretch;
+    grid-template-rows: auto minmax(0, 1fr);
   }
 
   /* Der Umschalter lebt in der Kopfzeile; die eigene Controls-Zeile entfällt. */
@@ -2232,17 +2254,28 @@ body {
     display: none;
   }
 
-  :root[data-desktop-layout='columns'] .stage,
-  :root[data-desktop-layout='columns'] .info-col {
-    align-self: start;
-  }
-
   :root[data-desktop-layout='columns'] .stage {
-    gap: 26px;
+    align-self: start;
+    min-height: 0;
+    max-height: 100%;
+    overflow-y: auto;
+    gap: 22px;
   }
 
   :root[data-desktop-layout='columns'] .info-col {
-    gap: 26px;
+    align-self: stretch;
+    min-height: 0;
+    max-height: 100%;
+    overflow-y: auto;
+  }
+
+  :root[data-desktop-layout='columns'] #info-cards {
+    column-width: 300px;
+    column-gap: 32px;
+  }
+
+  :root[data-desktop-layout='columns'] .info-card {
+    break-inside: avoid-column;
   }
 
   :root[data-desktop-layout='columns'] .timebar {

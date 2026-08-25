@@ -414,16 +414,6 @@ app.innerHTML = `
         <p class="offset__explain" id="offset-explain"></p>
       </section>
 
-      <div class="info-cards" id="stage-cards" hidden></div>
-    </main>
-
-    <div class="info-col">
-      <div class="weather" id="weather" hidden>
-        <span class="weather__k">${icon('eye')}<span class="sr-only" data-i18n="weather.title"></span></span>
-        <span class="weather__badge" id="weather-badge">–</span>
-        <span class="weather__sub" id="weather-sub"></span>
-      </div>
-
       <section class="sky">
         <div class="sky__cell">
           <span class="sky__k">${icon('sun')}<span class="sr-only" data-i18n="object.sun"></span></span>
@@ -442,6 +432,14 @@ app.innerHTML = `
           <span class="sky__sub" id="sunset">–</span>
         </div>
       </section>
+    </main>
+
+    <div class="info-col">
+      <div class="weather" id="weather" hidden>
+        <span class="weather__k">${icon('eye')}<span class="sr-only" data-i18n="weather.title"></span></span>
+        <span class="weather__badge" id="weather-badge">–</span>
+        <span class="weather__sub" id="weather-sub"></span>
+      </div>
 
       <div class="info-cards" id="info-cards" hidden></div>
 
@@ -663,35 +661,25 @@ function render(now: Date): void {
   updateTimebar(now);
 }
 
-const cardHtml = (m: InfoModuleDef, now: Date): string => `
+/** Dauer-Karten der eingeschalteten Info-Module (§7.4) — reine Ableitung aus
+ * bereits vorhandenen/gecachten Daten, kein Netz-Zugriff pro Tick. */
+function renderInfoCards(now: Date): void {
+  const active = INFO_MODULES.filter((m) => enabledInfoModules.has(m.key));
+  const container = $('#info-cards');
+  container.hidden = active.length === 0;
+  if (active.length === 0) return;
+  container.innerHTML = active
+    .map(
+      (m) => `
     <section class="info-card" data-info-card="${m.key}">
       <header class="info-card__head">
         <span class="info-card__ic" style="color:${m.color}">${icon(m.icon)}</span>
         <span class="info-card__title">${t(m.titleKey)}</span>
       </header>
       <div class="info-card__body">${m.render(now)}</div>
-    </section>`;
-
-/** Anzahl Module, die im zweispaltigen Desktop-Layout unter dem Zifferblatt
- * bleiben, bevor der Rest in die rechte Spalte wandert (§ Layout). */
-const STAGE_CARD_COUNT = 3;
-
-/** Dauer-Karten der eingeschalteten Info-Module (§7.4) — reine Ableitung aus
- * bereits vorhandenen/gecachten Daten, kein Netz-Zugriff pro Tick. */
-function renderInfoCards(now: Date): void {
-  const active = INFO_MODULES.filter((m) => enabledInfoModules.has(m.key));
-  const stageContainer = $('#stage-cards');
-  const infoContainer = $('#info-cards');
-
-  const splitToStage = desktopLayout === 'columns' && window.matchMedia('(min-width: 900px)').matches;
-  const stageCards = splitToStage ? active.slice(0, STAGE_CARD_COUNT) : [];
-  const infoCards = splitToStage ? active.slice(STAGE_CARD_COUNT) : active;
-
-  stageContainer.hidden = stageCards.length === 0;
-  stageContainer.innerHTML = stageCards.map((m) => cardHtml(m, now)).join('');
-
-  infoContainer.hidden = infoCards.length === 0;
-  infoContainer.innerHTML = infoCards.map((m) => cardHtml(m, now)).join('');
+    </section>`,
+    )
+    .join('');
 }
 
 const pad2 = (n: number): string => String(n).padStart(2, '0');
@@ -888,9 +876,6 @@ function wireEvents(): void {
       setInfoModuleEnabled('warn', true);
       rerender();
     }
-    $('#stage-cards')
-      .querySelector('[data-info-card="warn"]')
-      ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     $('#info-cards').querySelector('[data-info-card="warn"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
   document.addEventListener('keydown', (e) => {
@@ -926,14 +911,12 @@ function wireEvents(): void {
 
   // Outdoor-Karte wird bei jedem Tick neu gerendert — die Pin-Checkbox meldet
   // sich daher per Delegation statt per eigenem Listener (§7.4).
-  const handleOutdoorPin = (e: Event) => {
+  $('#info-cards').addEventListener('change', (e) => {
     const el = e.target as HTMLElement;
     if (el.matches('[data-action="outdoor-pin"]')) {
       setDialOverlay((el as HTMLInputElement).checked ? 'outdoor' : null);
     }
-  };
-  $('#info-cards').addEventListener('change', handleOutdoorPin);
-  $('#stage-cards').addEventListener('change', handleOutdoorPin);
+  });
 
   // Zeitreise (§24)
   const stepBy = (ms: number) => {
