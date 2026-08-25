@@ -536,6 +536,30 @@ body {
   color: var(--text-dim);
 }
 
+/* Aktuelles Wetter — Icon, Temperatur, Kurzlabel (Open-Meteo weather_code) */
+.weather-now {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: var(--fs-sm);
+}
+
+.weather-now__icon {
+  display: inline-flex;
+  color: var(--accent);
+  font-size: var(--fs-lg);
+}
+
+.weather-now__temp {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.weather-now__label {
+  color: var(--text-dim);
+}
+
 /* Zivilschutz-Warnungen (§5, §10, §38.1) */
 .warn__item {
   display: flex;
@@ -2070,6 +2094,12 @@ body {
 }
 
 /* 7 — Wetter / Beobachtung ───────────────────────────────────────────────── */
+
+.weather-now {
+  justify-content: flex-start;
+  gap: 10px;
+  padding-bottom: 14px;
+}
 
 .weather {
   justify-content: flex-start;

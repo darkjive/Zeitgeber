@@ -41,7 +41,7 @@ import { renderSkyMap } from './views/sky-map';
 import { buildOverlay, type DialOverlay, type OverlayId } from './core/dial-overlay';
 import { showOnboarding, hasOnboarded, type OnboardProfile } from './features/onboarding';
 import { WallMode } from './features/wallmode';
-import { fetchWeather, observationRating, type WeatherNow } from './features/weather';
+import { fetchWeather, observationRating, weatherCondition, type WeatherNow } from './features/weather';
 import { fetchCivilWarnings, renderWarnCard } from './features/civil-warnings';
 import { nearestKreis, type CivilWarning } from './core/civil-warnings';
 import { renderViewToBlob, shareOrDownload } from './features/share';
@@ -441,6 +441,12 @@ app.innerHTML = `
     </main>
 
     <aside class="side side--left">
+      <div class="weather-now" id="weather-now" hidden>
+        <span class="weather-now__icon" id="weather-now-icon"></span>
+        <span class="weather-now__temp" id="weather-now-temp">–</span>
+        <span class="weather-now__label" id="weather-now-label"></span>
+      </div>
+
       <div class="weather" id="weather" hidden>
         <span class="weather__k">${icon('eye')}<span class="sr-only" data-i18n="weather.title"></span></span>
         <span class="weather__badge" id="weather-badge">–</span>
@@ -707,11 +713,19 @@ function updateTimebar(now: Date): void {
 }
 
 function renderWeather(moon?: { horizontal: { elevation: number }; metadata?: Record<string, unknown> }): void {
+  const nowPanel = $('#weather-now');
   const panel = $('#weather');
   if (!weather) {
+    nowPanel.hidden = true;
     panel.hidden = true;
     return;
   }
+  nowPanel.hidden = false;
+  const cond = weatherCondition(weather.weatherCode, weather.isDay);
+  $('#weather-now-icon').innerHTML = icon(cond.icon);
+  $('#weather-now-temp').textContent = `${Math.round(weather.temperatureC)}°`;
+  $('#weather-now-label').textContent = t(cond.labelKey);
+
   panel.hidden = false;
   const moonUp = (moon?.horizontal.elevation ?? -90) > 0;
   const illum = (moon?.metadata?.illumination as number) ?? 0;

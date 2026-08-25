@@ -10,11 +10,15 @@
 import type { GeoLocation } from '../core/astro-engine';
 import type { HourTemp } from '../core/comfort';
 import { pressureTrend, type PressureChange, type PressurePoint } from '../core/pressure';
+import type { IconName } from '../icons';
 
 export interface WeatherNow {
   cloudCover: number; // %
   precipitationProbability: number; // %
   visibilityKm: number;
+  weatherCode: number; // WMO-Wettercode (Open-Meteo `weather_code`)
+  temperatureC: number;
+  isDay: boolean;
   fetchedAt: number; // epoch ms
 }
 
@@ -51,7 +55,7 @@ function readCache(loc: GeoLocation): WeatherNow | null {
 export async function fetchWeather(loc: GeoLocation): Promise<WeatherNow | null> {
   const url =
     `${OPEN_METEO}?latitude=${loc.latitude.toFixed(4)}&longitude=${loc.longitude.toFixed(4)}` +
-    `&current=cloud_cover,precipitation_probability,visibility`;
+    `&current=cloud_cover,precipitation_probability,visibility,weather_code,temperature_2m,is_day`;
   try {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 8000);
@@ -65,6 +69,9 @@ export async function fetchWeather(loc: GeoLocation): Promise<WeatherNow | null>
       cloudCover: c.cloud_cover ?? 0,
       precipitationProbability: c.precipitation_probability ?? 0,
       visibilityKm: (c.visibility ?? 0) / 1000,
+      weatherCode: c.weather_code ?? 0,
+      temperatureC: c.temperature_2m ?? 0,
+      isDay: (c.is_day ?? 1) === 1,
       fetchedAt: Date.now(),
     };
     cache(loc, w);
@@ -138,6 +145,31 @@ export async function fetchPressureTrend(loc: GeoLocation, now = new Date()): Pr
   } catch {
     return null;
   }
+}
+
+export interface WeatherCondition {
+  icon: IconName;
+  labelKey: string;
+}
+
+/**
+ * WMO-Wettercode (Open-Meteo `weather_code`) auf Icon + i18n-Label abgebildet.
+ * Tag/Nacht wählt bei Klarsicht/Teilbewölkung zwischen Sonne/Mond-Varianten.
+ */
+export function weatherCondition(code: number, isDay: boolean): WeatherCondition {
+  if (code === 0) return { icon: isDay ? 'sun' : 'moon', labelKey: 'weather.cond.clear' };
+  if (code <= 2) return { icon: isDay ? 'cloud-sun' : 'cloud-moon', labelKey: 'weather.cond.partlyCloudy' };
+  if (code === 3) return { icon: 'cloud', labelKey: 'weather.cond.overcast' };
+  if (code === 45 || code === 48) return { icon: 'cloud-fog', labelKey: 'weather.cond.fog' };
+  if (code >= 51 && code <= 57) return { icon: 'cloud-drizzle', labelKey: 'weather.cond.drizzle' };
+  if ((code >= 61 && code <= 67) || (code >= 80 && code <= 82)) {
+    return { icon: 'cloud-rain', labelKey: 'weather.cond.rain' };
+  }
+  if ((code >= 71 && code <= 77) || code === 85 || code === 86) {
+    return { icon: 'cloud-snow', labelKey: 'weather.cond.snow' };
+  }
+  if (code >= 95) return { icon: 'cloud-lightning', labelKey: 'weather.cond.thunderstorm' };
+  return { icon: 'cloud', labelKey: 'weather.cond.overcast' };
 }
 
 /**

@@ -333,6 +333,16 @@ const de: Dict = {
   'weather.stamp': 'Stand {time}',
   'weather.offline': 'Wetter offline',
 
+  'weather.now': 'Aktuelles Wetter',
+  'weather.cond.clear': 'Klar',
+  'weather.cond.partlyCloudy': 'Leicht bewölkt',
+  'weather.cond.overcast': 'Bedeckt',
+  'weather.cond.fog': 'Nebel',
+  'weather.cond.drizzle': 'Nieselregen',
+  'weather.cond.rain': 'Regen',
+  'weather.cond.snow': 'Schnee',
+  'weather.cond.thunderstorm': 'Gewitter',
+
   'zone.day': 'Tag',
   'zone.goldenHour': 'Goldene Stunde',
   'zone.civil': 'Bürgerliche Dämmerung',
@@ -734,6 +744,16 @@ const en: Dict = {
   'weather.clouds': 'Cloud cover',
   'weather.stamp': 'as of {time}',
   'weather.offline': 'Weather offline',
+
+  'weather.now': 'Current weather',
+  'weather.cond.clear': 'Clear',
+  'weather.cond.partlyCloudy': 'Partly cloudy',
+  'weather.cond.overcast': 'Overcast',
+  'weather.cond.fog': 'Fog',
+  'weather.cond.drizzle': 'Drizzle',
+  'weather.cond.rain': 'Rain',
+  'weather.cond.snow': 'Snow',
+  'weather.cond.thunderstorm': 'Thunderstorm',
 
   'zone.day': 'Day',
   'zone.goldenHour': 'Golden hour',
