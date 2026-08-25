@@ -24,8 +24,23 @@ function parseTle(text: string): Tle[] {
   return out;
 }
 
-/** Frische TLEs holen; bei Fehler Fallback behalten. */
-export async function refreshTles(): Promise<boolean> {
+let inFlight: Promise<boolean> | null = null;
+
+/**
+ * Frische TLEs holen; bei Fehler Fallback behalten.
+ * Ruft main.ts diese Funktion mehrfach kurz hintereinander auf (z. B. weil
+ * Info-Karte "sat" und Layer "satellites" im selben Zug aktiviert werden),
+ * teilen sich die Aufrufe einen laufenden Request statt doppelt zu fetchen.
+ */
+export function refreshTles(): Promise<boolean> {
+  if (inFlight) return inFlight;
+  inFlight = fetchTles().finally(() => {
+    inFlight = null;
+  });
+  return inFlight;
+}
+
+async function fetchTles(): Promise<boolean> {
   try {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 8000);

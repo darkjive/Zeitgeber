@@ -188,6 +188,35 @@ const LAYERS: LayerDef[] = [
   { id: 'aircraft', labelKey: 'layer.aircraft', icon: 'plane', color: '#5AA0D6' },
 ];
 
+const LAYERS_KEY = 'zeitgeber.layers';
+const loadEnabledLayers = (): LayerId[] => {
+  try {
+    const raw = JSON.parse(localStorage.getItem(LAYERS_KEY) ?? '[]') as string[];
+    return raw.filter((k): k is LayerId => LAYERS.some((l) => l.id === k));
+  } catch {
+    return [];
+  }
+};
+
+function saveEnabledLayers(): void {
+  try {
+    localStorage.setItem(LAYERS_KEY, JSON.stringify(LAYERS.filter((l) => bus.isEnabled(l.id)).map((l) => l.id)));
+  } catch {
+    /* Auswahl ist Komfort, kein Zustand, ohne den die Uhr scheitert. */
+  }
+}
+
+/** Schaltet eine Himmels-Ebene an/aus und persistiert (§7.4) — analog zu setInfoModuleEnabled. */
+function setLayerEnabled(id: LayerId, on: boolean): void {
+  bus.setEnabled(id, on);
+  saveEnabledLayers();
+  // Frische Netzdaten nur beim Einschalten (§20).
+  if (on && id === 'satellites') void refreshTles().then(() => rerender());
+  if (on && id === 'aircraft') void fetchAircraft(location).then(() => rerender());
+}
+
+for (const id of loadEnabledLayers()) bus.setEnabled(id, true);
+
 interface ToolModuleDef {
   key: string;
   labelKey: string;
@@ -307,9 +336,9 @@ function applyOnboardProfile(profile: OnboardProfile | null): void {
       (['outdoor', 'wildlife', 'comfort'] as const).forEach((k) => setInfoModuleEnabled(k, true));
       break;
     case 'space':
+      // 'sat' lädt die TLEs bereits über sein onEnable (§20) — kein zweiter Fetch nötig.
       (['sat', 'meteor', 'wheel'] as const).forEach((k) => setInfoModuleEnabled(k, true));
-      (['stars', 'planets', 'deep-sky', 'satellites'] as const).forEach((id) => bus.setEnabled(id, true));
-      void refreshTles().then(() => rerender());
+      (['stars', 'planets', 'deep-sky', 'satellites'] as const).forEach((id) => setLayerEnabled(id, true));
       break;
     case 'solar':
       (['comfort', 'wheel'] as const).forEach((k) => setInfoModuleEnabled(k, true));
@@ -821,11 +850,8 @@ function setView(view: ViewId): void {
 
 function toggleLayer(id: LayerId, row: HTMLElement): void {
   const on = !bus.isEnabled(id);
-  bus.setEnabled(id, on);
+  setLayerEnabled(id, on);
   row.setAttribute('aria-checked', String(on));
-  // Frische Netzdaten nur beim Einschalten (§20).
-  if (on && id === 'satellites') void refreshTles().then(() => rerender());
-  if (on && id === 'aircraft') void fetchAircraft(location).then(() => rerender());
   rerender();
 }
 

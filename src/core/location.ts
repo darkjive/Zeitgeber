@@ -191,15 +191,3 @@ export function findCity(query: string): City | null {
     null
   );
 }
-
-/** Vorschläge für die Eingabehilfe der Ortssuche. */
-export function suggestCities(query: string, limit = 8): City[] {
-  const q = query.trim().toLowerCase();
-  if (q.length < 2) return [];
-  const out: City[] = [];
-  for (const c of allCities()) {
-    if (c.label.toLowerCase().startsWith(q)) out.push(c);
-    if (out.length >= limit) break;
-  }
-  return out;
-}
