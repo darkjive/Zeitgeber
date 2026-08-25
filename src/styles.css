@@ -2223,11 +2223,12 @@ body {
 }
 
 /* 9 — Breitbild-Layout (Option 1b) ───────────────────────────────────────── */
-/* Nutzt die volle Fensterbreite/-höhe: Zifferblatt fix oben links, die Module
-   rechts fließen per CSS-Multicolumn (statt fester Spaltenzahl) in 1 bis
-   mehrere Spalten — im Idealfall passt so alles ohne Scrollen auf große
-   Bildschirme. Reicht die Höhe trotzdem nicht, scrollt die jeweilige Spalte
-   (Zifferblatt bzw. Module) intern statt der ganzen Seite.
+/* Feste, zentrierte Content-Breite (kein Ausufern auf die volle
+   Fensterbreite) — darin bilden Zifferblatt-Spalte + Module-Bereich
+   natürlich bis zu drei Spalten. Die Module suchen sich ihren Platz per
+   CSS-Multicolumn (statt fester Spaltenzahl) selbst, statt fest zwei oder
+   drei Spalten vorzugeben. Reicht die Höhe nicht, scrollt die jeweilige
+   Spalte (Zifferblatt bzw. Module) intern statt der ganzen Seite.
 
    Wichtig: KEINE feste Höhe + column-fill:balance auf #info-cards. Das
    zwingt den Browser bei zu viel Inhalt, zusätzliche Spalten nach rechts
@@ -2238,7 +2239,7 @@ body {
 
 @media (min-width: 900px) {
   :root[data-desktop-layout='columns'] .frame {
-    max-width: none;
+    max-width: 1400px;
     height: 100vh;
     padding: 26px 44px 32px;
     grid-template-columns: minmax(320px, 480px) minmax(0, 1fr);
