@@ -31,6 +31,18 @@
   box-sizing: border-box;
 }
 
+/* Weicher Farbwechsel bei jeder Themenänderung (Dimmen entlang der
+   Sonnenhöhe, §11.4/§12): verhindert, dass Text/Grund am Tag-Nacht-Kipppunkt
+   hart von Schwarz auf Weiß springen — der Sprung selbst ist unvermeidbar
+   (siehe theme-engine.ts), wird hier aber weich überblendet. Niedrige
+   Spezifität (Tag- + Universalselektor), damit spezifischere Regeln mit
+   eigener `transition` (Hover-States etc.) Vorrang behalten.
+*/
+body,
+body * {
+  transition: color 0.8s ease, background-color 0.8s ease;
+}
+
 /* Für Screenreader: Text neben Icon-only-Labels erhalten, visuell aber weg. */
 .sr-only {
   position: absolute;

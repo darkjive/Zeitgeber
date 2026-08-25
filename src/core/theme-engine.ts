@@ -93,6 +93,8 @@ const hex = (h: string): [number, number, number] => [
 ];
 const toHex = (c: number): string => Math.round(Math.min(255, Math.max(0, c))).toString(16).padStart(2, '0');
 const mixHex = (a: string, b: string, t: number): string => {
+  if (t <= 0) return a;
+  if (t >= 1) return b;
   const [ar, ag, ab] = hex(a);
   const [br, bg, bb] = hex(b);
   return `#${toHex(ar + (br - ar) * t)}${toHex(ag + (bg - ag) * t)}${toHex(ab + (bb - ab) * t)}`;
@@ -116,28 +118,43 @@ const contrast = (a: string, b: string): number => {
 };
 
 /**
+ * Kleinstes t in [0,1], für das `test(t)` erfüllt ist (test ist monoton in t
+ * von false auf true) — Bisektion statt fester 10%-Schritte, damit das
+ * Ergebnis mit der Eingabe stetig mitwandert statt in Stufen zu springen.
+ */
+const smallestPassing = (test: (t: number) => boolean): number => {
+  if (test(0)) return 0;
+  if (!test(1)) return 1;
+  let lo = 0;
+  let hi = 1;
+  for (let i = 0; i < 24; i++) {
+    const mid = (lo + hi) / 2;
+    if (test(mid)) hi = mid;
+    else lo = mid;
+  }
+  return hi;
+};
+
+/**
  * Hält eine (gedämpfte) Farbe lesbar: reicht der Kontrast zum Grund nicht,
- * wird sie schrittweise zum kräftigen Anker gezogen, bis das Ziel erreicht ist.
+ * wird sie fein zum kräftigen Anker gezogen, bis das Ziel erreicht ist.
  */
 const ensureContrast = (color: string, bg: string, min: number, anchor: string): string => {
-  let out = color;
-  for (let t = 0.1; t <= 1 && contrast(out, bg) < min; t += 0.1) {
-    out = mixHex(color, anchor, t);
-  }
-  return out;
+  if (contrast(color, bg) >= min) return color;
+  const t = smallestPassing((t) => contrast(mixHex(color, anchor, t), bg) >= min);
+  return mixHex(color, anchor, t);
 };
 
 /**
  * Gegenstück zu ensureContrast: statt die Textfarbe aufzuhellen, wird hier
- * der (bunte) Hintergrund schrittweise Richtung Schwarz gezogen, bis weißer
- * Text darauf lesbar ist. So bleibt der Farbton der Dämmerungszone erkennbar,
+ * der (bunte) Hintergrund fein Richtung Schwarz gezogen, bis weißer Text
+ * darauf lesbar ist. So bleibt der Farbton der Dämmerungszone erkennbar,
  * statt ihn durch reines Aufhellen des Texts zu verlieren.
  */
 const darkenForContrast = (bg: string, fg: string, min: number): string => {
-  let out = bg;
-  for (let t = 0.1; t <= 1 && contrast(fg, out) < min; t += 0.1) {
-    out = mixHex(bg, '#000000', t);
-  }
+  if (contrast(fg, bg) >= min) return bg;
+  const t = smallestPassing((t) => contrast(fg, mixHex(bg, '#000000', t)) >= min);
+  const out = mixHex(bg, '#000000', t);
   return out;
 };
 
@@ -207,58 +224,74 @@ const skyGradient = (
   };
 };
 
+/** Kubische Ease-Kurve (glatte Enden) für den Tag/Nacht-Übergang. */
+const smoothstep = (t: number): number => t * t * (3 - 2 * t);
+
 /**
  * Kontinuierliche Palette: Anteil `nightness` (0 = voller Tag, 1 = tiefe Nacht)
  * aus der Sonnenhöhe. Der Übergang atmet weich (§11.4), statt abrupt zu kippen.
  *
- * Wichtig: Flächen (surface, Akzente, Ringe) werden weich gemischt, damit
- * das Zifferblatt atmet. Die Schriftfarben dürfen jedoch nicht durch dasselbe
- * Mittelgrau laufen wie der Grund — sonst kreuzen sich Text und Hintergrund bei
- * Dämmerung und werden unlesbar. Sie kippen deshalb kontrastbasiert auf die
- * lesbare Seite, statt linear gemischt zu werden.
+ * Flächen (bg, surface, Akzente, Ringe) werden weich gemischt, damit das
+ * Zifferblatt atmet. Bei der Textfarbe ist echtes Weichmischen zwischen
+ * Schwarz und Weiß dagegen unmöglich, ohne die Lesbarkeit zu verlieren: laut
+ * WCAG-Kontrastformel kann ein Mischton in der Mitte (Grau) auf einem
+ * mittelhellen Grund nie AA erreichen — dort schafft nur reines Schwarz
+ * *oder* reines Weiß genug Kontrast, nie beides gleichzeitig und nie ein
+ * Grauton dazwischen. Der Kippunkt selbst lässt sich also nicht wegrechnen,
+ * nur an die richtige Stelle legen: statt an einer fest verdrahteten
+ * Sonnenhöhe (6°) unabhängig vom tatsächlichen (weich gemischten)
+ * Hintergrund zu kippen, entscheidet hier der tatsächliche Kontrast gegen
+ * den aktuellen Grund — dadurch fällt der Kippunkt exakt dorthin, wo Text
+ * sonst unlesbar würde, nicht früher. Den verbleibenden Sprung selbst blendet
+ * die CSS-`transition` auf `color`/`background-color` weich ein (styles.css).
  */
 export function paletteForElevation(
   elevation: number,
 ): { palette: Palette; nightness: number; sky: { top: string; bottom: string } } {
   // Über +6° voll Tag, unter −6° voll Nacht, dazwischen linear gemischt.
   const nightness = elevation >= 6 ? 0 : elevation <= -6 ? 1 : (6 - elevation) / 12;
+  const ease = smoothstep(nightness);
   const keys = (Object.keys(DAY) as (keyof Palette)[]).filter((k) => k !== 'bg');
   const palette = Object.fromEntries(
     keys.map((k) => [k, mixHex(DAY[k], NIGHT[k], nightness)]),
   ) as unknown as Palette;
 
   // Tagsüber bleibt der Hintergrund das helle Grundweiß; ab der Dämmerung
-  // übernimmt er die Zonenfarbe des Zifferblatt-Rings statt zu vergrauen.
-  const isDay = elevation >= 6;
-  palette.bg = isDay ? DAY.bg : zoneBackground(elevation, palette);
+  // übernimmt er weich die Zonenfarbe des Zifferblatt-Rings statt zu vergrauen
+  // oder bei 6° hart umzuschalten.
+  const twilightBg = zoneBackground(elevation, palette);
+  const dayBg = mixHex(DAY.bg, twilightBg, ease);
+  // Bunte Zonenfarben (v.a. Golden Hour) reichen an Helligkeit oft nicht aus,
+  // um mit weißem Text AA zu erreichen — dieses Nachdunkeln ebenfalls weich
+  // einblenden statt abrupt zuzuschlagen.
+  const darkBg = darkenForContrast(dayBg, NIGHT.text, 4.5);
+  palette.bg = mixHex(dayBg, darkBg, ease);
 
-  // Textseite: tagsüber dunkel auf hell wie gehabt, sonst durchgehend weiß —
-  // die bunten Dämmerungs-/Nachtgründe sind zu kräftig für dunklen Text.
-  const side = isDay ? DAY : NIGHT;
-  if (!isDay) {
-    // Bunte Zonenfarben (v.a. Golden Hour) reichen an Helligkeit oft nicht
-    // aus, um mit weißem Text AA zu erreichen — dort den Grund nachdunkeln,
-    // statt den Text über reines Weiß hinaus zu treiben.
-    palette.bg = darkenForContrast(palette.bg, side.text, 4.5);
-  }
-  // Am Dämmerungspunkt (Grund im Mittelgrau) reicht die Basisfarbe knapp nicht
-  // für AA — dort minimal Richtung Rein-Schwarz/-Weiß nachziehen. Tag/Nacht
-  // bleiben unberührt, weil ihr Kontrast dort ohnehin weit über der Schwelle liegt.
-  palette.text = ensureContrast(side.text, palette.bg, 4.5, side === DAY ? '#000000' : '#FFFFFF');
+  // Textfarbe: Schwarz oder Weiß, je nachdem was gegen den tatsächlichen
+  // Hintergrund mehr Kontrast bringt — nicht an einer festen Sonnenhöhe
+  // festgemacht (siehe Funktionskommentar oben).
+  const preferWhite = contrast('#FFFFFF', palette.bg) > contrast('#000000', palette.bg);
+  palette.text = ensureContrast(
+    preferWhite ? NIGHT.text : DAY.text,
+    palette.bg,
+    4.5,
+    preferWhite ? '#FFFFFF' : '#000000',
+  );
   // Gedämpfter Text bleibt gedämpft, aber garantiert lesbar (Ziel ~AA für Fließtext).
-  palette.textDim = ensureContrast(side.textDim, palette.bg, 4, side.text);
-  if (!isDay) {
-    // Karten/Flächen (surface) folgen demselben Weiß-Text-Kurs wie der Grund —
-    // sonst bleibt die Fläche zu hell für den (jetzt weißen) gedämpften Text.
-    palette.surface = darkenForContrast(palette.surface, palette.textDim, 3);
-  }
+  palette.textDim = ensureContrast(preferWhite ? NIGHT.textDim : DAY.textDim, palette.bg, 4, palette.text);
+
+  // Karten/Flächen (surface) folgen demselben weichen Kurs wie der Grund —
+  // sonst bleibt die Fläche zu hell für den gedämpften Text.
+  const darkSurface = darkenForContrast(palette.surface, palette.textDim, 3);
+  palette.surface = mixHex(palette.surface, darkSurface, ease);
+
   // Text auf Akzentflächen an die tatsächlich gemischte Akzentfarbe koppeln.
   palette.onAccent =
     contrast(DAY.onAccent, palette.accent) >= contrast(NIGHT.onAccent, palette.accent)
       ? DAY.onAccent
       : NIGHT.onAccent;
 
-  const sky = skyGradient(elevation, palette, nightness, side.text);
+  const sky = skyGradient(elevation, palette, nightness, palette.text);
 
   return { palette, nightness, sky };
 }
