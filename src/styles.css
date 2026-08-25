@@ -19,6 +19,12 @@
      (tnum), damit sie ohne klobige Monospace ausgerichtet bleiben. */
   --font-head: 'Inter', system-ui, sans-serif;
   --font-ui: 'Inter', system-ui, sans-serif;
+
+  /* Dezente Scrollbar statt OS-Standard (Chrome zeigt sonst einen klobigen
+     grauen Balken; Firefox blendet ihn schon von sich aus dezent ein/aus).
+     Standard-Property, wird vererbt — gilt für alle scrollbaren Container. */
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--text-dim) 45%, transparent) transparent;
 }
 
 * {
