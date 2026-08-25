@@ -178,27 +178,33 @@ const SKY_SPREAD = 9;
 const skyGradient = (
   elevation: number,
   palette: Palette,
-  isDay: boolean,
+  nightness: number,
   textColor: string,
 ): { top: string; bottom: string } => {
-  if (isDay) {
-    // Auch tagsüber kein flaches Weiß: horizontnah (niedrige Sonnenhöhe) ein
-    // blasses Gold, im Zenit reines Grundweiß — dieselbe Ringfarbe wie in der
-    // Golden Hour, nur stark verdünnt, damit der Übergang an der Zonengrenze
-    // nicht abrupt kippt.
-    const warmth = Math.min(1, Math.max(0, (30 - elevation) / 24));
-    return {
-      top: mixHex(DAY.bg, palette.ringGolden, warmth * 0.08),
-      bottom: mixHex(DAY.bg, palette.ringGolden, warmth * 0.22),
-    };
-  }
-  const top = darkenForContrast(zoneBackground(elevation - SKY_SPREAD, palette), textColor, 4.5);
-  const bottom = darkenForContrast(
-    zoneBackground(Math.min(elevation + SKY_SPREAD, 6), palette),
-    textColor,
-    4.5,
-  );
-  return { top, bottom };
+  // Auch tagsüber kein flaches Weiß: horizontnah (niedrige Sonnenhöhe) ein
+  // blasses Gold, im Zenit reines Grundweiß — dieselbe Ringfarbe wie in der
+  // Golden Hour, nur stark verdünnt, damit der Übergang an der Zonengrenze
+  // nicht abrupt kippt.
+  const warmth = Math.min(1, Math.max(0, (30 - elevation) / 24));
+  const daySky = {
+    top: mixHex(DAY.bg, palette.ringGolden, warmth * 0.08),
+    bottom: mixHex(DAY.bg, palette.ringGolden, warmth * 0.22),
+  };
+  const nightSky = {
+    top: darkenForContrast(zoneBackground(elevation - SKY_SPREAD, palette), textColor, 4.5),
+    bottom: darkenForContrast(
+      zoneBackground(Math.min(elevation + SKY_SPREAD, 6), palette),
+      textColor,
+      4.5,
+    ),
+  };
+  // Stetig statt eines harten Kippens an der Tag/Nacht-Grenze (elevation = 6°):
+  // dieselbe `nightness`-Rampe wie beim Rest der Palette blendet zwischen der
+  // blassen Tagesformel und der kontrastgezwungenen Nachtformel.
+  return {
+    top: mixHex(daySky.top, nightSky.top, nightness),
+    bottom: mixHex(daySky.bottom, nightSky.bottom, nightness),
+  };
 };
 
 /**
@@ -252,7 +258,7 @@ export function paletteForElevation(
       ? DAY.onAccent
       : NIGHT.onAccent;
 
-  const sky = skyGradient(elevation, palette, isDay, side.text);
+  const sky = skyGradient(elevation, palette, nightness, side.text);
 
   return { palette, nightness, sky };
 }
