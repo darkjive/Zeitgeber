@@ -413,6 +413,8 @@ app.innerHTML = `
         <p class="offset" id="offset-line"></p>
         <p class="offset__explain" id="offset-explain"></p>
       </section>
+
+      <div class="info-cards" id="stage-cards" hidden></div>
     </main>
 
     <div class="info-col">
@@ -661,25 +663,35 @@ function render(now: Date): void {
   updateTimebar(now);
 }
 
-/** Dauer-Karten der eingeschalteten Info-Module (§7.4) — reine Ableitung aus
- * bereits vorhandenen/gecachten Daten, kein Netz-Zugriff pro Tick. */
-function renderInfoCards(now: Date): void {
-  const active = INFO_MODULES.filter((m) => enabledInfoModules.has(m.key));
-  const container = $('#info-cards');
-  container.hidden = active.length === 0;
-  if (active.length === 0) return;
-  container.innerHTML = active
-    .map(
-      (m) => `
+const cardHtml = (m: InfoModuleDef, now: Date): string => `
     <section class="info-card" data-info-card="${m.key}">
       <header class="info-card__head">
         <span class="info-card__ic" style="color:${m.color}">${icon(m.icon)}</span>
         <span class="info-card__title">${t(m.titleKey)}</span>
       </header>
       <div class="info-card__body">${m.render(now)}</div>
-    </section>`,
-    )
-    .join('');
+    </section>`;
+
+/** Anzahl Module, die im zweispaltigen Desktop-Layout unter dem Zifferblatt
+ * bleiben, bevor der Rest in die rechte Spalte wandert (§ Layout). */
+const STAGE_CARD_COUNT = 3;
+
+/** Dauer-Karten der eingeschalteten Info-Module (§7.4) — reine Ableitung aus
+ * bereits vorhandenen/gecachten Daten, kein Netz-Zugriff pro Tick. */
+function renderInfoCards(now: Date): void {
+  const active = INFO_MODULES.filter((m) => enabledInfoModules.has(m.key));
+  const stageContainer = $('#stage-cards');
+  const infoContainer = $('#info-cards');
+
+  const splitToStage = desktopLayout === 'columns' && window.matchMedia('(min-width: 900px)').matches;
+  const stageCards = splitToStage ? active.slice(0, STAGE_CARD_COUNT) : [];
+  const infoCards = splitToStage ? active.slice(STAGE_CARD_COUNT) : active;
+
+  stageContainer.hidden = stageCards.length === 0;
+  stageContainer.innerHTML = stageCards.map((m) => cardHtml(m, now)).join('');
+
+  infoContainer.hidden = infoCards.length === 0;
+  infoContainer.innerHTML = infoCards.map((m) => cardHtml(m, now)).join('');
 }
 
 const pad2 = (n: number): string => String(n).padStart(2, '0');
@@ -876,6 +888,9 @@ function wireEvents(): void {
       setInfoModuleEnabled('warn', true);
       rerender();
     }
+    $('#stage-cards')
+      .querySelector('[data-info-card="warn"]')
+      ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     $('#info-cards').querySelector('[data-info-card="warn"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
   document.addEventListener('keydown', (e) => {
@@ -911,12 +926,14 @@ function wireEvents(): void {
 
   // Outdoor-Karte wird bei jedem Tick neu gerendert — die Pin-Checkbox meldet
   // sich daher per Delegation statt per eigenem Listener (§7.4).
-  $('#info-cards').addEventListener('change', (e) => {
+  const handleOutdoorPin = (e: Event) => {
     const el = e.target as HTMLElement;
     if (el.matches('[data-action="outdoor-pin"]')) {
       setDialOverlay((el as HTMLInputElement).checked ? 'outdoor' : null);
     }
-  });
+  };
+  $('#info-cards').addEventListener('change', handleOutdoorPin);
+  $('#stage-cards').addEventListener('change', handleOutdoorPin);
 
   // Zeitreise (§24)
   const stepBy = (ms: number) => {

@@ -2211,8 +2211,10 @@ body {
 /* 9 — Breitbild-Layout (Option 1b) ───────────────────────────────────────── */
 
 @media (min-width: 900px) {
-  /* Kein Strecken der Grid-Zeilen mehr: der Block sitzt mittig, die Zeilen
-     behalten ihre natürliche Höhe. Das war die Hauptursache des Leerraums. */
+  /* Kein Strecken der Grid-Zeilen mehr: die Zeilen behalten ihre natürliche
+     Höhe. Zifferblatt und Info-Spalte oben ausgerichtet statt vertikal
+     zentriert, sonst rutscht das Zifferblatt bei langer Info-Spalte weit
+     nach unten und man muss erst scrollen, um es zu sehen. */
   :root[data-desktop-layout='columns'] .frame {
     max-width: 1400px;
     padding: 26px 44px 32px;
@@ -2232,7 +2234,7 @@ body {
 
   :root[data-desktop-layout='columns'] .stage,
   :root[data-desktop-layout='columns'] .info-col {
-    align-self: center;
+    align-self: start;
   }
 
   :root[data-desktop-layout='columns'] .stage {
