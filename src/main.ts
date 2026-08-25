@@ -419,7 +419,6 @@ app.innerHTML = `
           <span class="loc__pin">📍</span>
           <span id="loc-label">–</span>
         </button>
-        <p class="loc__hint" id="loc-hint" hidden></p>
         <form class="loc-search" id="loc-search" hidden>
           <input id="loc-input" type="text" autocomplete="off" />
           <button class="btn btn--primary" type="submit" data-i18n="loc.manual"></button>
@@ -792,9 +791,6 @@ function renderLocbar(): void {
   const guessed = location.source === 'default';
   $('#loc-label').textContent = guessed ? t('loc.unset') : placeLabel(location);
   $('#loc-btn').classList.toggle('is-guess', guessed);
-  const hint = $('#loc-hint');
-  hint.hidden = !guessed;
-  hint.textContent = guessed ? t('loc.guessHint') : '';
   // Ohne verlässlichen Ort steht die Ortssuche sofort bereit — sonst führte der
   // einzige Weg über den GPS-Knopf und dessen Zeitablauf (§10). Sobald ein Ort
   // feststeht, schliesst sie sich wieder.

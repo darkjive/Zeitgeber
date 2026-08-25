@@ -91,7 +91,7 @@ const de: Dict = {
 
   'chrono.button': 'Rhythmus',
   'chrono.title': 'Dein Rhythmus',
-  'chrono.intro': 'Vier Zeitangaben genügen. Alles bleibt lokal auf dem Gerät.',
+  'chrono.intro': 'Alles bleibt lokal auf dem Gerät.',
   'chrono.onset': 'Einschlafen',
   'chrono.wake': 'Aufwachen',
   'chrono.workdays': 'Arbeitstage',
@@ -215,7 +215,6 @@ const de: Dict = {
 
   'modules.button': 'Module',
   'modules.title': 'Module',
-  'modules.subtitle': 'Optionale Funktionen – standardmäßig aus, hier bei Bedarf.',
   'modules.close': 'Schließen',
 
   'menu.open': 'Menü',
@@ -375,7 +374,6 @@ const de: Dict = {
   'loc.denied': 'Kein Standort – bitte Ort manuell wählen. Die Uhr läuft weiter.',
   'loc.notFound': 'Ort nicht gefunden.',
   'loc.unset': 'Standort wählen',
-  'loc.guessHint': 'Angenommener Ort – die Werte gelten noch nicht für dich.',
 
   'onboard.skip': 'Überspringen',
   'onboard.next': 'Weiter',
@@ -397,7 +395,6 @@ const de: Dict = {
 
   'wall.enter': 'Wandmodus',
   'wall.exit': 'Wandmodus beenden',
-  'wall.hint': 'Tippen für die volle Oberfläche',
 
   'settings.language': 'Sprache',
   'unit.min': 'Min',
@@ -496,7 +493,7 @@ const en: Dict = {
 
   'chrono.button': 'Rhythm',
   'chrono.title': 'Your rhythm',
-  'chrono.intro': 'Four times are enough. Everything stays local on the device.',
+  'chrono.intro': 'Everything stays local on the device.',
   'chrono.onset': 'Fall asleep',
   'chrono.wake': 'Wake up',
   'chrono.workdays': 'Work days',
@@ -620,7 +617,6 @@ const en: Dict = {
 
   'modules.button': 'Modules',
   'modules.title': 'Modules',
-  'modules.subtitle': 'Optional features – off by default, here when you need them.',
   'modules.close': 'Close',
 
   'menu.open': 'Menu',
@@ -780,7 +776,6 @@ const en: Dict = {
   'loc.denied': 'No location – please pick a place manually. The clock keeps running.',
   'loc.notFound': 'Place not found.',
   'loc.unset': 'Choose location',
-  'loc.guessHint': 'Assumed place – these values are not yours yet.',
 
   'onboard.skip': 'Skip',
   'onboard.next': 'Next',
@@ -802,7 +797,6 @@ const en: Dict = {
 
   'wall.enter': 'Wall mode',
   'wall.exit': 'Exit wall mode',
-  'wall.hint': 'Tap for the full interface',
 
   'settings.language': 'Language',
   'unit.min': 'min',
