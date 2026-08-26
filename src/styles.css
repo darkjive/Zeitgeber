@@ -1667,7 +1667,7 @@ body {
 }
 
 .comfort__rows {
-  margin: 0;
+  margin: 0 0 16px;
   margin-inline: -4px;
 }
 
