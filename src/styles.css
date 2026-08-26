@@ -1328,9 +1328,9 @@ body {
   border-bottom: 1px solid color-mix(in srgb, var(--text-dim) 16%, transparent);
 }
 
-.wheel__row.is-next {
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
-  border-bottom-color: transparent;
+.wheel__row.is-next .wheel__name,
+.wheel__row.is-next .wheel__date {
+  color: var(--accent);
 }
 
 .wheel__name {
