@@ -285,6 +285,9 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
       // Warmes Gold statt des Rot-Akzents (der bei Nacht sogar türkis wäre) —
       // dieselbe Farbe wie der Tagesring, dazu kurze Strahlen für den Sonnen-Look.
       const r = above ? 9 : 6;
+      // Blende die Kompass-Linie hinter dem Marker aus, damit dieser bei
+      // reduzierter Deckkraft (unter dem Horizont) trotzdem darüber liegt.
+      svg.appendChild(el('circle', { cx: ox, cy: oy, r, fill: palette.bg }));
       const g = el('g', { opacity: above ? 1 : 0.35, class: 'dial__planet', 'data-name': t('object.sun') });
       for (let i = 0; i < 8; i++) {
         const rad = (i / 8) * 2 * Math.PI;
@@ -306,6 +309,9 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
       g.appendChild(title);
       svg.appendChild(g);
     } else {
+      // Blende die Kompass-Linie hinter dem Marker aus, damit dieser bei
+      // reduzierter Deckkraft (unter dem Horizont) trotzdem darüber liegt.
+      svg.appendChild(el('circle', { cx: ox, cy: oy, r: 8, fill: palette.bg }));
       const g = el('g', { opacity: above ? 1 : 0.3, class: 'dial__planet', 'data-name': t('object.moon') });
       g.appendChild(el('circle', { cx: ox, cy: oy, r: 8, fill: palette.secondary }));
       // Beleuchtungsgrad als Sichel andeuten

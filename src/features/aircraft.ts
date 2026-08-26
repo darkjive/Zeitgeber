@@ -18,7 +18,9 @@ export async function fetchAircraft(loc: GeoLocation): Promise<boolean> {
   const url = `${OPENSKY}?lamin=${(loc.latitude - d).toFixed(3)}&lomin=${(loc.longitude - d).toFixed(3)}&lamax=${(loc.latitude + d).toFixed(3)}&lomax=${(loc.longitude + d).toFixed(3)}`;
   try {
     const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 8000);
+    // Länger als api/aircraft.ts' eigenes Timeout (15 s) — sonst bricht der
+    // Client immer vor der serverseitigen 502-Fallback-Antwort ab (Race).
+    const timer = setTimeout(() => ctrl.abort(), 18000);
     const res = await fetch(url, { signal: ctrl.signal });
     clearTimeout(timer);
     if (!res.ok) throw new Error(`http ${res.status}`);

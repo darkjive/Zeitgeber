@@ -28,7 +28,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     return;
   }
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 8000);
+  const timer = setTimeout(() => ctrl.abort(), 15000);
   try {
     const upstream = await fetch(`${OPENSKY}?lamin=${lamin}&lomin=${lomin}&lamax=${lamax}&lomax=${lomax}`, {
       signal: ctrl.signal,
