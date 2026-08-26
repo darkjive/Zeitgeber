@@ -414,6 +414,18 @@ app.innerHTML = `
         <p class="loc__msg" id="loc-msg" hidden></p>
       </header>
 
+      <div class="weather" id="weather" hidden>
+        <span class="weather__k">${icon('eye')}<span class="sr-only" data-i18n="weather.title"></span></span>
+        <span class="weather__badge" id="weather-badge">–</span>
+        <span class="weather__sub" id="weather-sub"></span>
+      </div>
+
+      <div class="weather-now" id="weather-now" hidden>
+        <span class="weather-now__icon" id="weather-now-icon"></span>
+        <span class="weather-now__temp" id="weather-now-temp">–</span>
+        <span class="weather-now__label" id="weather-now-label"></span>
+      </div>
+
       <div class="view-wrap" id="view-wrap"></div>
 
       <div class="overlay-key" id="overlay-key" hidden></div>
@@ -453,18 +465,6 @@ app.innerHTML = `
     </main>
 
     <aside class="side side--left">
-      <div class="weather" id="weather" hidden>
-        <span class="weather__k">${icon('eye')}<span class="sr-only" data-i18n="weather.title"></span></span>
-        <span class="weather__badge" id="weather-badge">–</span>
-        <span class="weather__sub" id="weather-sub"></span>
-      </div>
-
-      <div class="weather-now" id="weather-now" hidden>
-        <span class="weather-now__icon" id="weather-now-icon"></span>
-        <span class="weather-now__temp" id="weather-now-temp">–</span>
-        <span class="weather-now__label" id="weather-now-label"></span>
-      </div>
-
       <div class="info-cards" id="info-cards-left" hidden></div>
     </aside>
 
