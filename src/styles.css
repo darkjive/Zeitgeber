@@ -256,6 +256,29 @@ body {
   transition: transform 4s ease;
 }
 
+/* Planeten-Tooltip (Hover/Touch statt dauerhaftem Namen am Ring) */
+.dial__planet {
+  cursor: pointer;
+}
+
+.dial-tip {
+  position: fixed;
+  transform: translate(-50%, calc(-100% - 10px));
+  z-index: 55;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--text);
+  color: var(--bg);
+  font-family: var(--font-ui);
+  font-size: var(--fs-sm);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.dial-tip[hidden] {
+  display: none;
+}
+
 .dial {
   overflow: visible;
 }

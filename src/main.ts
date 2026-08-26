@@ -428,6 +428,8 @@ app.innerHTML = `
 
       <div class="view-wrap" id="view-wrap"></div>
 
+      <div class="dial-tip" id="dial-tip" role="tooltip" hidden></div>
+
       <div class="overlay-key" id="overlay-key" hidden></div>
 
       <section class="readout" id="readout" aria-live="polite">
@@ -889,6 +891,41 @@ function wireEvents(): void {
   $('#view-dial').addEventListener('click', () => setView('dial'));
   $('#view-map').addEventListener('click', () => setView('map'));
   $('#view-list').addEventListener('click', () => setView('list'));
+
+  // Planeten-Tooltip: der Name steht nicht mehr fest am Ring (überlagerte
+  // Himmelsrichtungen/andere Marker), sondern erscheint nur bei Hover/Tap.
+  // Delegation auf #view-wrap, weil das SVG bei jedem Tick neu aufgebaut wird.
+  const dialTip = $('#dial-tip');
+  let tipHideTimer: number | undefined;
+  const showTip = (target: Element): void => {
+    const name = target.getAttribute('data-name');
+    if (!name) return;
+    const rect = target.getBoundingClientRect();
+    dialTip.textContent = name;
+    dialTip.style.left = `${rect.left + rect.width / 2}px`;
+    dialTip.style.top = `${rect.top}px`;
+    dialTip.hidden = false;
+  };
+  const hideTip = (): void => {
+    dialTip.hidden = true;
+  };
+  const viewWrap = $('#view-wrap');
+  viewWrap.addEventListener('mouseover', (e) => {
+    const planet = (e.target as Element).closest('.dial__planet');
+    if (planet) showTip(planet);
+  });
+  viewWrap.addEventListener('mouseout', (e) => {
+    if ((e.target as Element).closest('.dial__planet')) hideTip();
+  });
+  viewWrap.addEventListener('click', (e) => {
+    const planet = (e.target as Element).closest('.dial__planet');
+    if (!planet) return;
+    e.stopPropagation();
+    window.clearTimeout(tipHideTimer);
+    showTip(planet);
+    tipHideTimer = window.setTimeout(hideTip, 2500);
+  });
+  document.addEventListener('click', hideTip);
 
   // Burger-Menü + Drawer (§11)
   $('#burger').addEventListener('click', openDrawer);

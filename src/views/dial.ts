@@ -255,39 +255,24 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
   }
 
   // Planeten (nur wenn der Layer aktiv ist, §7.4): Größe nach Helligkeit,
-  // eigene Farbe, Name — sonst bleibt der Ebenen-Schalter ohne sichtbare Wirkung.
-  // Die Namen werden gesammelt und erst nach Sonne/Mond gezeichnet (siehe unten),
-  // damit deren Marker nie über einem Planetennamen liegen.
-  const planetLabels: SVGElement[] = [];
+  // eigene Farbe. Der Name steht nicht mehr dauerhaft am Ring (überlagerte
+  // sich mit Himmelsrichtungen und anderen Markern), sondern nur als Tooltip:
+  // natives <title> für Maus-Hover, data-name für den Touch-Tooltip in main.ts.
   for (const p of objects.filter((o) => o.kind === 'planet')) {
     if (p.horizontal.elevation <= -0.833) continue;
     const [px, py] = polar(R_COMPASS, p.horizontal.azimuth);
-    svg.appendChild(
-      el('circle', {
-        cx: px,
-        cy: py,
-        r: planetRadius(p.magnitude),
-        fill: PLANET_COLOR[p.id] ?? palette.secondary,
-      }),
-    );
-    // Name nach innen versetzt, damit er die Himmelsrichtungen am Ring nicht überschreibt.
-    // Halo (Textkontur in Hintergrundfarbe) hält den Namen lesbar, egal welche
-    // Ring-/Overlay-Farbe gerade darunterliegt (§11: variabler Untergrund).
-    const [lx, ly] = polar(R_COMPASS - 13, p.horizontal.azimuth);
-    const label = el('text', {
-      x: lx,
-      y: ly,
-      fill: palette.text,
-      stroke: palette.bg,
-      'stroke-width': 3,
-      'paint-order': 'stroke fill',
-      'stroke-linejoin': 'round',
-      'font-size': 11,
-      'text-anchor': 'middle',
-      'dominant-baseline': 'central',
+    const dot = el('circle', {
+      cx: px,
+      cy: py,
+      r: planetRadius(p.magnitude),
+      fill: PLANET_COLOR[p.id] ?? palette.secondary,
+      class: 'dial__planet',
+      'data-name': t(p.nameKey),
     });
-    label.textContent = t(p.nameKey);
-    planetLabels.push(label);
+    const title = el('title', {});
+    title.textContent = t(p.nameKey);
+    dot.appendChild(title);
+    svg.appendChild(dot);
   }
 
   const sun = objects.find((o) => o.kind === 'sun');
@@ -326,10 +311,6 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
       svg.appendChild(g);
     }
   }
-
-  // Planetennamen zuletzt: Sonne/Mond können denselben Azimut-Bereich treffen,
-  // die Namen müssen trotzdem lesbar obenauf bleiben.
-  for (const label of planetLabels) svg.appendChild(label);
 
   // --- Innerer Ring: persönlicher Rhythmus (§26.4) ------------------------
   if (state.chrono) {
