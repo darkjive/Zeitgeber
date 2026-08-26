@@ -2302,6 +2302,7 @@ body {
     min-height: 0;
     max-height: 100%;
     overflow-y: auto;
+    padding-right: 10px;
   }
 
   :root[data-desktop-layout='columns'] .side--left {
