@@ -383,28 +383,31 @@ app.innerHTML = `
 
     <main class="stage">
       <header class="locbar">
-        <button class="loc" id="loc-btn">
-          <span class="loc__pin">📍</span>
-          <span id="loc-label">–</span>
-        </button>
+        <div class="locbar__row">
+          <button class="loc locbar__cell" id="loc-btn">
+            <span class="locbar__k loc__pin">📍</span>
+            <span class="locbar__v" id="loc-label">–</span>
+          </button>
+
+          <div class="locbar__cell" id="weather" hidden>
+            <span class="locbar__k">${icon('eye')}<span class="sr-only" data-i18n="weather.title"></span></span>
+            <span class="locbar__v" id="weather-badge">–</span>
+            <span class="locbar__sub" id="weather-sub"></span>
+          </div>
+
+          <div class="locbar__cell" id="weather-now" hidden>
+            <span class="locbar__k" id="weather-now-icon"></span>
+            <span class="locbar__v" id="weather-now-temp">–</span>
+            <span class="locbar__sub" id="weather-now-label"></span>
+          </div>
+        </div>
+
         <form class="loc-search" id="loc-search" hidden>
           <input id="loc-input" type="text" autocomplete="off" />
           <button class="btn btn--primary" type="submit" data-i18n="loc.manual"></button>
         </form>
         <p class="loc__msg" id="loc-msg" hidden></p>
       </header>
-
-      <div class="weather" id="weather" hidden>
-        <span class="weather__k">${icon('eye')}<span class="sr-only" data-i18n="weather.title"></span></span>
-        <span class="weather__badge" id="weather-badge">–</span>
-        <span class="weather__sub" id="weather-sub"></span>
-      </div>
-
-      <div class="weather-now" id="weather-now" hidden>
-        <span class="weather-now__icon" id="weather-now-icon"></span>
-        <span class="weather-now__temp" id="weather-now-temp">–</span>
-        <span class="weather-now__label" id="weather-now-label"></span>
-      </div>
 
       <div class="view-wrap" id="view-wrap"></div>
 

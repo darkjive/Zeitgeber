@@ -178,7 +178,7 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
     const [x1, y1] = polar(R_TIME_OUT - 10, a);
     ticks.appendChild(el('line', { x1: x0, y1: y0, x2: x1, y2: y1, stroke: palette.textDim, 'stroke-width': 1 }));
     if (h % 6 === 0) {
-      const [lx, ly] = polar(R_TIME_OUT + 14, a);
+      const [lx, ly] = polar(R_TIME_OUT + 20, a);
       const label = el('text', {
         x: lx,
         y: ly,
@@ -232,7 +232,7 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
     const a = hourToAngle(solarNoonHour);
     const [sx, sy] = polar((R_TIME_OUT + R_TIME_IN) / 2, a);
     svg.appendChild(el('circle', { cx: sx, cy: sy, r: 9, fill: palette.accent }));
-    svg.appendChild(el('circle', { cx: sx, cy: sy, r: 9, fill: 'none', stroke: palette.bg, 'stroke-width': 2 }));
+    svg.appendChild(el('circle', { cx: sx, cy: sy, r: 9, fill: 'none', stroke: palette.bg, 'stroke-width': 1 }));
     // dünne Linie von 12:00-Position zum Marker verdeutlicht die Abweichung
     const [nx, ny] = polar((R_TIME_OUT + R_TIME_IN) / 2, hourToAngle(12));
     svg.appendChild(el('circle', { cx: nx, cy: ny, r: 3, fill: palette.textDim }));
@@ -241,7 +241,7 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
   // --- Kompassring innen: Sonne & Mond an ihrer Azimut-Position -----------
   svg.appendChild(el('circle', { cx: C, cy: C, r: R_COMPASS, fill: 'none', stroke: palette.textDim, 'stroke-width': 1, 'stroke-dasharray': '2 4' }));
   for (const [dir, ang] of [['N', 0], ['O', 90], ['S', 180], ['W', 270]] as const) {
-    const [dx, dy] = polar(R_COMPASS + 0, ang);
+    const [dx, dy] = polar(R_COMPASS + 14, ang);
     const label = el('text', {
       x: dx,
       y: dy,
@@ -253,6 +253,26 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
     label.textContent = dir;
     svg.appendChild(label);
   }
+
+  // --- Analoge Stunden-/Minuten-/Sekundenzeiger ---------------------------
+  // Klassische 12-h-Uhr-Geometrie (0 = oben, im Uhrzeigersinn) als
+  // vertrauter Lesehilfe-Layer — bewusst blass, damit Sonnenstand und
+  // Zonenring optisch führend bleiben. Vor Sonne/Mond gezeichnet, damit
+  // deren Marker im Überlappungsfall darüberliegen.
+  const nowHour = ((time.getTime() + tz * 60_000) / 3_600_000 % 24 + 24) % 24;
+  const minuteOfHour = (nowHour - Math.floor(nowHour)) * 60;
+  const secondOfMinute = (minuteOfHour - Math.floor(minuteOfHour)) * 60;
+  const hourAngle = (nowHour % 12) * 30;
+  const minuteAngle = minuteOfHour * 6;
+  const secondAngle = secondOfMinute * 6;
+  const hands = el('g', { opacity: 0.32 });
+  const [hhx, hhy] = polar(65, hourAngle);
+  hands.appendChild(el('line', { x1: C, y1: C, x2: hhx, y2: hhy, stroke: palette.text, 'stroke-width': 3, 'stroke-linecap': 'round' }));
+  const [mhx, mhy] = polar(100, minuteAngle);
+  hands.appendChild(el('line', { x1: C, y1: C, x2: mhx, y2: mhy, stroke: palette.text, 'stroke-width': 2, 'stroke-linecap': 'round' }));
+  const [shx, shy] = polar(128, secondAngle);
+  hands.appendChild(el('line', { x1: C, y1: C, x2: shx, y2: shy, stroke: palette.accent, 'stroke-width': 1, 'stroke-linecap': 'round' }));
+  svg.appendChild(hands);
 
   // Planeten (nur wenn der Layer aktiv ist, §7.4): Größe nach Helligkeit,
   // eigene Farbe. Der Name steht nicht mehr dauerhaft am Ring (überlagerte
@@ -342,7 +362,6 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
   }
 
   // --- Zeiger auf die aktuelle gesetzliche Zeit ---------------------------
-  const nowHour = ((time.getTime() + tz * 60_000) / 3_600_000 % 24 + 24) % 24;
   const [hx, hy] = polar(R_TIME_OUT - 4, hourToAngle(nowHour));
   svg.appendChild(el('circle', { cx: C, cy: C, r: 4, fill: palette.text }));
   svg.appendChild(el('line', { x1: C, y1: C, x2: hx, y2: hy, stroke: palette.text, 'stroke-width': 2.5, 'stroke-linecap': 'round' }));

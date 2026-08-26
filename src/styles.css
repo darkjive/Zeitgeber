@@ -27,6 +27,29 @@
   scrollbar-color: color-mix(in srgb, var(--text-dim) 45%, transparent) transparent;
 }
 
+/* Chrome/WebKit ignoriert `scrollbar-width: thin` nur teilweise — eigene
+   Balkenbreite plus transparenter Rahmen um den Thumb schafft den Abstand
+   zum Content, den Firefox über `thin` schon automatisch bekommt. */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--text-dim) 45%, transparent);
+  background-clip: padding-box;
+  border: 2px solid transparent;
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in srgb, var(--text-dim) 65%, transparent);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -478,11 +501,14 @@ body {
 }
 
 .t-input {
+  display: inline-flex;
+  align-items: center;
+  height: var(--ctrl-h);
   border: 1px solid color-mix(in srgb, var(--text-dim) 45%, transparent);
   background: var(--surface);
   color: var(--text);
   border-radius: 999px;
-  padding: 6px 12px;
+  padding: 0 12px;
   font-family: var(--font-mono);
   font-size: var(--fs-xs);
   color-scheme: light dark;
@@ -540,67 +566,6 @@ body {
   color: var(--text-dim);
   padding: 32px 0;
   font-size: var(--fs-base);
-}
-
-/* Wetter / Beobachtungseignung (§28) */
-.weather {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  font-size: var(--fs-sm);
-}
-
-.weather__k {
-  display: inline-flex;
-  color: var(--text-dim);
-  font-size: var(--fs-md);
-}
-
-.weather__badge {
-  font-weight: 600;
-  padding: 2px 10px;
-  border-radius: 999px;
-}
-
-.weather__badge[data-rating='good'] {
-  background: color-mix(in srgb, #4caf7d 30%, transparent);
-}
-
-.weather__badge[data-rating='fair'] {
-  background: color-mix(in srgb, #d8a24a 30%, transparent);
-}
-
-.weather__badge[data-rating='poor'] {
-  background: color-mix(in srgb, var(--text-dim) 25%, transparent);
-}
-
-.weather__sub {
-  color: var(--text-dim);
-}
-
-/* Aktuelles Wetter — Icon, Temperatur, Kurzlabel (Open-Meteo weather_code) */
-.weather-now {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-size: var(--fs-sm);
-}
-
-.weather-now__icon {
-  display: inline-flex;
-  color: var(--accent);
-  font-size: var(--fs-lg);
-}
-
-.weather-now__temp {
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-
-.weather-now__label {
-  color: var(--text-dim);
 }
 
 /* Zivilschutz-Warnungen (§5, §10, §38.1) */
@@ -681,7 +646,7 @@ body {
 .offset {
   margin: 10px 0 0;
   font-size: var(--fs-base);
-  font-weight: 500;
+  font-weight: 400;
   max-width: 34ch;
   margin-inline: auto;
 }
@@ -727,23 +692,57 @@ body {
   color: var(--text-dim);
 }
 
-/* Location bar — zentriert über dem Zifferblatt. */
+/* Location bar — Standort/Sicht/Wetter als eine Zeile über dem Zifferblatt,
+   im selben Spalten-Muster wie die Kennwerte-Zeile (.sky) darunter. */
 .locbar {
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 10px;
 }
 
-.loc {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+.locbar__row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.locbar__cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
   background: transparent;
   border: none;
   color: var(--text);
   font-size: var(--fs-base);
+  cursor: default;
+}
+
+.loc.locbar__cell {
   cursor: pointer;
+}
+
+.locbar__k {
+  display: inline-flex;
+  color: var(--text-dim);
+  font-size: var(--fs-md);
+}
+
+.locbar__v {
+  font-family: var(--font-mono);
+  font-size: var(--fs-md);
+}
+
+.locbar__sub {
+  font-size: var(--fs-xs);
+  color: var(--text-dim);
+}
+
+.locbar__v[data-rating='good'] {
+  color: #4caf7d;
+}
+
+.locbar__v[data-rating='fair'] {
+  color: #d8a24a;
 }
 
 .loc__pin {
@@ -755,10 +754,11 @@ body {
   gap: 8px;
   width: 100%;
   max-width: 320px;
+  margin-inline: auto;
 }
 
 .loc-search[hidden],
-.weather[hidden] {
+.locbar__cell[hidden] {
   display: none;
 }
 
@@ -779,13 +779,22 @@ body {
   text-align: center;
 }
 
-/* Angenommener Ort: als Handlungsaufforderung erkennbar, nicht als Angabe. */
+/* Angenommener Ort: als Handlungsaufforderung erkennbar, nicht als Angabe —
+   fällt aus dem Spalten-Raster in eine eigenständige, mittig sitzende Pille. */
 .loc.is-guess {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  align-self: center;
   height: var(--ctrl-h);
   border: 1px dashed color-mix(in srgb, var(--accent) 60%, transparent);
   border-radius: 999px;
   padding: 0 12px;
   color: var(--accent);
+}
+
+.loc.is-guess .locbar__k {
+  color: inherit;
 }
 
 /* Onboarding */
@@ -1216,8 +1225,8 @@ body {
 }
 
 .outdoor__hero-v {
-  font-size: var(--fs-lg);
-  font-weight: 600;
+  font-size: var(--fs-md);
+  font-weight: 400;
   color: var(--text);
 }
 
@@ -2069,6 +2078,9 @@ body {
 
 /* Δ-Feld für den Versatz (neues Element, README-Schritt 5) */
 .delta {
+  display: inline-flex;
+  align-items: center;
+  height: var(--ctrl-h);
   font-family: var(--font-mono);
   font-size: var(--fs-xs);
   letter-spacing: 0.1em;
@@ -2076,7 +2088,7 @@ body {
   color: var(--accent);
   border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);
   border-radius: var(--radius);
-  padding: 5px 10px;
+  padding: 0 10px;
 }
 
 .offset {
@@ -2135,30 +2147,44 @@ body {
   font-weight: 300;
 }
 
-/* 7 — Wetter / Beobachtung ───────────────────────────────────────────────── */
+/* 7 — Standort / Sicht / Wetter als gerissene Datenzeile ─────────────────── */
+/* Dasselbe Spalten-Muster wie die Kennwerte-Zeile (.sky) unter dem
+   Zifferblatt (§6): Icon, große mono Kennzahl, gedämpfter Subtext, dünne
+   Trennlinien zwischen den Zellen. */
 
-.weather-now {
-  justify-content: flex-start;
-  gap: 10px;
+.locbar__row {
+  border-top: 1px solid var(--hair);
+  border-bottom: 1px solid var(--hair);
 }
 
-.weather {
-  justify-content: flex-start;
-  gap: 12px;
+.locbar__cell {
+  gap: 6px;
+  padding: 18px 20px;
 }
 
-.weather__k {
+.locbar__cell:first-child {
+  padding-left: 0;
+}
+
+.locbar__cell:last-child {
+  padding-right: 0;
+}
+
+.locbar__cell + .locbar__cell {
+  border-left: 1px solid var(--hair);
+}
+
+.locbar__k {
   font-size: var(--fs-md);
 }
 
-.weather__badge {
-  font-family: var(--font-mono);
-  font-size: var(--fs-xs);
-  font-weight: 400;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  border-radius: var(--radius);
-  padding: 4px 10px;
+.locbar__v {
+  font-size: var(--fs-xl);
+  font-weight: 300;
+}
+
+.locbar__v[data-rating='poor'] {
+  color: var(--text-dim);
 }
 
 /* 7b — Info-Karten (Dauer-Karten der eingeschalteten Info-Module, §7.4) ──── */
@@ -2202,21 +2228,17 @@ body {
 
 /* 8 — Standort ───────────────────────────────────────────────────────────── */
 
-.locbar {
-  align-items: center;
-  gap: 10px;
-}
-
-.loc {
-  font-family: var(--font-mono);
-  font-size: var(--fs-xs);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
 .loc.is-guess {
   border-radius: var(--radius);
   padding: 0 12px;
+}
+
+.loc.is-guess .locbar__v {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .loc-search {
