@@ -256,6 +256,9 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
 
   // Planeten (nur wenn der Layer aktiv ist, §7.4): Größe nach Helligkeit,
   // eigene Farbe, Name — sonst bleibt der Ebenen-Schalter ohne sichtbare Wirkung.
+  // Die Namen werden gesammelt und erst nach Sonne/Mond gezeichnet (siehe unten),
+  // damit deren Marker nie über einem Planetennamen liegen.
+  const planetLabels: SVGElement[] = [];
   for (const p of objects.filter((o) => o.kind === 'planet')) {
     if (p.horizontal.elevation <= -0.833) continue;
     const [px, py] = polar(R_COMPASS, p.horizontal.azimuth);
@@ -284,7 +287,7 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
       'dominant-baseline': 'central',
     });
     label.textContent = t(p.nameKey);
-    svg.appendChild(label);
+    planetLabels.push(label);
   }
 
   const sun = objects.find((o) => o.kind === 'sun');
@@ -294,7 +297,26 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
     const above = obj.horizontal.elevation > -0.833;
     const [ox, oy] = polar(R_COMPASS, obj.horizontal.azimuth);
     if (obj.kind === 'sun') {
-      svg.appendChild(el('circle', { cx: ox, cy: oy, r: above ? 11 : 7, fill: palette.accent, opacity: above ? 1 : 0.35 }));
+      // Warmes Gold statt des Rot-Akzents (der bei Nacht sogar türkis wäre) —
+      // dieselbe Farbe wie der Tagesring, dazu kurze Strahlen für den Sonnen-Look.
+      const r = above ? 9 : 6;
+      const g = el('g', { opacity: above ? 1 : 0.35 });
+      for (let i = 0; i < 8; i++) {
+        const rad = (i / 8) * 2 * Math.PI;
+        g.appendChild(
+          el('line', {
+            x1: ox + Math.cos(rad) * (r + 3),
+            y1: oy + Math.sin(rad) * (r + 3),
+            x2: ox + Math.cos(rad) * (r + 7),
+            y2: oy + Math.sin(rad) * (r + 7),
+            stroke: palette.ringDay,
+            'stroke-width': 2,
+            'stroke-linecap': 'round',
+          }),
+        );
+      }
+      g.appendChild(el('circle', { cx: ox, cy: oy, r, fill: palette.ringDay }));
+      svg.appendChild(g);
     } else {
       const g = el('g', { opacity: above ? 1 : 0.3 });
       g.appendChild(el('circle', { cx: ox, cy: oy, r: 8, fill: palette.secondary }));
@@ -304,6 +326,10 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
       svg.appendChild(g);
     }
   }
+
+  // Planetennamen zuletzt: Sonne/Mond können denselben Azimut-Bereich treffen,
+  // die Namen müssen trotzdem lesbar obenauf bleiben.
+  for (const label of planetLabels) svg.appendChild(label);
 
   // --- Innerer Ring: persönlicher Rhythmus (§26.4) ------------------------
   if (state.chrono) {
