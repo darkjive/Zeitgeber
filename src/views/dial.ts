@@ -241,7 +241,7 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
   // --- Kompassring innen: Sonne & Mond an ihrer Azimut-Position -----------
   svg.appendChild(el('circle', { cx: C, cy: C, r: R_COMPASS, fill: 'none', stroke: palette.textDim, 'stroke-width': 1, 'stroke-dasharray': '2 4' }));
   for (const [dir, ang] of [['N', 0], ['O', 90], ['S', 180], ['W', 270]] as const) {
-    const [dx, dy] = polar(R_COMPASS + 14, ang);
+    const [dx, dy] = polar(R_COMPASS - 14, ang);
     const label = el('text', {
       x: dx,
       y: dy,

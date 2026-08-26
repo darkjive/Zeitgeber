@@ -2368,7 +2368,11 @@ body {
   }
 
   .sky__v {
-    font-size: var(--fs-lg);
+    font-size: var(--fs-md);
+  }
+
+  .locbar__v {
+    font-size: var(--fs-md);
   }
 
   .loc-search {
