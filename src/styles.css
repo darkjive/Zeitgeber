@@ -1012,6 +1012,7 @@ body {
 .prayer__list {
   list-style: none;
   margin: 0 0 12px;
+  margin-inline: -4px;
   padding: 0;
 }
 
@@ -1196,6 +1197,7 @@ body {
 
 .outdoor__block {
   margin: 0 0 12px;
+  margin-inline: -4px;
 }
 
 .outdoor__block div {
@@ -1290,6 +1292,7 @@ body {
 .wheel__list {
   list-style: none;
   margin: 0 0 14px;
+  margin-inline: -8px;
   padding: 0;
 }
 
@@ -1459,6 +1462,12 @@ body {
 .mrow:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: -2px;
+}
+
+/* Innerhalb von .onboard__card direkt platziert (kein .mlist-Wrapper) —
+   Innenabstand kompensieren, damit Label/Switch mit dem übrigen Karteninhalt fluchten. */
+.mrow--pin {
+  margin-inline: -10px;
 }
 
 .mrow__ic {
@@ -1636,6 +1645,7 @@ body {
 
 .comfort__rows {
   margin: 0;
+  margin-inline: -4px;
 }
 
 .comfort__rows div {
@@ -1667,6 +1677,7 @@ body {
 .meteor__list {
   list-style: none;
   margin: 0 0 8px;
+  margin-inline: -8px;
   padding: 0;
 }
 
