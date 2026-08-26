@@ -11,6 +11,7 @@ import { moonInfo, sunPosition } from '../core/astro-engine';
 import { usableLight } from '../core/outdoor';
 import { visibleBrightPlanet } from '../core/kids';
 import { azimuthDirKey, type Translator } from '../i18n';
+import { icon } from '../icons';
 
 interface KidQuestion {
   q: string;
@@ -79,7 +80,7 @@ export function openKids(location: GeoLocation, date: Date, t: Translator): void
   const card = document.createElement('div');
   card.className = 'onboard__card kids__card';
   card.innerHTML = `
-    <div class="kids__glyph">${sunUpNow ? '☀️' : '🌙'}</div>
+    <div class="kids__glyph">${icon(sunUpNow ? 'sun' : 'moon')}</div>
     <p class="kids__q" id="kids-q"></p>
     <p class="kids__a" id="kids-a"></p>
     <p class="kids__why" id="kids-why" hidden></p>
@@ -87,8 +88,8 @@ export function openKids(location: GeoLocation, date: Date, t: Translator): void
       <button class="btn btn--ghost" id="kids-why-btn"></button>
       <button class="btn btn--primary" id="kids-next"></button>
     </div>
-    <p class="kids__task">🔭 ${task}</p>
-    <button class="kids__close" id="kids-close" aria-label="${t('kids.close')}">✕</button>
+    <p class="kids__task"><span class="kids__task-ic" aria-hidden="true">${icon('telescope')}</span> ${task}</p>
+    <button class="kids__close" id="kids-close" aria-label="${t('kids.close')}">${icon('x')}</button>
   `;
   overlay.appendChild(card);
   document.body.appendChild(overlay);

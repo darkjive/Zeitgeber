@@ -399,6 +399,8 @@ const de: Dict = {
   'onboard.2.body': 'Die Sonne steht je nach Ort und Datum deutlich vor oder nach 12:00 am höchsten. Genau das zeigt diese Uhr.',
   'onboard.3.title': 'Dein Standort bestimmt dein Zifferblatt',
   'onboard.3.body': 'Aus deinem Ort berechnen wir Auf- und Untergang, Dämmerung und den Sonnenzeit-Versatz — alles lokal auf dem Gerät.',
+  'onboard.location.pending': 'Standort wird ermittelt …',
+  'onboard.location.granted': 'Standort erkannt',
   'onboard.4.title': 'Was du sehen wirst',
   'onboard.4.body': 'Sonne und Mond, die Dämmerungszonen als Farbringe und den Versatz zwischen deiner Uhr und der Sonne.',
 
@@ -810,6 +812,8 @@ const en: Dict = {
   'onboard.2.body': 'Depending on place and date, the sun peaks well before or after 12:00. That is exactly what this clock reveals.',
   'onboard.3.title': 'Your location shapes your dial',
   'onboard.3.body': 'From your place we compute sunrise, sunset, twilight and the solar-time offset — all locally on the device.',
+  'onboard.location.pending': 'Locating …',
+  'onboard.location.granted': 'Location detected',
   'onboard.4.title': 'What you will see',
   'onboard.4.body': 'Sun and moon, the twilight zones as coloured rings, and the offset between your clock and the sun.',
 

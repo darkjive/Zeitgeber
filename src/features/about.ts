@@ -5,6 +5,7 @@
 
 import { APP_VERSION, support } from '../config/support';
 import type { Translator } from '../i18n';
+import { icon } from '../icons';
 
 export function openAbout(t: Translator): void {
   const overlay = document.createElement('div');
@@ -17,7 +18,7 @@ export function openAbout(t: Translator): void {
   const card = document.createElement('div');
   card.className = 'onboard__card about';
   card.innerHTML = `
-    <div class="about__mark">☀</div>
+    <div class="about__mark">${icon('sun')}</div>
     <h2 class="onboard__title">${t('app.title')}</h2>
     <p class="about__tag">${t('app.tagline')}</p>
     <p class="about__body">${t('about.opensource')}</p>

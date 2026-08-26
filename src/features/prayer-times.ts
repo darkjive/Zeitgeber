@@ -10,6 +10,7 @@
 import type { GeoLocation } from '../core/astro-engine';
 import { METHODS, prayerTimes, type AsrMadhab } from '../core/prayer-times';
 import type { Translator } from '../i18n';
+import { icon } from '../icons';
 
 const fmt = (d: Date | null): string =>
   d ? new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(d) : '—';
@@ -26,6 +27,7 @@ export function openPrayerTimes(location: GeoLocation, date: Date, t: Translator
   const card = document.createElement('div');
   card.className = 'onboard__card prayer';
   card.innerHTML = `
+    <div class="onboard__glyph" style="color:#8FA6D8">${icon('moon-star')}</div>
     <h2 class="onboard__title">${t('prayer.title')}</h2>
     <div class="prayer__controls">
       <label class="prayer__field">

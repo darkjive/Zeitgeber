@@ -6,15 +6,16 @@
 
 import type { CelestialObject } from '../core/types';
 import { azimuthDirKey, type Translator } from '../i18n';
+import { icon, type IconName } from '../icons';
 
-const KIND_GLYPH: Record<string, string> = {
-  sun: '☀',
-  moon: '🌙',
-  planet: '🪐',
-  star: '★',
-  dso: '✦',
-  satellite: '🛰',
-  aircraft: '✈',
+const KIND_ICON: Record<string, IconName> = {
+  sun: 'sun',
+  moon: 'moon',
+  planet: 'orbit',
+  star: 'star',
+  dso: 'sparkles',
+  satellite: 'satellite',
+  aircraft: 'plane',
 };
 
 export function renderObjectList(objects: CelestialObject[], t: Translator): HTMLElement {
@@ -39,7 +40,7 @@ export function renderObjectList(objects: CelestialObject[], t: Translator): HTM
 
     const glyph = document.createElement('span');
     glyph.className = 'objlist__glyph';
-    glyph.textContent = KIND_GLYPH[o.kind] ?? '•';
+    glyph.innerHTML = KIND_ICON[o.kind] ? icon(KIND_ICON[o.kind]) : '•';
 
     const name = document.createElement('span');
     name.className = 'objlist__name';

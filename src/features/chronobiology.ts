@@ -70,6 +70,7 @@ export function openChronobiology(
   const card = document.createElement('div');
   card.className = 'onboard__card chrono';
   card.innerHTML = `
+    <div class="onboard__glyph" style="color:#8D6FE7">${icon('moon')}</div>
     <h2 class="onboard__title">${t('chrono.title')}</h2>
     <p class="chrono__intro">${t('chrono.intro')}</p>
     <div class="chrono__grid">

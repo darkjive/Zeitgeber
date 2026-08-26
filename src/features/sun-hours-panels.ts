@@ -7,6 +7,7 @@
 import type { GeoLocation } from '../core/astro-engine';
 import { directSunHours, seasonSunHours } from '../core/sun-hours';
 import { azimuthDirKey, type Translator } from '../i18n';
+import { icon, type IconName } from '../icons';
 
 function fmtH(min: number, t: Translator): string {
   const h = Math.floor(min / 60);
@@ -14,14 +15,19 @@ function fmtH(min: number, t: Translator): string {
   return h === 0 ? `${m} ${t('unit.min')}` : `${h} ${t('unit.hour')} ${m} ${t('unit.min')}`;
 }
 
-function shell(titleKey: string, t: Translator): { overlay: HTMLElement; body: HTMLElement } {
+function shell(
+  titleKey: string,
+  t: Translator,
+  glyph: { icon: IconName; color: string },
+): { overlay: HTMLElement; body: HTMLElement } {
   const overlay = document.createElement('div');
   overlay.className = 'onboard onboard--sheet';
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-modal', 'true');
   const card = document.createElement('div');
   card.className = 'onboard__card sunhours';
-  card.innerHTML = `<h2 class="onboard__title">${t(titleKey)}</h2><div class="sunhours__body"></div>
+  card.innerHTML = `<div class="onboard__glyph" style="color:${glyph.color}">${icon(glyph.icon)}</div>
+    <h2 class="onboard__title">${t(titleKey)}</h2><div class="sunhours__body"></div>
     <div class="onboard__actions"><span></span><button class="btn btn--primary" data-close>${t('sunhours.close')}</button></div>`;
   overlay.appendChild(card);
   document.body.appendChild(overlay);
@@ -35,7 +41,7 @@ function shell(titleKey: string, t: Translator): { overlay: HTMLElement; body: H
 /** §31.3 — Fassadenbesonnung: „Wohnung mit Nachmittagssonne?" wird prüfbar. */
 export function openArchitecture(location: GeoLocation, date: Date, t: Translator): void {
   let facade = 180; // Süd
-  const { body } = shell('arch.title', t);
+  const { body } = shell('arch.title', t, { icon: 'building-2', color: '#7C93B0' });
   body.innerHTML = `
     <label class="solar__field">
       <span>${t('arch.facade')}: <b id="ar-val"></b></span>
@@ -70,7 +76,7 @@ export function openArchitecture(location: GeoLocation, date: Date, t: Translato
 
 /** §31.2 — Garten: Sonnenstunden am Standort inkl. Verschattung. */
 export function openGarden(location: GeoLocation, date: Date, t: Translator): void {
-  const { body } = shell('garden.title', t);
+  const { body } = shell('garden.title', t, { icon: 'sprout', color: '#5FA968' });
   body.innerHTML = `
     <label class="solar__field">
       <span>${t('garden.direction')}: <b id="ga-dirval"></b></span>

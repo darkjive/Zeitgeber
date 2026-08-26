@@ -9,6 +9,7 @@
 import type { GeoLocation } from '../core/astro-engine';
 import { FALLBACK_TLES, getTles, nextPass, satellitePosition, setTles, type Tle } from '../core/satellites';
 import type { Translator } from '../i18n';
+import { icon } from '../icons';
 
 const CELESTRAK = 'https://celestrak.org/NORAD/elements/gp.php?GROUP=stations&FORMAT=TLE';
 
@@ -83,7 +84,7 @@ export function renderSatCard(location: GeoLocation, date: Date, t: Translator):
       <span class="comfort__k">${t('sat.nextPass')}</span>
       ${passLine}
     </div>
-    ${ageWarn ? `<p class="solar__note">⚠︎ ${t('sat.stale', { days: String(Math.round(Math.abs(now!.tleAgeDays))) })}</p>` : ''}
+    ${ageWarn ? `<p class="solar__note solar__note--warn">${icon('triangle-alert')} ${t('sat.stale', { days: String(Math.round(Math.abs(now!.tleAgeDays))) })}</p>` : ''}
     <p class="solar__note">${t('sat.note')}</p>
   `;
 }

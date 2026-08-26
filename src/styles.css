@@ -718,7 +718,7 @@ body {
 }
 
 .loc.locbar__cell {
-  cursor: pointer;
+  cursor: text;
 }
 
 .locbar__k {
@@ -749,52 +749,64 @@ body {
   filter: grayscale(0.2);
 }
 
-.loc-search {
-  display: flex;
-  gap: 8px;
-  width: 100%;
-  max-width: 320px;
-  margin-inline: auto;
-}
-
-.loc-search[hidden],
 .locbar__cell[hidden] {
   display: none;
 }
 
-.loc-search input {
-  flex: 1;
-  padding: 8px 12px;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--text-dim) 45%, transparent);
-  background: var(--surface);
-  color: var(--text);
-  font-family: var(--font-ui);
-}
-
-.loc__msg {
-  font-size: var(--fs-xs);
-  color: var(--accent);
-  margin: 0;
-  text-align: center;
-}
-
-/* Angenommener Ort: als Handlungsaufforderung erkennbar, nicht als Angabe —
-   fällt aus dem Spalten-Raster in eine eigenständige, mittig sitzende Pille. */
-.loc.is-guess {
-  flex-direction: row;
-  align-items: center;
-  gap: 6px;
-  align-self: center;
-  height: var(--ctrl-h);
-  border: 1px dashed color-mix(in srgb, var(--accent) 60%, transparent);
-  border-radius: 999px;
-  padding: 0 12px;
-  color: var(--accent);
-}
-
-.loc.is-guess .locbar__k {
+/* Das Eingabefeld übernimmt die Optik von .locbar__v (Zelle §7) statt
+   nativer Input-Chrome — Standortanzeige und manuelle Suche sind dieselbe
+   Zeile, kein separates Formular mehr unterhalb der Datenzeile. */
+#loc-input {
+  appearance: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0;
+  width: 100%;
   color: inherit;
+}
+
+#loc-input::placeholder {
+  color: var(--text-dim);
+}
+
+#loc-input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Sucht-Button bricht bewusst in die zweite Zeile der Zelle um (§loc__field
+   wäre hier fehl am Platz — die Spalte ist zu schmal für Eingabefeld und
+   Knopf nebeneinander), bleibt aber innerhalb der Box statt eines eigenen
+   Formulars unter der Datenzeile. */
+.loc__submit {
+  align-self: flex-start;
+  margin-top: 2px;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: var(--radius);
+  border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+#loc-msg {
+  color: var(--accent);
+}
+
+/* Angenommener/fehlender Ort: Feld und Icon heben sich als
+   Handlungsaufforderung ab, bleiben aber in der Zelle statt in einer
+   eigenständigen Pille auszubrechen. */
+.loc.is-guess .locbar__k,
+.loc.is-guess #loc-input,
+.loc.is-guess #loc-input::placeholder {
+  color: var(--accent);
 }
 
 /* Onboarding */
@@ -872,6 +884,31 @@ body {
 
 .onboard__profile-glyph {
   font-size: var(--fs-lg);
+}
+
+.onboard__locate {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.onboard__locate svg {
+  margin-right: 6px;
+  vertical-align: -0.15em;
+}
+
+.onboard__locate[hidden] {
+  display: none;
+}
+
+.onboard__locate:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.onboard__locate-msg {
+  font-size: var(--fs-xs);
+  color: var(--accent);
+  margin: -4px 0 14px;
 }
 
 .onboard__dots {
@@ -1011,6 +1048,11 @@ body {
   line-height: 1.5;
   color: var(--text-dim);
   margin: 0 0 16px;
+}
+
+.solar__note--warn svg {
+  vertical-align: -0.15em;
+  margin-right: 2px;
 }
 
 /* Gebetszeiten-Panel (§32.1) */
@@ -1798,6 +1840,9 @@ body {
 }
 
 .kids__task {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: var(--fs-base);
   color: var(--text);
   background: color-mix(in srgb, var(--accent) 12%, transparent);
@@ -1806,12 +1851,20 @@ body {
   margin: 0;
 }
 
+.kids__task-ic {
+  display: inline-flex;
+  flex: none;
+}
+
 .kids__close {
   position: absolute;
   top: 12px;
   right: 12px;
   width: 32px;
   height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 50%;
   border: none;
   background: transparent;
@@ -1888,7 +1941,7 @@ body {
   --fs-xl: 28px;
   --fs-display: clamp(46px, 5.6vw, 88px);
 
-  /* Einheitliche Steuerelement-Höhe: .btn, .chip, .seg__btn, .iconbtn, .loc.is-guess. */
+  /* Einheitliche Steuerelement-Höhe: .btn, .chip, .seg__btn, .iconbtn. */
   --ctrl-h: 38px;
 }
 
@@ -1943,8 +1996,7 @@ body {
 
 .chip,
 .btn,
-.t-input,
-.loc-search input {
+.t-input {
   border-radius: var(--radius);
 }
 
@@ -2226,34 +2278,6 @@ body {
   color: var(--text-dim);
 }
 
-/* 8 — Standort ───────────────────────────────────────────────────────────── */
-
-.loc.is-guess {
-  border-radius: var(--radius);
-  padding: 0 12px;
-}
-
-.loc.is-guess .locbar__v {
-  font-family: var(--font-mono);
-  font-size: var(--fs-xs);
-  font-weight: 400;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.loc-search {
-  max-width: 360px;
-}
-
-.loc-search input {
-  border-color: var(--hair-strong);
-}
-
-.loc__msg {
-  text-align: center;
-  max-width: 44ch;
-}
-
 /* 9 — Breitbild-Layout: drei Spalten, Zifferblatt bleibt Mitte ───────────── */
 /* Feste, zentrierte Content-Breite (kein Ausufern auf die volle
    Fensterbreite). Module ordnen sich nach Themenspalte (§ InfoModuleDef.side
@@ -2374,9 +2398,5 @@ body {
 
   .locbar__v {
     font-size: var(--fs-md);
-  }
-
-  .loc-search {
-    width: 100%;
   }
 }

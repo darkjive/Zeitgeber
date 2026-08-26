@@ -10,6 +10,7 @@
 import type { GeoLocation } from '../core/astro-engine';
 import { seasonComparison, yieldSummary, type YieldSample } from '../core/solar-geometry';
 import { azimuthDirKey, type Translator } from '../i18n';
+import { icon } from '../icons';
 
 const fmtTime = (d: Date): string => new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(d);
 
@@ -25,6 +26,7 @@ export function openSolarYield(location: GeoLocation, date: Date, t: Translator)
   const card = document.createElement('div');
   card.className = 'onboard__card solar';
   card.innerHTML = `
+    <div class="onboard__glyph" style="color:#E0A93C">${icon('zap')}</div>
     <h2 class="onboard__title">${t('solar.title')}</h2>
     <div class="solar__controls">
       <label class="solar__field">

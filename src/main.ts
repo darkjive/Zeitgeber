@@ -73,8 +73,6 @@ import {
 let lang: Lang = detectLang();
 let t: Translator = createTranslator(lang);
 let location: StoredLocation = loadLocation() ?? DEFAULT_LOCATION;
-/** Ortssuche vom Nutzer aufgeklappt (nach fehlgeschlagenem GPS-Versuch). */
-let searchOpen = false;
 
 const bus = new ObjectBus();
 bus.register(sunProvider);
@@ -347,7 +345,7 @@ app.innerHTML = `
     <header class="topbar">
       <div class="topbar__row">
         <div class="brand">
-          <span class="brand__mark">☀</span>
+          <span class="brand__mark">${icon('sun')}</span>
           <div>
             <div class="brand__name" data-i18n="app.title"></div>
             <div class="brand__tag" data-i18n="app.tagline"></div>
@@ -384,10 +382,12 @@ app.innerHTML = `
     <main class="stage">
       <header class="locbar">
         <div class="locbar__row">
-          <button class="loc locbar__cell" id="loc-btn">
-            <span class="locbar__k loc__pin">📍</span>
-            <span class="locbar__v" id="loc-label">–</span>
-          </button>
+          <form class="locbar__cell loc" id="loc-search">
+            <span class="locbar__k loc__pin">${icon('map-pin')}</span>
+            <input class="locbar__v" id="loc-input" type="text" autocomplete="off" />
+            <button class="loc__submit" type="submit" data-i18n="loc.manual"></button>
+            <span class="locbar__sub" id="loc-msg" hidden></span>
+          </form>
 
           <div class="locbar__cell" id="weather" hidden>
             <span class="locbar__k">${icon('eye')}<span class="sr-only" data-i18n="weather.title"></span></span>
@@ -401,12 +401,6 @@ app.innerHTML = `
             <span class="locbar__sub" id="weather-now-label"></span>
           </div>
         </div>
-
-        <form class="loc-search" id="loc-search" hidden>
-          <input id="loc-input" type="text" autocomplete="off" />
-          <button class="btn btn--primary" type="submit" data-i18n="loc.manual"></button>
-        </form>
-        <p class="loc__msg" id="loc-msg" hidden></p>
       </header>
 
       <div class="view-wrap" id="view-wrap"></div>
@@ -822,22 +816,25 @@ function setLang(next: Lang): void {
 /**
  * Standortleiste. Ein bloss angenommener Ort wird sichtbar als solcher
  * ausgewiesen — sonst könnte der Nutzer nicht erkennen, ob die angezeigten
- * Zeiten überhaupt für ihn gelten.
+ * Zeiten überhaupt für ihn gelten. Das Eingabefeld dient zugleich als Anzeige
+ * und als manuelle Ortssuche (§10) — die GPS-Abfrage selbst läuft nur noch im
+ * Onboarding.
  */
 function renderLocbar(): void {
   const guessed = location.source === 'default';
-  $('#loc-label').textContent = guessed ? t('loc.unset') : placeLabel(location);
-  $('#loc-btn').classList.toggle('is-guess', guessed);
-  // Ohne verlässlichen Ort steht die Ortssuche sofort bereit — sonst führte der
-  // einzige Weg über den GPS-Knopf und dessen Zeitablauf (§10). Sobald ein Ort
-  // feststeht, schliesst sie sich wieder.
-  $('#loc-search').hidden = !(guessed || searchOpen);
+  const form = $('#loc-search');
+  form.classList.toggle('is-guess', guessed);
+  const input = $('#loc-input') as HTMLInputElement;
+  // Tippt der Nutzer gerade oder klickt gleich auf "Ort suchen", darf das
+  // Sekundentakt-Rerender den Eingabewert nicht überschreiben — sonst reißt
+  // ein Klick auf den Button (der den Fokus vom Feld nimmt) die Eingabe weg,
+  // bevor die Fehlermeldung überhaupt gelesen werden kann.
+  if (!form.contains(document.activeElement)) input.value = guessed ? '' : placeLabel(location);
 }
 
 /** Nur die Koordinaten wandern in den Zustand — der Name wird stets neu abgeleitet. */
 function setLocation(loc: GeoLocation, source: LocationSource): void {
   location = { latitude: loc.latitude, longitude: loc.longitude, source };
-  searchOpen = false; // Ort steht fest, die Suche darf zu.
   saveLocation(location);
   rerender();
   void refreshWeather(); // §28: Wetter am neuen Ort neu holen
@@ -988,28 +985,15 @@ function wireEvents(): void {
   const input = $('#loc-input') as HTMLInputElement;
   const msg = $('#loc-msg');
 
-  $('#loc-btn').addEventListener('click', async () => {
-    msg.hidden = true;
-    try {
-      const geo = await requestGeolocation();
-      setLocation(geo, 'gps');
-    } catch {
-      // §10: Rückfall auf manuelle Eingabe, Kernuhr läuft weiter.
-      searchOpen = true;
-      renderLocbar();
-      msg.hidden = false;
-      msg.textContent = t('loc.denied');
-      input.focus();
-    }
-  });
-
   search.addEventListener('submit', (e) => {
     e.preventDefault();
     const city = findCity(input.value);
     if (city) {
-      setLocation(city, 'manual');
       msg.hidden = true;
-      input.value = '';
+      setLocation(city, 'manual');
+      // Feld zeigt danach den aufgelösten Namen (§renderLocbar), nicht die Sucheingabe —
+      // egal ob per Enter (Fokus im Feld) oder Klick auf den Button (Fokus dort) abgeschickt.
+      (document.activeElement as HTMLElement | null)?.blur();
     } else {
       msg.hidden = false;
       msg.textContent = t('loc.notFound');
@@ -1061,7 +1045,7 @@ async function boot(): Promise<void> {
   initReminders({ getLocation: () => location, getTranslator: () => t, getLang: () => lang });
 
   if (!hasOnboarded()) {
-    applyOnboardProfile(await showOnboarding(t));
+    applyOnboardProfile(await showOnboarding(t, (geo) => setLocation(geo, 'gps')));
   }
 
   // Sekundentakt für den Zeiger; Ephemeriden nur bei Bedarf teuer (§8).
