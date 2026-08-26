@@ -285,7 +285,7 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
       // Warmes Gold statt des Rot-Akzents (der bei Nacht sogar türkis wäre) —
       // dieselbe Farbe wie der Tagesring, dazu kurze Strahlen für den Sonnen-Look.
       const r = above ? 9 : 6;
-      const g = el('g', { opacity: above ? 1 : 0.35 });
+      const g = el('g', { opacity: above ? 1 : 0.35, class: 'dial__planet', 'data-name': t('object.sun') });
       for (let i = 0; i < 8; i++) {
         const rad = (i / 8) * 2 * Math.PI;
         g.appendChild(
@@ -301,13 +301,19 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
         );
       }
       g.appendChild(el('circle', { cx: ox, cy: oy, r, fill: palette.ringDay }));
+      const title = el('title', {});
+      title.textContent = t('object.sun');
+      g.appendChild(title);
       svg.appendChild(g);
     } else {
-      const g = el('g', { opacity: above ? 1 : 0.3 });
+      const g = el('g', { opacity: above ? 1 : 0.3, class: 'dial__planet', 'data-name': t('object.moon') });
       g.appendChild(el('circle', { cx: ox, cy: oy, r: 8, fill: palette.secondary }));
       // Beleuchtungsgrad als Sichel andeuten
       const illum = (obj.metadata?.illumination as number) ?? 0.5;
       g.appendChild(el('circle', { cx: ox - (1 - illum) * 8, cy: oy, r: 8, fill: palette.surface, opacity: 0.55 }));
+      const title = el('title', {});
+      title.textContent = t('object.moon');
+      g.appendChild(title);
       svg.appendChild(g);
     }
   }
