@@ -2125,14 +2125,11 @@ body {
 .weather-now {
   justify-content: flex-start;
   gap: 10px;
-  padding-bottom: 14px;
 }
 
 .weather {
   justify-content: flex-start;
   gap: 12px;
-  border-bottom: 1px solid var(--hair);
-  padding-bottom: 18px;
 }
 
 .weather__k {
@@ -2191,11 +2188,8 @@ body {
 /* 8 — Standort ───────────────────────────────────────────────────────────── */
 
 .locbar {
-  align-items: flex-start;
-  align-self: stretch;
+  align-items: center;
   gap: 10px;
-  border-bottom: 1px solid var(--hair);
-  padding-bottom: 18px;
 }
 
 .loc {
@@ -2219,7 +2213,7 @@ body {
 }
 
 .loc__msg {
-  text-align: left;
+  text-align: center;
   max-width: 44ch;
 }
 
