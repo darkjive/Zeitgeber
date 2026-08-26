@@ -120,38 +120,19 @@ function setDialOverlay(id: OverlayId | null): void {
   rerender();
 }
 
-// Layout im Breitbild (ab 900px): gestapelt (wie mobil, nur zentriert) oder
-// zweispaltig (Zifferblatt links, Infos rechts). Persistiert, Default gestapelt
-// — so, wie es bisher immer war.
-type DesktopLayout = 'stacked' | 'columns';
-const DESKTOP_LAYOUT_KEY = 'zeitgeber.desktopLayout';
-
-const loadDesktopLayout = (): DesktopLayout => {
-  try {
-    return localStorage.getItem(DESKTOP_LAYOUT_KEY) === 'columns' ? 'columns' : 'stacked';
-  } catch {
-    return 'stacked';
-  }
-};
-
-let desktopLayout: DesktopLayout = loadDesktopLayout();
+// Layout: ab 900px automatisch zweispaltig (Zifferblatt Mitte, Module
+// links/rechts), darunter automatisch gestapelt wie mobil — kein manueller
+// Umschalter mehr.
+const DESKTOP_LAYOUT_QUERY = window.matchMedia('(min-width: 900px)');
 
 function applyDesktopLayout(): void {
-  document.documentElement.dataset.desktopLayout = desktopLayout;
-  $('#layout-toggle').classList.toggle('is-on', desktopLayout === 'columns');
-  const target = desktopLayout === 'columns' ? $('.topbar__mid') : $('.controls');
+  const columns = DESKTOP_LAYOUT_QUERY.matches;
+  document.documentElement.dataset.desktopLayout = columns ? 'columns' : 'stacked';
+  const target = columns ? $('.topbar__mid') : $('.controls');
   target.appendChild($('.seg'));
 }
 
-function toggleDesktopLayout(): void {
-  desktopLayout = desktopLayout === 'stacked' ? 'columns' : 'stacked';
-  try {
-    localStorage.setItem(DESKTOP_LAYOUT_KEY, desktopLayout);
-  } catch {
-    /* Layout-Wahl ist Komfort, kein Zustand, ohne den die Uhr scheitert. */
-  }
-  applyDesktopLayout();
-}
+DESKTOP_LAYOUT_QUERY.addEventListener('change', applyDesktopLayout);
 
 // --- Formatierung -----------------------------------------------------------
 
@@ -375,7 +356,7 @@ app.innerHTML = `
         <div class="topbar__mid"></div>
         <div class="topbar__actions">
           <button class="iconbtn iconbtn--warn" id="warn-badge" aria-label="Warnungen" hidden>${icon('triangle-alert')}</button>
-          <button class="iconbtn iconbtn--side" id="layout-toggle" aria-label="Desktop-Layout wechseln">${icon('columns-2')}</button>
+          <button class="chip" id="t-share" data-i18n="share.button"></button>
           <button class="iconbtn" id="burger" aria-label="Menü" aria-haspopup="dialog" aria-expanded="false">${icon('menu')}</button>
         </div>
       </div>
@@ -389,7 +370,6 @@ app.innerHTML = `
         </div>
         <input class="t-input" id="t-input" type="datetime-local" aria-label="Zeitpunkt" />
         <button class="chip" id="t-now" data-i18n="time.now"></button>
-        <button class="chip" id="t-share" data-i18n="share.button"></button>
       </div>
     </header>
 
@@ -513,7 +493,6 @@ function applyStaticI18n(): void {
   });
   $('#burger').setAttribute('aria-label', t('menu.open'));
   $('#drawer-close').setAttribute('aria-label', t('menu.close'));
-  $('#layout-toggle').setAttribute('aria-label', t('layout.toggle'));
   renderWarnBadge();
   const locInput = $('#loc-input') as HTMLInputElement;
   locInput.placeholder = t('loc.placeholder');
@@ -931,7 +910,6 @@ function wireEvents(): void {
   $('#burger').addEventListener('click', openDrawer);
   $('#drawer-close').addEventListener('click', closeDrawer);
   $('#drawer-scrim').addEventListener('click', closeDrawer);
-  $('#layout-toggle').addEventListener('click', toggleDesktopLayout);
   $('#warn-badge').addEventListener('click', () => {
     if (!enabledInfoModules.has('warn')) {
       setInfoModuleEnabled('warn', true);

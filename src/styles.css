@@ -197,16 +197,6 @@ body {
   stroke-width: 1.75;
 }
 
-/* Der Layout-Toggle ergibt nur im Breitbild-Layout Sinn — schmal ist ohnehin
-   nur das gestapelte Layout vorgesehen. */
-.iconbtn--side {
-  display: none;
-}
-
-.iconbtn--side.is-on {
-  color: var(--accent);
-}
-
 /* Badge für aktive Zivilschutz-Warnungen — sticht bewusst farblich hervor. */
 .iconbtn--warn {
   color: var(--accent);
@@ -1566,16 +1556,6 @@ body {
   }
 }
 
-@media (min-width: 900px) {
-  .iconbtn--side {
-    display: inline-flex;
-  }
-
-  /* Das eigentliche Breitbild-Grid (Zifferblatt bleibt Mitte, Module links/
-     rechts nach Thema) steht gebündelt in Abschnitt „9 — Breitbild-Layout“
-     weiter unten — hier nur der Toggle-Button-Sichtbarkeitsschalter. */
-}
-
 /* Sonnenstunden-Panels (§31.2, §31.3) */
 .onboard__card.sunhours {
   text-align: left;
@@ -1997,13 +1977,8 @@ body {
   border-color: color-mix(in srgb, var(--accent) 50%, transparent);
 }
 
-#layout-toggle,
 #burger {
   border: none;
-}
-
-#layout-toggle.is-on {
-  color: var(--accent);
 }
 
 .btn--primary,
@@ -2217,6 +2192,7 @@ body {
 
 .locbar {
   align-items: flex-start;
+  align-self: stretch;
   gap: 10px;
   border-bottom: 1px solid var(--hair);
   padding-bottom: 18px;
