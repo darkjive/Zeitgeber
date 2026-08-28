@@ -52,12 +52,20 @@ Danach **neu deployen**, damit die Variablen greifen.
 Der Endpunkt `GET /api/cron` prüft die fälligen Erinnerungen und stellt sie zu.
 Er muss regelmäßig (etwa alle 15 Minuten) angestoßen werden.
 
-**Variante A – kostenlos, über GitHub Actions** (empfohlen bei Vercel Hobby):
-Der Workflow `.github/workflows/push-cron.yml` liegt schon bereit. Setze zwei
-Repository-Secrets (Settings → Secrets and variables → Actions):
+**Variante A – kostenlos, über cron-job.org** (empfohlen bei Vercel Hobby):
+GitHub-Actions-Zeitpläne laufen oft stark verzögert oder pausieren bei
+Repo-Inaktivität – daher [console.cron-job.org](https://console.cron-job.org/)
+statt Actions-Workflow:
 
-- `ZEITGEBER_CRON_URL` = `https://<deine-domain>/api/cron`
-- `CRON_SECRET` = derselbe Wert wie oben
+1. Konto anlegen / einloggen auf console.cron-job.org.
+2. **Create cronjob** → Titel z. B. „Zeitgeber Push".
+3. **URL**: `https://<deine-domain>/api/cron`
+4. **Schedule**: alle 15 Minuten (`*/15 * * * *` bzw. „Every 15 minutes").
+5. Unter **Advanced → Headers** einen Header hinzufügen:
+   `Authorization: Bearer <CRON_SECRET>` (derselbe Wert wie die Vercel-Variable
+   `CRON_SECRET`).
+6. **Request method**: `GET`, Timeout ausreichend hoch (z. B. 30 s) lassen.
+7. Speichern und einmal manuell über **Run now** testen.
 
 **Variante B – Vercel Cron** (braucht den Pro-Plan für Intervalle unter 1 Tag):
 `vercel.json` um einen Cron ergänzen – Vercel schickt `CRON_SECRET` automatisch
@@ -73,8 +81,8 @@ als `Authorization: Bearer …` mit:
 
 1. App öffnen → Menü → **Erinnerungen** → einschalten und Benachrichtigungen
    erlauben. Der Status sollte **„Hintergrund-Push aktiv"** anzeigen.
-2. Den Zeitgeber einmal von Hand auslösen: in GitHub unter *Actions →
-   „Push reminders (cron)" → Run workflow*, oder per
+2. Den Zeitgeber einmal von Hand auslösen: in console.cron-job.org über
+   **Run now**, oder per
    `curl -H "Authorization: Bearer <CRON_SECRET>" https://<domain>/api/cron`.
    Die Antwort nennt `checked`/`sent`.
 3. Ein echter Hinweis kommt, sobald ein Ereignis in sein Vorlauf-Fenster fällt
