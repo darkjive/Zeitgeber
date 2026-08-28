@@ -23,7 +23,11 @@ const SENT_TTL_S = 90_000; // ~25 h: dieselbe Erinnerung kommt nur einmal am Tag
 
 function authorized(req: VercelRequest): boolean {
   const secret = process.env.CRON_SECRET;
-  if (!secret) return true; // ohne Secret offen — nur für lokale Tests, Doku rät zum Secret
+  if (!secret) {
+    // Ohne Secret nur außerhalb von Produktion offen (lokale Tests/Preview) —
+    // in Produktion darf der Endpoint ohne Secret nicht erreichbar sein.
+    return process.env.VERCEL_ENV !== 'production';
+  }
   const header = req.headers.authorization;
   const key = req.query.key;
   return header === `Bearer ${secret}` || key === secret;
