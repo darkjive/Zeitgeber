@@ -375,29 +375,6 @@ app.innerHTML = `
     </div>
 
     <main class="stage">
-      <header class="locbar">
-        <div class="locbar__row">
-          <div class="locbar__cell" id="weather-now" hidden>
-            <span class="locbar__k" id="weather-now-icon"></span>
-            <span class="locbar__v" id="weather-now-temp">–</span>
-            <span class="locbar__sub" id="weather-now-label"></span>
-          </div>
-
-          <form class="locbar__cell loc" id="loc-search">
-            <span class="locbar__k loc__pin">${icon('map-pin')}</span>
-            <input class="locbar__v" id="loc-input" type="text" autocomplete="off" />
-            <button class="loc__submit" type="submit" data-i18n="loc.manual"></button>
-            <span class="locbar__sub" id="loc-msg" hidden></span>
-          </form>
-
-          <div class="locbar__cell" id="weather" hidden>
-            <span class="locbar__k">${icon('eye')}<span class="sr-only" data-i18n="weather.title"></span></span>
-            <span class="locbar__v" id="weather-badge">–</span>
-            <span class="locbar__sub" id="weather-sub"></span>
-          </div>
-        </div>
-      </header>
-
       <div class="view-wrap" id="view-wrap"></div>
 
       <div class="dial-tip" id="dial-tip" role="tooltip" hidden></div>
@@ -436,6 +413,29 @@ app.innerHTML = `
           <span class="sky__sub" id="sunset">–</span>
         </div>
       </section>
+
+      <header class="locbar">
+        <div class="locbar__row">
+          <div class="locbar__cell" id="weather-now" hidden>
+            <span class="locbar__k" id="weather-now-icon"></span>
+            <span class="locbar__v" id="weather-now-temp">–</span>
+            <span class="locbar__sub" id="weather-now-label"></span>
+          </div>
+
+          <form class="locbar__cell loc" id="loc-search">
+            <span class="locbar__k loc__pin">${icon('map-pin')}</span>
+            <input class="locbar__v" id="loc-input" type="text" autocomplete="off" />
+            <button class="loc__submit" type="submit" data-i18n="loc.manual"></button>
+            <span class="locbar__sub" id="loc-msg" hidden></span>
+          </form>
+
+          <div class="locbar__cell" id="weather" hidden>
+            <span class="locbar__k">${icon('eye')}<span class="sr-only" data-i18n="weather.title"></span></span>
+            <span class="locbar__v" id="weather-badge">–</span>
+            <span class="locbar__sub" id="weather-sub"></span>
+          </div>
+        </div>
+      </header>
     </main>
 
     <aside class="side side--left">
