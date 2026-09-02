@@ -15,7 +15,6 @@ const KIND_ICON: Record<string, IconName> = {
   star: 'star',
   dso: 'sparkles',
   satellite: 'satellite',
-  aircraft: 'plane',
 };
 
 export function renderObjectList(objects: CelestialObject[], t: Translator): HTMLElement {

@@ -7,7 +7,7 @@
 
 import type { GeoLocation, HorizontalCoords } from './astro-engine';
 
-export type ObjectKind = 'sun' | 'moon' | 'planet' | 'star' | 'satellite' | 'aircraft' | 'dso';
+export type ObjectKind = 'sun' | 'moon' | 'planet' | 'star' | 'satellite' | 'dso';
 
 export interface CelestialObject {
   id: string;

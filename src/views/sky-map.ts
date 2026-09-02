@@ -62,7 +62,7 @@ export function renderSkyMap(objects: CelestialObject[], t: Translator): { svg: 
   const visible = objects.filter((o) => o.horizontal.elevation > 0);
 
   // Sterne zuerst (Hintergrund), dann Planeten, dann Sonne/Mond obenauf.
-  const order: Record<string, number> = { star: 0, dso: 0, planet: 1, satellite: 1, aircraft: 1, moon: 2, sun: 3 };
+  const order: Record<string, number> = { star: 0, dso: 0, planet: 1, satellite: 1, moon: 2, sun: 3 };
   visible.sort((a, b) => (order[a.kind] ?? 1) - (order[b.kind] ?? 1));
 
   for (const o of visible) {

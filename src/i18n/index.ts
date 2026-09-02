@@ -24,13 +24,11 @@ const de: Dict = {
   'object.star': 'Stern',
   'object.dso': 'Deep-Sky-Objekt',
   'object.satellite': 'Satellit',
-  'object.aircraft': 'Flugzeug',
 
   'layer.planets': 'Planeten',
   'layer.stars': 'Sterne',
   'layer.deepsky': 'Deep Sky',
   'layer.satellites': 'Satelliten',
-  'layer.aircraft': 'Flugzeuge',
 
   'sat.button': 'ISS & Satelliten',
   'sat.title': 'ISS & Satelliten',
@@ -442,13 +440,11 @@ const en: Dict = {
   'object.star': 'Star',
   'object.dso': 'Deep-sky object',
   'object.satellite': 'Satellite',
-  'object.aircraft': 'Aircraft',
 
   'layer.planets': 'Planets',
   'layer.stars': 'Stars',
   'layer.deepsky': 'Deep sky',
   'layer.satellites': 'Satellites',
-  'layer.aircraft': 'Aircraft',
 
   'sat.button': 'ISS & satellites',
   'sat.title': 'ISS & satellites',

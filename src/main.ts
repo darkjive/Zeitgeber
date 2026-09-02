@@ -32,9 +32,7 @@ import { planetsProvider } from './providers/planets';
 import { starsProvider } from './providers/stars';
 import { deepSkyProvider } from './providers/deep-sky';
 import { satellitesProvider } from './providers/satellites';
-import { aircraftProvider } from './providers/aircraft';
 import { renderSatCard, refreshTles } from './features/satellites';
-import { fetchAircraft } from './features/aircraft';
 import { renderDial } from './views/dial';
 import { renderObjectList } from './views/object-list';
 import { renderSkyMap } from './views/sky-map';
@@ -81,12 +79,11 @@ bus.register(planetsProvider); // optional, standardmäßig deaktiviert (§7.4)
 bus.register(starsProvider); // optional, standardmäßig deaktiviert (§7.4)
 bus.register(deepSkyProvider); // optional, standardmäßig deaktiviert (§7.4)
 bus.register(satellitesProvider); // optional, standardmäßig deaktiviert (§7.4)
-bus.register(aircraftProvider); // optional, standardmäßig deaktiviert (§7.4)
 
 const app = document.getElementById('app') as HTMLElement;
 let wall: WallMode;
 type ViewId = 'dial' | 'list' | 'map';
-type LayerId = 'planets' | 'stars' | 'deep-sky' | 'satellites' | 'aircraft';
+type LayerId = 'planets' | 'stars' | 'deep-sky' | 'satellites';
 let currentView: ViewId = 'dial';
 let weather: WeatherNow | null = null;
 let civilWarnings: CivilWarning[] = [];
@@ -164,7 +161,6 @@ const LAYERS: LayerDef[] = [
   { id: 'stars', labelKey: 'layer.stars', icon: 'star', color: '#E0C24E' },
   { id: 'deep-sky', labelKey: 'layer.deepsky', icon: 'telescope', color: '#8D6FE7' },
   { id: 'satellites', labelKey: 'layer.satellites', icon: 'satellite', color: '#4FB6A0' },
-  { id: 'aircraft', labelKey: 'layer.aircraft', icon: 'plane', color: '#5AA0D6' },
 ];
 
 const LAYERS_KEY = 'zeitgeber.layers';
@@ -191,7 +187,6 @@ function setLayerEnabled(id: LayerId, on: boolean): void {
   saveEnabledLayers();
   // Frische Netzdaten nur beim Einschalten (§20).
   if (on && id === 'satellites') void refreshTles().then(() => rerender());
-  if (on && id === 'aircraft') void fetchAircraft(location).then(() => rerender());
 }
 
 for (const id of loadEnabledLayers()) bus.setEnabled(id, true);
@@ -1060,10 +1055,6 @@ async function boot(): Promise<void> {
     if (enabledInfoModules.has('sat')) void refreshTles().then(() => rerender());
     if (enabledInfoModules.has('comfort')) void refreshComfortTemps(location).then(() => rerender());
   }, 15 * 60_000);
-  // Flugzeuge nur bei aktiver Ansicht nachladen (§20, Rate-Limits beachten).
-  window.setInterval(() => {
-    if (bus.isEnabled('aircraft')) void fetchAircraft(location);
-  }, 12_000);
 }
 
 void boot();
