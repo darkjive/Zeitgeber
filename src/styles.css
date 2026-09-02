@@ -732,6 +732,7 @@ body {
 .locbar__v {
   font-family: var(--font-mono);
   font-size: var(--fs-md);
+  overflow-wrap: break-word;
 }
 
 .locbar__sub {
