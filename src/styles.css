@@ -2366,6 +2366,20 @@ body {
     letter-spacing: 0.14em;
   }
 
+  /* Zeitschritte und Datumsfeld auf eine Breite bringen (fluchten sonst
+     nicht: Stepper zentriert schmaler als die Datumszeile darunter). */
+  .stepper {
+    width: 100%;
+  }
+
+  .stepper .chip {
+    flex: 1;
+  }
+
+  .t-input {
+    flex: 1;
+  }
+
   .view-wrap {
     padding: 14px;
     width: 100%;
