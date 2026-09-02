@@ -702,7 +702,7 @@ body {
 
 .locbar__row {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr);
 }
 
 .locbar__cell {
@@ -719,6 +719,8 @@ body {
 
 .loc.locbar__cell {
   cursor: text;
+  align-items: center;
+  text-align: center;
 }
 
 .locbar__k {
@@ -764,6 +766,10 @@ body {
   padding: 0;
   width: 100%;
   color: inherit;
+  text-align: center;
+  font-size: var(--fs-md);
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #loc-input::placeholder {
@@ -781,7 +787,7 @@ body {
    Knopf nebeneinander), bleibt aber innerhalb der Box statt eines eigenen
    Formulars unter der Datenzeile. */
 .loc__submit {
-  align-self: flex-start;
+  align-self: center;
   margin-top: 2px;
   height: 26px;
   padding: 0 10px;
