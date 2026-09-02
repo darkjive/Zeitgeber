@@ -871,8 +871,10 @@ function wireEvents(): void {
   $('#view-map').addEventListener('click', () => setView('map'));
   $('#view-list').addEventListener('click', () => setView('list'));
 
-  // Planeten-Tooltip: der Name steht nicht mehr fest am Ring (überlagerte
-  // Himmelsrichtungen/andere Marker), sondern erscheint nur bei Hover/Tap.
+  // Zifferblatt-Tooltip: Beschriftung für Planeten, Sonne/Mond, Dämmerungs-
+  // zonen, Sonnenhöchststand/gesetzlichen Mittag, Analog-Zeiger und
+  // Schlaffenster steht nicht dauerhaft am Ring (überlagert sich sonst mit
+  // Himmelsrichtungen/anderen Markern), sondern erscheint nur bei Hover/Tap.
   // Delegation auf #view-wrap, weil das SVG bei jedem Tick neu aufgebaut wird.
   const dialTip = $('#dial-tip');
   let tipHideTimer: number | undefined;
@@ -890,18 +892,18 @@ function wireEvents(): void {
   };
   const viewWrap = $('#view-wrap');
   viewWrap.addEventListener('mouseover', (e) => {
-    const planet = (e.target as Element).closest('.dial__planet');
-    if (planet) showTip(planet);
+    const hinted = (e.target as Element).closest('.dial__hint');
+    if (hinted) showTip(hinted);
   });
   viewWrap.addEventListener('mouseout', (e) => {
-    if ((e.target as Element).closest('.dial__planet')) hideTip();
+    if ((e.target as Element).closest('.dial__hint')) hideTip();
   });
   viewWrap.addEventListener('click', (e) => {
-    const planet = (e.target as Element).closest('.dial__planet');
-    if (!planet) return;
+    const hinted = (e.target as Element).closest('.dial__hint');
+    if (!hinted) return;
     e.stopPropagation();
     window.clearTimeout(tipHideTimer);
-    showTip(planet);
+    showTip(hinted);
     tipHideTimer = window.setTimeout(hideTip, 2500);
   });
   document.addEventListener('click', hideTip);

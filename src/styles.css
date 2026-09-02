@@ -273,8 +273,8 @@ body {
   transition: transform 4s ease;
 }
 
-/* Planeten-Tooltip (Hover/Touch statt dauerhaftem Namen am Ring) */
-.dial__planet {
+/* Zifferblatt-Tooltip (Hover/Touch statt dauerhafter Beschriftung am Ring) */
+.dial__hint {
   cursor: pointer;
 }
 

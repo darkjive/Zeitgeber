@@ -161,12 +161,17 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
 
   const zoneLayer = el('g', {});
   for (const s of segs) {
-    zoneLayer.appendChild(
-      el('path', {
-        d: annularSector(R_TIME_OUT, R_TIME_IN, hourToAngle(s.from), hourToAngle(s.to)),
-        fill: zoneColor[s.zone] ?? palette.ringNight,
-      }),
-    );
+    const zoneName = t(`zone.${s.zone}`);
+    const path = el('path', {
+      d: annularSector(R_TIME_OUT, R_TIME_IN, hourToAngle(s.from), hourToAngle(s.to)),
+      fill: zoneColor[s.zone] ?? palette.ringNight,
+      class: 'dial__hint',
+      'data-name': zoneName,
+    });
+    const title = el('title', {});
+    title.textContent = zoneName;
+    path.appendChild(title);
+    zoneLayer.appendChild(path);
   }
   svg.appendChild(zoneLayer);
 
@@ -231,11 +236,26 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
   if (solarNoonHour != null) {
     const a = hourToAngle(solarNoonHour);
     const [sx, sy] = polar((R_TIME_OUT + R_TIME_IN) / 2, a);
-    svg.appendChild(el('circle', { cx: sx, cy: sy, r: 9, fill: palette.accent }));
-    svg.appendChild(el('circle', { cx: sx, cy: sy, r: 9, fill: 'none', stroke: palette.bg, 'stroke-width': 1 }));
+    const solarNoonName = t('dial.solarNoon', {
+      time: new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(times.solarNoon),
+    });
+    const noonMarker = el('g', { class: 'dial__hint', 'data-name': solarNoonName });
+    noonMarker.appendChild(el('circle', { cx: sx, cy: sy, r: 9, fill: palette.accent }));
+    noonMarker.appendChild(el('circle', { cx: sx, cy: sy, r: 9, fill: 'none', stroke: palette.bg, 'stroke-width': 1 }));
+    const noonTitle = el('title', {});
+    noonTitle.textContent = solarNoonName;
+    noonMarker.appendChild(noonTitle);
+    svg.appendChild(noonMarker);
+
     // dünne Linie von 12:00-Position zum Marker verdeutlicht die Abweichung
     const [nx, ny] = polar((R_TIME_OUT + R_TIME_IN) / 2, hourToAngle(12));
-    svg.appendChild(el('circle', { cx: nx, cy: ny, r: 3, fill: palette.textDim }));
+    const legalNoonName = t('dial.legalNoon');
+    const legalMarker = el('g', { class: 'dial__hint', 'data-name': legalNoonName });
+    legalMarker.appendChild(el('circle', { cx: nx, cy: ny, r: 3, fill: palette.textDim }));
+    const legalTitle = el('title', {});
+    legalTitle.textContent = legalNoonName;
+    legalMarker.appendChild(legalTitle);
+    svg.appendChild(legalMarker);
   }
 
   // --- Kompassring innen: Sonne & Mond an ihrer Azimut-Position -----------
@@ -265,14 +285,21 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
   const hourAngle = (nowHour % 12) * 30;
   const minuteAngle = minuteOfHour * 6;
   const secondAngle = secondOfMinute * 6;
-  const hands = el('g', { opacity: 0.32 });
+  const hand = (x2: number, y2: number, width: number, color: string, nameKey: string): SVGElement => {
+    const name = t(nameKey);
+    const g = el('g', { class: 'dial__hint', opacity: 0.32, 'data-name': name });
+    g.appendChild(el('line', { x1: C, y1: C, x2, y2, stroke: color, 'stroke-width': width, 'stroke-linecap': 'round' }));
+    const title = el('title', {});
+    title.textContent = name;
+    g.appendChild(title);
+    return g;
+  };
   const [hhx, hhy] = polar(65, hourAngle);
-  hands.appendChild(el('line', { x1: C, y1: C, x2: hhx, y2: hhy, stroke: palette.text, 'stroke-width': 3, 'stroke-linecap': 'round' }));
+  svg.appendChild(hand(hhx, hhy, 3, palette.text, 'dial.hourHand'));
   const [mhx, mhy] = polar(100, minuteAngle);
-  hands.appendChild(el('line', { x1: C, y1: C, x2: mhx, y2: mhy, stroke: palette.text, 'stroke-width': 2, 'stroke-linecap': 'round' }));
+  svg.appendChild(hand(mhx, mhy, 2, palette.text, 'dial.minuteHand'));
   const [shx, shy] = polar(128, secondAngle);
-  hands.appendChild(el('line', { x1: C, y1: C, x2: shx, y2: shy, stroke: palette.accent, 'stroke-width': 1, 'stroke-linecap': 'round' }));
-  svg.appendChild(hands);
+  svg.appendChild(hand(shx, shy, 1, palette.accent, 'dial.secondHand'));
 
   // Planeten (nur wenn der Layer aktiv ist, §7.4): Größe nach Helligkeit,
   // eigene Farbe. Der Name steht nicht mehr dauerhaft am Ring (überlagerte
@@ -286,7 +313,7 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
       cy: py,
       r: planetRadius(p.magnitude),
       fill: PLANET_COLOR[p.id] ?? palette.secondary,
-      class: 'dial__planet',
+      class: 'dial__hint',
       'data-name': t(p.nameKey),
     });
     const title = el('title', {});
@@ -308,7 +335,7 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
       // Blende die Kompass-Linie hinter dem Marker aus, damit dieser bei
       // reduzierter Deckkraft (unter dem Horizont) trotzdem darüber liegt.
       svg.appendChild(el('circle', { cx: ox, cy: oy, r, fill: palette.bg }));
-      const g = el('g', { opacity: above ? 1 : 0.35, class: 'dial__planet', 'data-name': t('object.sun') });
+      const g = el('g', { opacity: above ? 1 : 0.35, class: 'dial__hint', 'data-name': t('object.sun') });
       for (let i = 0; i < 8; i++) {
         const rad = (i / 8) * 2 * Math.PI;
         g.appendChild(
@@ -332,7 +359,7 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
       // Blende die Kompass-Linie hinter dem Marker aus, damit dieser bei
       // reduzierter Deckkraft (unter dem Horizont) trotzdem darüber liegt.
       svg.appendChild(el('circle', { cx: ox, cy: oy, r: 8, fill: palette.bg }));
-      const g = el('g', { opacity: above ? 1 : 0.3, class: 'dial__planet', 'data-name': t('object.moon') });
+      const g = el('g', { opacity: above ? 1 : 0.3, class: 'dial__hint', 'data-name': t('object.moon') });
       g.appendChild(el('circle', { cx: ox, cy: oy, r: 8, fill: palette.secondary }));
       // Beleuchtungsgrad als Sichel andeuten
       const illum = (obj.metadata?.illumination as number) ?? 0.5;
@@ -350,7 +377,9 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
     const onsetH = state.chrono.idealOnsetMin / 60;
     let wakeH = state.chrono.idealWakeMin / 60;
     if (wakeH <= onsetH) wakeH += 24; // Schlaffenster über Mitternacht
-    svg.appendChild(
+    const sleepName = t('dial.sleepWindow');
+    const sleepGroup = el('g', { class: 'dial__hint', 'data-name': sleepName });
+    sleepGroup.appendChild(
       el('path', {
         d: annularSector(R_SLEEP + 5, R_SLEEP - 5, hourToAngle(onsetH), hourToAngle(wakeH)),
         fill: palette.secondary,
@@ -358,7 +387,11 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
       }),
     );
     const [mx, my] = polar(R_SLEEP, hourToAngle(state.chrono.msfScMin / 60));
-    svg.appendChild(el('circle', { cx: mx, cy: my, r: 4, fill: palette.secondary }));
+    sleepGroup.appendChild(el('circle', { cx: mx, cy: my, r: 4, fill: palette.secondary }));
+    const sleepTitle = el('title', {});
+    sleepTitle.textContent = sleepName;
+    sleepGroup.appendChild(sleepTitle);
+    svg.appendChild(sleepGroup);
   }
 
   // --- Zeiger auf die aktuelle gesetzliche Zeit ---------------------------
