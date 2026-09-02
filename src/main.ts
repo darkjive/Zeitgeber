@@ -420,7 +420,7 @@ app.innerHTML = `
 
       <section class="sky">
         <div class="sky__cell">
-          <span class="sky__k">${icon('sun')}<span class="sr-only" data-i18n="object.sun"></span></span>
+          <span class="sky__k">${icon('angle')}<span class="sr-only" data-i18n="object.sun"></span></span>
           <span class="sky__v" id="sun-elev">–</span>
           <span class="sky__sub" id="sun-dir">–</span>
         </div>
