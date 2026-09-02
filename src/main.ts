@@ -377,6 +377,12 @@ app.innerHTML = `
     <main class="stage">
       <header class="locbar">
         <div class="locbar__row">
+          <div class="locbar__cell" id="weather-now" hidden>
+            <span class="locbar__k" id="weather-now-icon"></span>
+            <span class="locbar__v" id="weather-now-temp">–</span>
+            <span class="locbar__sub" id="weather-now-label"></span>
+          </div>
+
           <form class="locbar__cell loc" id="loc-search">
             <span class="locbar__k loc__pin">${icon('map-pin')}</span>
             <input class="locbar__v" id="loc-input" type="text" autocomplete="off" />
@@ -388,12 +394,6 @@ app.innerHTML = `
             <span class="locbar__k">${icon('eye')}<span class="sr-only" data-i18n="weather.title"></span></span>
             <span class="locbar__v" id="weather-badge">–</span>
             <span class="locbar__sub" id="weather-sub"></span>
-          </div>
-
-          <div class="locbar__cell" id="weather-now" hidden>
-            <span class="locbar__k" id="weather-now-icon"></span>
-            <span class="locbar__v" id="weather-now-temp">–</span>
-            <span class="locbar__sub" id="weather-now-label"></span>
           </div>
         </div>
       </header>
