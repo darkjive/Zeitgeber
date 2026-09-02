@@ -207,26 +207,34 @@ export function renderDial(state: DialState): { svg: SVGElement; a11yLabel: stri
       let toH = localHour(arc.to, tz);
       if (fromH == null || toH == null) continue;
       if (toH <= fromH) toH += 24; // Fenster über Mitternacht
-      ov.appendChild(
-        el('path', {
-          d: arcStroke(R_OVERLAY, hourToAngle(fromH), hourToAngle(toH)),
-          fill: 'none',
-          stroke: arc.color,
-          'stroke-width': 5,
-          'stroke-linecap': 'round',
-          opacity: 0.9,
-        }),
-      );
+      const name = t(arc.labelKey);
+      const path = el('path', {
+        d: arcStroke(R_OVERLAY, hourToAngle(fromH), hourToAngle(toH)),
+        fill: 'none',
+        stroke: arc.color,
+        'stroke-width': 5,
+        'stroke-linecap': 'round',
+        opacity: 0.9,
+        class: 'dial__hint',
+        'data-name': name,
+      });
+      const title = el('title', {});
+      title.textContent = name;
+      path.appendChild(title);
+      ov.appendChild(path);
     }
     for (const mk of state.overlay.markers) {
       const h = localHour(mk.at, tz);
       if (h == null) continue;
       const [mx, my] = polar(R_OVERLAY, hourToAngle(h));
-      if (mk.hollow) {
-        ov.appendChild(el('circle', { cx: mx, cy: my, r: 4.5, fill: palette.bg, stroke: mk.color, 'stroke-width': 2 }));
-      } else {
-        ov.appendChild(el('circle', { cx: mx, cy: my, r: 4.5, fill: mk.color }));
-      }
+      const name = t(mk.labelKey);
+      const circle = mk.hollow
+        ? el('circle', { cx: mx, cy: my, r: 4.5, fill: palette.bg, stroke: mk.color, 'stroke-width': 2, class: 'dial__hint', 'data-name': name })
+        : el('circle', { cx: mx, cy: my, r: 4.5, fill: mk.color, class: 'dial__hint', 'data-name': name });
+      const title = el('title', {});
+      title.textContent = name;
+      circle.appendChild(title);
+      ov.appendChild(circle);
     }
     svg.appendChild(ov);
   }
