@@ -732,7 +732,7 @@ body {
 .locbar__v {
   font-family: var(--font-mono);
   font-size: var(--fs-md);
-  overflow-wrap: break-word;
+  white-space: nowrap;
 }
 
 .locbar__sub {
@@ -2417,7 +2417,12 @@ body {
     font-size: var(--fs-md);
   }
 
+  /* vw statt Container-Query-Units: `container-type` auf .locbar__cell lässt
+     die ganze Grid-Zeile kollabieren (Zusammenspiel Grid-Track + Flex-Column
+     + Size-Containment), vw ist hier unkritisch, da die Spalten immer
+     proportional zur mobilen Viewport-Breite sind. Schrumpft „schlecht“
+     (längster Wert) statt es umzubrechen (white-space:nowrap, Basisregel). */
   .locbar__v {
-    font-size: var(--fs-md);
+    font-size: clamp(11px, 4vw, var(--fs-md));
   }
 }
