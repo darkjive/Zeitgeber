@@ -86,6 +86,9 @@ type ViewId = 'dial' | 'list' | 'map';
 type LayerId = 'planets' | 'stars' | 'deep-sky' | 'satellites';
 let currentView: ViewId = 'dial';
 let weather: WeatherNow | null = null;
+// Der Abruf dauert spürbar; ohne eigenes Flag ist "lädt noch" von "kein Wetter
+// am Ort verfügbar" nicht zu unterscheiden — beides wäre sonst `weather === null`.
+let weatherLoading = true;
 let civilWarnings: CivilWarning[] = [];
 
 // Zeitreise (§24): null = Live (jetzt), sonst eingefrorener Zeitpunkt.
@@ -417,6 +420,7 @@ app.innerHTML = `
       <header class="locbar">
         <div class="locbar__row">
           <div class="locbar__cell" id="weather-now" hidden>
+            <span class="locbar__spinner" aria-hidden="true"></span>
             <span class="locbar__k" id="weather-now-icon"></span>
             <span class="locbar__v" id="weather-now-temp">–</span>
             <span class="locbar__sub" id="weather-now-label"></span>
@@ -430,6 +434,7 @@ app.innerHTML = `
           </form>
 
           <div class="locbar__cell" id="weather" hidden>
+            <span class="locbar__spinner" aria-hidden="true"></span>
             <span class="locbar__k">${icon('eye')}<span class="sr-only" data-i18n="weather.title"></span></span>
             <span class="locbar__v" id="weather-badge">–</span>
             <span class="locbar__sub" id="weather-sub"></span>
@@ -688,12 +693,21 @@ function updateTimebar(now: Date): void {
 function renderWeather(moon?: { horizontal: { elevation: number }; metadata?: Record<string, unknown> }): void {
   const nowPanel = $('#weather-now');
   const panel = $('#weather');
+
+  // Während des Abrufs bleiben beide Zellen sichtbar (reservierter Platz,
+  // §Layout) und zeigen nur den Spinner — kein Ein-/Ausblenden, das die
+  // Ortszeile verschiebt.
+  nowPanel.hidden = false;
+  panel.hidden = false;
+  nowPanel.classList.toggle('is-loading', weatherLoading);
+  panel.classList.toggle('is-loading', weatherLoading);
+  if (weatherLoading) return;
+
   if (!weather) {
     nowPanel.hidden = true;
     panel.hidden = true;
     return;
   }
-  nowPanel.hidden = false;
   const cond = weatherCondition(weather.weatherCode, weather.isDay);
   $('#weather-now-icon').innerHTML = icon(cond.icon);
   $('#weather-now-temp').textContent = `${Math.round(weather.temperatureC)}°`;
@@ -744,7 +758,10 @@ function renderOverlayKey(overlay: DialOverlay | null): void {
 }
 
 async function refreshWeather(): Promise<void> {
+  weatherLoading = true;
+  renderWeather(bus.collect({ time: currentTime(), location }).find((o) => o.kind === 'moon'));
   weather = await fetchWeather(location);
+  weatherLoading = false;
   renderWeather(bus.collect({ time: currentTime(), location }).find((o) => o.kind === 'moon'));
 }
 

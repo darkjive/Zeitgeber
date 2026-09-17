@@ -720,6 +720,43 @@ body {
   color: var(--text);
   font-size: var(--fs-base);
   cursor: default;
+  position: relative;
+}
+
+/* Wetter/Sicht laden spürbar nach (Netz). Die Zelle behält währenddessen ihre
+   Größe (Inhalt bleibt reserviert, nur unsichtbar) und zeigt stattdessen
+   einen zentrierten Spinner — kein Ein-/Ausblenden, das die Zeile verschiebt. */
+.locbar__cell.is-loading > :not(.locbar__spinner) {
+  visibility: hidden;
+}
+
+.locbar__spinner {
+  display: none;
+}
+
+.locbar__cell.is-loading .locbar__spinner {
+  display: block;
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--hair);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: locbar-spin 0.8s linear infinite;
+}
+
+@keyframes locbar-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .locbar__cell.is-loading .locbar__spinner {
+    animation: none;
+  }
 }
 
 .loc.locbar__cell {
