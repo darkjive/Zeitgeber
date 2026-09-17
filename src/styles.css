@@ -266,6 +266,11 @@ body {
   align-self: stretch;
 }
 
+.stage .locbar {
+  align-self: stretch;
+  margin-top: -14px;
+}
+
 .view-wrap {
   width: min(78vw, 340px);
   min-height: 200px;
@@ -662,7 +667,7 @@ body {
 /* Sky strip */
 .sky {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr 1.5fr 1fr;
   gap: 10px;
   border-top: 1px solid color-mix(in srgb, var(--text-dim) 30%, transparent);
   padding-top: 16px;
@@ -702,7 +707,7 @@ body {
 
 .locbar__row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 1fr);
 }
 
 .locbar__cell {
@@ -2212,7 +2217,6 @@ body {
    Trennlinien zwischen den Zellen. */
 
 .locbar__row {
-  border-top: 1px solid var(--hair);
   border-bottom: 1px solid var(--hair);
 }
 
