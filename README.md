@@ -11,6 +11,8 @@ Open Source (AGPL-3.0) · TypeScript strict · Web (PWA) + iOS/Android · offlin
 <img src="./docs/screenshot-dark.png" alt="Zeitgeber — Zifferblatt bei Nacht, mit Dämmerungszonen, gesetzlicher Zeit und Sonnenzeit" width="280" />
 <img src="./docs/screenshot-light.png" alt="Zeitgeber — Zifferblatt bei Tag, mit Dämmerungszonen, gesetzlicher Zeit und Sonnenzeit" width="280" />
 
+<img src="./docs/screenshot-desktop.png" alt="Zeitgeber am Desktop — Zifferblatt mit Komfort-, Outdoor- und Astronomie-Modulen in drei Spalten" width="720" />
+
 </div>
 
 ---
