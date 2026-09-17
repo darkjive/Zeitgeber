@@ -598,7 +598,7 @@ function render(now: Date): void {
 
   const tz = utcOffsetMinutes(now, location.timeZone);
   const { palette, nightness, sky } = paletteForElevation(sun?.horizontal.elevation ?? -90);
-  applyPalette(palette, sky);
+  applyPalette(palette, sky, nightness);
   wall?.setNightness(nightness);
 
   // Ansicht (Achse B): Zifferblatt, Himmelskarte oder Objektliste
@@ -807,6 +807,7 @@ async function exportCurrentView(): Promise<void> {
 function applyPalette(
   p: ReturnType<typeof paletteForElevation>['palette'],
   sky: ReturnType<typeof paletteForElevation>['sky'],
+  nightness: number,
 ): void {
   const r = document.documentElement.style;
   r.setProperty('--bg', p.bg);
@@ -818,6 +819,11 @@ function applyPalette(
   r.setProperty('--text', p.text);
   r.setProperty('--text-dim', p.textDim);
   r.setProperty('--on-accent', p.onAccent);
+  // Das Datumsfeld ist ein natives <input>; sein Kalender-Icon zeichnet der
+  // Browser nach `color-scheme`, nicht nach unseren Palette-Variablen. Die
+  // App wechselt Tag/Nacht nach Sonnenstand, nicht nach OS-Einstellung —
+  // ohne diese Zeile bliebe das Icon bei Nacht dunkel auf dunklem Grund.
+  r.colorScheme = nightness > 0.5 ? 'dark' : 'light';
 }
 
 // --- Interaktion ------------------------------------------------------------
