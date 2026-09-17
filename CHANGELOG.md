@@ -50,7 +50,7 @@ plus nativer Aufsatz auf geteilter, UI-freier Berechnungsebene.
 - Barrierefreiheit: axe-core-Durchlauf (WCAG 2.0/2.1/2.2 A+AA) mit 0 Verstößen
 - 68 Unit-Tests gegen Referenzwerte und physikalische Invarianten
 - Lokalisierung DE/EN; rein lokale Datenhaltung, kein Backend, kein Tracking
-- Bundle deutlich unter 500 KB; Open Source (MIT), Finanzierung über Spenden
+- Bundle deutlich unter 500 KB; Open Source (AGPL-3.0), Finanzierung über Spenden
 
 ### Nativer Aufsatz (React Native + Expo)
 
