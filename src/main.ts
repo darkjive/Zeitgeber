@@ -225,6 +225,8 @@ interface InfoModuleDef {
   render: (now: Date) => string;
   /** Einmaliges Nachladen von Netzdaten, wenn die Karte eingeschaltet wird (§20). */
   onEnable?: () => void;
+  /** Kurzer Zusatztext unter dem Label im Menü, z. B. eine Länder-Einschränkung. */
+  hintKey?: string;
 }
 
 // Info-Module — reine Anzeige, bleiben als Dauer-Karte im Content-Bereich
@@ -258,6 +260,7 @@ const INFO_MODULES: InfoModuleDef[] = [
     color: '#C94F3D',
     side: 'left',
     render: () => renderWarnCard(civilWarnings, nearestKreis(location)?.name ?? null, lang, t),
+    hintKey: 'warn.outsideDe',
   },
   { key: 'drone', labelKey: 'drone.button', titleKey: 'drone.title', icon: 'radar', color: '#5AA0D6', side: 'right', render: (now) => renderDroneCard(location, now, t) },
   { key: 'wheel', labelKey: 'wheel.button', titleKey: 'wheel.title', icon: 'orbit', color: '#C77FA8', side: 'right', render: (now) => renderWheelCard(now, t) },
@@ -518,7 +521,10 @@ function buildDrawer(): void {
     (m) => `
     <button class="mrow" data-info="${m.key}" role="switch" aria-checked="${enabledInfoModules.has(m.key)}">
       ${iconSpan(m.icon, m.color)}
-      <span class="mrow__label">${t(m.labelKey)}</span>
+      <span class="mrow__label">
+        ${t(m.labelKey)}
+        ${m.hintKey ? `<span class="mrow__sub">${t(m.hintKey)}</span>` : ''}
+      </span>
       <span class="mrow__switch" aria-hidden="true"></span>
     </button>`,
   ).join('');

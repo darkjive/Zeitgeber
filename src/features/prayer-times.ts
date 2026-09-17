@@ -27,6 +27,7 @@ export function openPrayerTimes(location: GeoLocation, date: Date, t: Translator
   const card = document.createElement('div');
   card.className = 'onboard__card prayer';
   card.innerHTML = `
+    <div class="onboard__handle" aria-hidden="true"></div>
     <div class="onboard__glyph" style="color:#8FA6D8">${icon('moon-star')}</div>
     <h2 class="onboard__title">${t('prayer.title')}</h2>
     <div class="prayer__controls">
@@ -85,6 +86,7 @@ export function openPrayerTimes(location: GeoLocation, date: Date, t: Translator
   methodSel.addEventListener('change', update);
   madhabSel.addEventListener('change', update);
   $('#pt-close').addEventListener('click', () => overlay.remove());
+  card.querySelector('.onboard__handle')?.addEventListener('click', () => overlay.remove());
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) overlay.remove();
   });

@@ -26,6 +26,7 @@ export function openSolarYield(location: GeoLocation, date: Date, t: Translator)
   const card = document.createElement('div');
   card.className = 'onboard__card solar';
   card.innerHTML = `
+    <div class="onboard__handle" aria-hidden="true"></div>
     <div class="onboard__glyph" style="color:#E0A93C">${icon('zap')}</div>
     <h2 class="onboard__title">${t('solar.title')}</h2>
     <div class="solar__controls">
@@ -98,6 +99,7 @@ export function openSolarYield(location: GeoLocation, date: Date, t: Translator)
   azInput.addEventListener('input', update);
   tiltInput.addEventListener('input', update);
   $('#sy-close').addEventListener('click', () => overlay.remove());
+  card.querySelector('.onboard__handle')?.addEventListener('click', () => overlay.remove());
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) overlay.remove();
   });

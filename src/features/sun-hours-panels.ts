@@ -26,12 +26,14 @@ function shell(
   overlay.setAttribute('aria-modal', 'true');
   const card = document.createElement('div');
   card.className = 'onboard__card sunhours';
-  card.innerHTML = `<div class="onboard__glyph" style="color:${glyph.color}">${icon(glyph.icon)}</div>
+  card.innerHTML = `<div class="onboard__handle" aria-hidden="true"></div>
+    <div class="onboard__glyph" style="color:${glyph.color}">${icon(glyph.icon)}</div>
     <h2 class="onboard__title">${t(titleKey)}</h2><div class="sunhours__body"></div>
     <div class="onboard__actions"><span></span><button class="btn btn--primary" data-close>${t('sunhours.close')}</button></div>`;
   overlay.appendChild(card);
   document.body.appendChild(overlay);
   (card.querySelector('[data-close]') as HTMLElement).addEventListener('click', () => overlay.remove());
+  card.querySelector('.onboard__handle')?.addEventListener('click', () => overlay.remove());
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) overlay.remove();
   });

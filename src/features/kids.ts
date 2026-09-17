@@ -80,6 +80,7 @@ export function openKids(location: GeoLocation, date: Date, t: Translator): void
   const card = document.createElement('div');
   card.className = 'onboard__card kids__card';
   card.innerHTML = `
+    <div class="onboard__handle" aria-hidden="true"></div>
     <div class="kids__glyph">${icon(sunUpNow ? 'sun' : 'moon')}</div>
     <p class="kids__q" id="kids-q"></p>
     <p class="kids__a" id="kids-a"></p>
@@ -116,6 +117,7 @@ export function openKids(location: GeoLocation, date: Date, t: Translator): void
     paint();
   });
   $('#kids-close').addEventListener('click', () => overlay.remove());
+  card.querySelector('.onboard__handle')?.addEventListener('click', () => overlay.remove());
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) overlay.remove();
   });

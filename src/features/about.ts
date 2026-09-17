@@ -18,6 +18,7 @@ export function openAbout(t: Translator): void {
   const card = document.createElement('div');
   card.className = 'onboard__card about';
   card.innerHTML = `
+    <div class="onboard__handle" aria-hidden="true"></div>
     <div class="about__mark">${icon('sun')}</div>
     <h2 class="onboard__title">${t('app.title')}</h2>
     <p class="about__tag">${t('app.tagline')}</p>
@@ -42,6 +43,7 @@ export function openAbout(t: Translator): void {
   document.body.appendChild(overlay);
 
   (card.querySelector('#about-close') as HTMLElement).addEventListener('click', () => overlay.remove());
+  card.querySelector('.onboard__handle')?.addEventListener('click', () => overlay.remove());
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) overlay.remove();
   });

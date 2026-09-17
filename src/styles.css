@@ -1002,14 +1002,26 @@ body {
   animation: onboard-sheet-in 0.28s ease;
 }
 
-.onboard--sheet .onboard__card::before {
+/* Der Griff sieht aus wie eine Wischgeste, tut aber nichts, wenn man ihn
+   antippt, statt zu wischen — deshalb ein echtes, klickbares Element statt
+   eines reinen ::before, mit grosszügigerem Treffbereich als der schmale
+   sichtbare Balken. */
+.onboard--sheet .onboard__handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 28px;
+  margin: -8px 0 4px;
+  cursor: pointer;
+}
+
+.onboard--sheet .onboard__handle::before {
   content: '';
-  display: block;
   width: 36px;
   height: 4px;
   border-radius: 2px;
   background: var(--hair-strong, color-mix(in srgb, var(--text-dim) 40%, transparent));
-  margin: 0 auto 16px;
 }
 
 @keyframes onboard-sheet-in {
@@ -1615,6 +1627,13 @@ body {
 .mrow__label {
   flex: 1;
   min-width: 0;
+}
+
+.mrow__sub {
+  display: block;
+  font-size: var(--fs-xs);
+  color: var(--text-dim);
+  font-weight: 400;
 }
 
 .mrow__chev {
