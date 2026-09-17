@@ -2329,6 +2329,10 @@ body {
     gap: 22px;
   }
 
+  :root[data-desktop-layout='columns'] .stage .locbar {
+    margin-top: -22px;
+  }
+
   :root[data-desktop-layout='columns'] .side {
     display: flex;
     flex-direction: column;

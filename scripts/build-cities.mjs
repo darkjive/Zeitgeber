@@ -15,6 +15,7 @@
 
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
+import { find as findTimeZone } from 'geo-tz';
 
 const NEAR = new Set(['DE', 'AT', 'CH', 'LI', 'LU']);
 const MIN_NEAR = 20_000;
@@ -40,7 +41,13 @@ for (const line of readFileSync(src, 'utf8').split('\n')) {
 // Groesste zuerst: bei gleichem Namen gewinnt die groessere Stadt in der Suche.
 rows.sort((a, b) => b.pop - a.pop);
 
-const packed = rows.map((r) => `${r.name}|${r.lat.toFixed(3)}|${r.lon.toFixed(3)}|${r.cc}`).join('\n');
+// Zeitzone pro Ort: ohne sie rechnet die Sonnenzeit (Legal- vs. Sonnenmittag,
+// §Kernuhr) mit der Geraete-Zeitzone statt der des gewaehlten Ortes — falsch,
+// sobald jemand einen Ort ausserhalb der eigenen Zeitzone sucht (z. B. New York
+// von Europa aus). `geo-tz` arbeitet offline anhand der Zeitzonengrenzen.
+const packed = rows
+  .map((r) => `${r.name}|${r.lat.toFixed(3)}|${r.lon.toFixed(3)}|${r.cc}|${findTimeZone(r.lat, r.lon)[0]}`)
+  .join('\n');
 
 const out = `/**
  * cities — GENERIERT von scripts/build-cities.mjs. Nicht von Hand aendern.
@@ -49,9 +56,9 @@ const out = `/**
  * Enthaelt ${rows.length} Orte: DACH ab ${MIN_NEAR.toLocaleString('de-DE')} Einwohnern,
  * weltweit ab ${MIN_WORLD.toLocaleString('de-DE')}.
  *
- * Kompaktes Zeilenformat "Name|Breite|Laenge|Land" statt eines Objekt-Arrays —
- * das spart im Bundle rund zwei Drittel und wird beim ersten Zugriff einmalig
- * geparst (siehe core/location.ts).
+ * Kompaktes Zeilenformat "Name|Breite|Laenge|Land|Zeitzone" statt eines
+ * Objekt-Arrays — das spart im Bundle rund zwei Drittel und wird beim ersten
+ * Zugriff einmalig geparst (siehe core/location.ts).
  */
 
 export const CITIES_PACKED = ${JSON.stringify(packed)};

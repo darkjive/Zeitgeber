@@ -28,6 +28,14 @@ export type LocationSource = 'gps' | 'manual' | 'default';
 
 export interface StoredLocation extends GeoLocation {
   source: LocationSource;
+  /**
+   * IANA-Zeitzone des Ortes. Fehlt sie (GPS-Standort: das Gerät steht ja am
+   * Ort, seine eigene Zeitzone stimmt), rechnet die Sonnenzeit (§time-engine)
+   * mit der Geräte-Zeitzone weiter. Bei einer *manuell* fernen Stadt (z. B.
+   * New York von Europa aus) wäre das falsch — deshalb tragen Städte aus der
+   * mitgelieferten Liste ihre eigene Zeitzone mit.
+   */
+  timeZone?: string;
 }
 
 /**
@@ -39,6 +47,7 @@ export const DEFAULT_LOCATION: StoredLocation = {
   latitude: 49.0069,
   longitude: 8.4037,
   source: 'default',
+  timeZone: 'Europe/Berlin',
 };
 
 /**
@@ -52,12 +61,12 @@ export function loadLocation(): StoredLocation | null {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<StoredLocation> & { label?: string };
-    const { latitude, longitude } = parsed;
+    const { latitude, longitude, timeZone } = parsed;
     if (typeof latitude !== 'number' || typeof longitude !== 'number') return null;
     // Altbestand ohne `source` stammt aus GPS oder manueller Wahl — beides vom
     // Nutzer veranlasst. Ein mitgespeichertes Label wird bewusst verworfen:
     // frühere Versionen konnten dort einen falsch geratenen Ort ablegen.
-    return { latitude, longitude, source: parsed.source ?? 'manual' };
+    return { latitude, longitude, source: parsed.source ?? 'manual', timeZone };
   } catch {
     return null;
   }
@@ -65,8 +74,8 @@ export function loadLocation(): StoredLocation | null {
 
 export function saveLocation(loc: StoredLocation): void {
   try {
-    const { latitude, longitude, source } = loc;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ latitude, longitude, source }));
+    const { latitude, longitude, source, timeZone } = loc;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ latitude, longitude, source, timeZone }));
   } catch {
     /* Persistenz optional — Kernuhr läuft auch ohne. */
   }
@@ -107,6 +116,7 @@ export async function geolocationGranted(): Promise<boolean> {
 export interface City extends GeoLocation {
   label: string;
   country: string;
+  timeZone: string;
 }
 
 let cities: City[] | null = null;
@@ -115,8 +125,8 @@ let cities: City[] | null = null;
 function allCities(): City[] {
   if (cities) return cities;
   cities = CITIES_PACKED.split('\n').map((line) => {
-    const [label, lat, lon, country] = line.split('|');
-    return { label, latitude: +lat, longitude: +lon, country };
+    const [label, lat, lon, country, timeZone] = line.split('|');
+    return { label, latitude: +lat, longitude: +lon, country, timeZone };
   });
   return cities;
 }

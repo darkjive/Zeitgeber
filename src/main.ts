@@ -201,7 +201,7 @@ interface ToolModuleDef {
 
 // Werkzeuge — Formulare/Rechner, öffnen als Bottom-Sheet, auf Zuruf (§7.4).
 const TOOL_MODULES: ToolModuleDef[] = [
-  { key: 'chrono', labelKey: 'chrono.button', icon: 'moon', color: '#8D6FE7', open: (now) => openChronobiology(solarOffset(now, location).minutes, location, now, t, () => rerender()) },
+  { key: 'chrono', labelKey: 'chrono.button', icon: 'moon', color: '#8D6FE7', open: (now) => openChronobiology(solarOffset(now, location, location.timeZone).minutes, location, now, t, () => rerender()) },
   { key: 'solar', labelKey: 'solar.button', icon: 'zap', color: '#E0A93C', open: (now) => openSolarYield(location, now, t) },
   { key: 'arch', labelKey: 'arch.button', icon: 'building-2', color: '#7C93B0', open: (now) => openArchitecture(location, now, t) },
   { key: 'garden', labelKey: 'garden.button', icon: 'sprout', color: '#5FA968', open: (now) => openGarden(location, now, t) },
@@ -585,7 +585,7 @@ function render(now: Date): void {
   const sun = objects.find((o) => o.kind === 'sun');
   const moon = objects.find((o) => o.kind === 'moon');
 
-  const tz = utcOffsetMinutes(now);
+  const tz = utcOffsetMinutes(now, location.timeZone);
   const { palette, nightness, sky } = paletteForElevation(sun?.horizontal.elevation ?? -90);
   applyPalette(palette, sky);
   wall?.setNightness(nightness);
@@ -615,7 +615,7 @@ function render(now: Date): void {
   const legal = fmtTime(now, true);
   $('#legal-time').innerHTML = `${legal.slice(0, -2)}<span class="readout__sec">${legal.slice(-2)}</span>`;
 
-  const off = solarOffset(now, location);
+  const off = solarOffset(now, location, location.timeZone);
   const solarClock = new Date(now.getTime() - off.minutes * 60_000);
   $('#solar-time').textContent = fmtTime(solarClock);
   $('#delta').textContent = Math.abs(off.minutes) < 2 ? '—' : `Δ ${fmtDuration(off.minutes)}`;
@@ -827,9 +827,14 @@ function renderLocbar(): void {
   if (!form.contains(document.activeElement)) input.value = guessed ? '' : placeLabel(location);
 }
 
-/** Nur die Koordinaten wandern in den Zustand — der Name wird stets neu abgeleitet. */
-function setLocation(loc: GeoLocation, source: LocationSource): void {
-  location = { latitude: loc.latitude, longitude: loc.longitude, source };
+/**
+ * Nur die Koordinaten wandern in den Zustand — der Name wird stets neu abgeleitet.
+ * `timeZone` kommt nur mit, wenn die Quelle sie kennt (Städteliste); bei GPS
+ * fehlt sie bewusst — dort gilt die Geräte-Zeitzone (§time-engine), weil man
+ * ja tatsächlich dort steht.
+ */
+function setLocation(loc: GeoLocation & { timeZone?: string }, source: LocationSource): void {
+  location = { latitude: loc.latitude, longitude: loc.longitude, source, timeZone: loc.timeZone };
   saveLocation(location);
   rerender();
   void refreshWeather(); // §28: Wetter am neuen Ort neu holen
