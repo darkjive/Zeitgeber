@@ -1,6 +1,6 @@
 # Mitwirken an Zeitgeber
 
-Danke für dein Interesse! Zeitgeber ist Open Source (MIT) und lebt von
+Danke für dein Interesse! Zeitgeber ist Open Source (AGPL-3.0) und lebt von
 Beiträgen — besonders willkommen sind Genauigkeits-Prüfungen der Berechnungen
 und Übersetzungen.
 

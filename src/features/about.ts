@@ -31,7 +31,7 @@ export function openAbout(t: Translator): void {
 
     <p class="about__meta">
       <a class="about__link" href="${support.repo}" target="_blank" rel="noopener">${t('about.repo')}</a>
-      · v${APP_VERSION} · MIT
+      · v${APP_VERSION} · AGPL-3.0
     </p>
 
     <div class="onboard__actions">

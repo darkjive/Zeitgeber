@@ -6,7 +6,7 @@
 
 _12 Uhr ist fast nie Mittag._
 
-Open Source (MIT) · TypeScript strict · Web (PWA) + iOS/Android · offline · ohne Backend · DE/EN
+Open Source (AGPL-3.0) · TypeScript strict · Web (PWA) + iOS/Android · offline · ohne Backend · DE/EN
 
 <img src="./docs/screenshot-dark.png" alt="Zeitgeber — Zifferblatt bei Nacht, mit Dämmerungszonen, gesetzlicher Zeit und Sonnenzeit" width="280" />
 <img src="./docs/screenshot-light.png" alt="Zeitgeber — Zifferblatt bei Tag, mit Dämmerungszonen, gesetzlicher Zeit und Sonnenzeit" width="280" />
@@ -212,4 +212,4 @@ brauchen einen Test gegen einen Referenzwert.
 
 ## Lizenz
 
-[MIT](./LICENSE).
+[AGPL-3.0](./LICENSE).
