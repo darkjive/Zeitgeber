@@ -82,6 +82,8 @@ Gerät.
 | Für Kinder | fragengeführte, vereinfachte Ansicht mit Beobachtungsaufgabe – ohne Gamification, ohne Datenerhebung |
 | Gebetszeiten | etablierte Konventionen (auswählbar, mit Quelle), reine Zeitangabe |
 | Jahreskreis | Sonnenwenden, Tagundnachtgleichen und Zwischenfeste als exakter astronomischer Zeitpunkt |
+| Zivilschutz-Warnungen | amtliche Warnungen des Bundes für den eigenen Landkreis (nur Deutschland) |
+| Erinnerungen | dynamischer Wecker für fällige Hinweise, im Vordergrund/Wandmodus lokal, optional per Hintergrund-Push |
 | Wetter | Beobachtungseignung über Open-Meteo, mit Offline-Rückfall |
 | Teilen & Export | aktuelle Ansicht als hochauflösendes PNG mit Fußzeile |
 | Wandmodus | lebende Wanduhr mit Abdunklung und Einbrennschutz |
@@ -148,7 +150,8 @@ src/
   views/               Achse B – dial, sky-map, object-list
   features/            Achse C – onboarding, wallmode, weather, share, solar-yield,
                                  prayer-times, chronobiology, outdoor, wheel-of-year,
-                                 sun-hours-panels, comfort, wildlife, drone, module-menu, about
+                                 sun-hours-panels, comfort, wildlife, drone, civil-warnings,
+                                 kids, meteor-showers, reminders, push, satellites, about
   i18n/                DE/EN
   main.ts              App-Shell, verdrahtet die drei Achsen
 
