@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "Zeitgeber — die Uhr, die zeigt, wie weit die soziale Zeit von der Sonnenzeit entfernt ist. Phase-1-MVP (Web-Target).",
-  "license": "MIT",
+  "license": "AGPL-3.0-only",
   "type": "module",
   "scripts": {
     "dev": "vite",
