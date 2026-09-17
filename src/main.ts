@@ -134,8 +134,14 @@ DESKTOP_LAYOUT_QUERY.addEventListener('change', applyDesktopLayout);
 
 // --- Formatierung -----------------------------------------------------------
 
-const fmtTime = (d: Date, withSeconds = false): string =>
+// Ohne timeZone bilden alle Zeit-Readouts immer die Geräte-Zeitzone ab, auch
+// wenn ein anderer Ort ausgewählt ist (§7.1: Sonnenzeit-Versatz ist ortsbezogen,
+// die gesetzliche Zeit muss deshalb konsequent in derselben Ortszeitzone
+// stehen wie der verglichene Sonnenhöchststand — sonst passen beide Zahlen
+// nicht zueinander).
+const fmtTime = (d: Date, withSeconds = false, timeZone?: string): string =>
   new Intl.DateTimeFormat(undefined, {
+    timeZone,
     hour: '2-digit',
     minute: '2-digit',
     ...(withSeconds ? { second: '2-digit' } : {}),
@@ -622,20 +628,21 @@ function render(now: Date): void {
     $('#readout').hidden = true;
   }
 
-  // Zeit-Readout
-  const legal = fmtTime(now, true);
+  // Zeit-Readout — konsequent in der Zeitzone des ausgewählten Ortes, sonst
+  // widerspricht sich die gesetzliche Zeit mit dem verglichenen Sonnenstand.
+  const legal = fmtTime(now, true, location.timeZone);
   $('#legal-time').innerHTML = `${legal.slice(0, -2)}<span class="readout__sec">${legal.slice(-2)}</span>`;
 
   const off = solarOffset(now, location, location.timeZone);
   const solarClock = new Date(now.getTime() - off.minutes * 60_000);
-  $('#solar-time').textContent = fmtTime(solarClock);
+  $('#solar-time').textContent = fmtTime(solarClock, false, location.timeZone);
   $('#delta').textContent = Math.abs(off.minutes) < 2 ? '—' : `Δ ${fmtDuration(off.minutes)}`;
 
   const line = $('#offset-line');
   if (Math.abs(off.minutes) < 2) line.textContent = t('offset.exact');
   else if (off.minutes > 0) line.textContent = t('offset.ahead', { m: fmtDuration(off.minutes) });
   else line.textContent = t('offset.behind', { m: fmtDuration(off.minutes) });
-  $('#offset-explain').textContent = t('offset.explain', { noon: fmtTime(off.solarNoon) });
+  $('#offset-explain').textContent = t('offset.explain', { noon: fmtTime(off.solarNoon, false, location.timeZone) });
 
   // Sky-Strip
   if (sun) {
@@ -651,8 +658,8 @@ function render(now: Date): void {
 
   // Auf-/Untergang
   const times = sunTimes(now, location);
-  $('#sunrise').textContent = times.sunrise ? fmtTime(times.sunrise) : '—';
-  $('#sunset').textContent = times.sunset ? fmtTime(times.sunset) : '—';
+  $('#sunrise').textContent = times.sunrise ? fmtTime(times.sunrise, false, location.timeZone) : '—';
+  $('#sunset').textContent = times.sunset ? fmtTime(times.sunset, false, location.timeZone) : '—';
 
   renderLocbar();
 
