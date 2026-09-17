@@ -7,7 +7,7 @@
  */
 
 import type { GeoLocation } from '../core/astro-engine';
-import { moonInfo, sunPosition } from '../core/astro-engine';
+import { moonInfo, sunPosition, sunTimes } from '../core/astro-engine';
 import { usableLight } from '../core/outdoor';
 import { visibleBrightPlanet } from '../core/kids';
 import { azimuthDirKey, type Translator } from '../i18n';
@@ -18,6 +18,9 @@ interface KidQuestion {
   answer: () => string;
   why: string;
 }
+
+const fmtTime = (d: Date): string =>
+  new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(d);
 
 export function openKids(location: GeoLocation, date: Date, t: Translator): void {
   const overlay = document.createElement('div');
@@ -66,6 +69,35 @@ export function openKids(location: GeoLocation, date: Date, t: Translator): void
         return t('kids.a.moonShape', { phase: t(m.phaseKey), pct: String(Math.round(m.illumination * 100)) });
       },
       why: t('kids.exp.moonShape'),
+    },
+    {
+      q: t('kids.q.sunset'),
+      answer: () => {
+        const times = sunTimes(date, location);
+        return times.sunset ? t('kids.a.sunset', { time: fmtTime(times.sunset) }) : t('kids.a.sunsetNone');
+      },
+      why: t('kids.exp.sunset'),
+    },
+    {
+      q: t('kids.q.sky'),
+      answer: () => {
+        const s = sunPosition(date, location);
+        return s.elevation > -0.833 ? t('kids.a.skyBlue') : t('kids.a.skyDark');
+      },
+      why: t('kids.exp.sky'),
+    },
+    {
+      q: t('kids.q.sameSize'),
+      answer: () => t('kids.a.sameSize'),
+      why: t('kids.exp.sameSize'),
+    },
+    {
+      q: t('kids.q.sleep'),
+      answer: () => {
+        const s = sunPosition(date, location);
+        return s.elevation > -0.833 ? t('kids.a.sleepDay') : t('kids.a.sleepNight');
+      },
+      why: t('kids.exp.sleep'),
     },
   ];
 
