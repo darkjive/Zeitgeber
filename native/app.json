@@ -13,8 +13,18 @@
       }
     },
     "android": {
-      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"]
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0B0D12"
+      }
     },
-    "plugins": ["expo-location"]
+    "plugins": [
+      "expo-location"
+    ],
+    "icon": "./assets/icon.png"
   }
 }
