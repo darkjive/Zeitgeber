@@ -8,6 +8,8 @@ export default defineConfig({
   // Eigenständiges Projekt: nicht die PostCSS-/Tailwind-Konfig des
   // umgebenden Astro-Repos erben.
   css: { postcss: {} },
+  // Eigener Port: 5173 kollidiert mit anderen Vite-Projekten (Service Worker der PWA).
+  server: { port: 5181, strictPort: true },
   build: {
     target: 'es2022',
     outDir: 'dist',
