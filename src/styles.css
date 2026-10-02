@@ -142,8 +142,9 @@ body {
 }
 
 .brand__mark {
+  width: 1.6em;
+  height: 1.6em;
   font-size: var(--fs-lg);
-  color: var(--accent);
 }
 
 .brand__name {

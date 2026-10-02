@@ -352,7 +352,7 @@ app.innerHTML = `
     <header class="topbar">
       <div class="topbar__row">
         <div class="brand">
-          <span class="brand__mark">${icon('sun')}</span>
+          <img class="brand__mark" src="icon.svg" alt="" />
           <div>
             <div class="brand__name" data-i18n="app.title"></div>
             <div class="brand__tag" data-i18n="app.tagline"></div>
